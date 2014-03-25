@@ -1,0 +1,43 @@
+/* Copyright 2014 SoFIE Studios. All rights reserved.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file.
+ */
+
+/**
+ * The simulation view. This must be wrapped inside a DIV element that has an
+ * absolute position so that it gets correctly resized.
+ */
+#chicken_and_egg_view {
+  height: 100%;
+  width: 900px;
+}
+
+/**
+ * The canvas.
+ */
+#chicken_and_egg_canvas {
+  border: 1px solid black;
+}
+
+/**
+ * Use this class to wrap other elements that can resize to fill this element. E.g.:
+ *  <div class="autoresize">
+ *    <canvas id="chicken_and_egg"></canvas>
+ *  </div>
+ */
+.autoresize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/**
+ * Center the element horizontally within its parent container.
+ */
+.horizontal-align-center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}

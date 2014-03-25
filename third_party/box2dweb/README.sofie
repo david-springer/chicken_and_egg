@@ -1,0 +1,15 @@
+Name: Box2DWeb, a Javascript physics engine based on Box2D.
+Short Name: Box2DWeb
+URL: https://code.google.com/p/box2dweb/
+Version: 2.1a.3
+Date: 2014-03-27
+Revision: Based on Box2DFlash 2.1a.
+License: "Other Open Source"
+License File: <none>
+Description:
+  Box2DWeb is a 2D physics engine based on Box2D developed by Erin Catto (visit
+  http://www.gphysics.com for more information).
+
+Local Modifications:
+  Box2D.js and Box2d.min.js, fixed Object.prototype.defineProperty bug. For more
+  info, see: https://code.google.com/p/box2dweb/issues/detail?id=41
