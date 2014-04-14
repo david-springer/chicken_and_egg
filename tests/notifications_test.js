@@ -39,12 +39,20 @@ test("Remove Observer", function() {
 });
 
 test("Unique Observer", function() {
-  var testObserver = function() { var a = 1; };
-  var otherTestObserver = function() { var b = 0; };
+  var testObserver = function() {};
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver("TEST_NOTIFICATION", testObserver);
   defaultCenter.addNotificationObserver("TEST_NOTIFICATION", testObserver);
   equal(defaultCenter.hasObserversForNotification("TEST_NOTIFICATION"), true);
+  defaultCenter.removeNotificationObserver("TEST_NOTIFICATION", testObserver);
+  equal(defaultCenter.hasObserversForNotification("TEST_NOTIFICATION"), false);
+});
+
+test("Multi Observers", function() {
+  var testObserver = function() { var a = 1; };
+  var otherTestObserver = function() { var b = 2; };
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver("TEST_NOTIFICATION", testObserver);
   defaultCenter.addNotificationObserver("TEST_NOTIFICATION", otherTestObserver);
   equal(defaultCenter.hasObserversForNotification("TEST_NOTIFICATION"), true);
   defaultCenter.removeNotificationObserver("TEST_NOTIFICATION", testObserver);
@@ -68,4 +76,35 @@ test("Post Notification", function() {
   defaultCenter.removeNotificationObserver("TEST_NOTIFICATION", testObserver);
   defaultCenter.postNotification("TEST_NOTIFICATION");
   equal(postCount, 2);
+});
+
+test("Multi Post Notification", function() {
+  var postCount = 0;
+  var otherPostCount = 0;
+  var testObserver = function() { postCount++; };
+  var otherTestObserver = function() { otherPostCount++; };
+  var defaultCenter = NotificationDefaultCenter();
+  // Post with no observers should do nothing.
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 0);
+  equal(otherPostCount, 0);
+  defaultCenter.addNotificationObserver("TEST_NOTIFICATION", testObserver);
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 1);
+  equal(otherPostCount, 0);
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 2);
+  equal(otherPostCount, 0);
+  defaultCenter.addNotificationObserver("TEST_NOTIFICATION", otherTestObserver);
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 3);
+  equal(otherPostCount, 1);
+  defaultCenter.removeNotificationObserver("TEST_NOTIFICATION", testObserver);
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 3);
+  equal(otherPostCount, 2);
+  defaultCenter.removeNotificationObserver("TEST_NOTIFICATION", otherTestObserver);
+  defaultCenter.postNotification("TEST_NOTIFICATION");
+  equal(postCount, 3);
+  equal(otherPostCount, 2);
 });
