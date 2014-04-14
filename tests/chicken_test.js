@@ -66,14 +66,15 @@ test("Lay Egg", function() {
     didLayEggCount++;
     return false;
   };
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).addObserver(didLayEgg);
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
   testChicken.peckFeed(Chicken.MAX_FEED);
   testChicken.drinkWater(Chicken.MAX_WATER);
   // Max feed & water should produce an egg and reset the chicken.
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
   equal(didLayEggCount, 1);
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).removeObserver(didLayEgg);
+  defaultCenter.removeNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
 });
 
 test("Lay 2 Eggs", function() {
@@ -85,7 +86,8 @@ test("Lay 2 Eggs", function() {
     didLayEggCount++;
     return false;
   };
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).addObserver(didLayEgg);
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
   testChicken.peckFeed(Chicken.MAX_FEED);
   testChicken.drinkWater(Chicken.MAX_WATER);
   // Max feed & water should produce an egg and reset the chicken.
@@ -100,5 +102,5 @@ test("Lay 2 Eggs", function() {
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
   equal(didLayEggCount, 2);
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).removeObserver(didLayEgg);
+  defaultCenter.removeNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
 });
