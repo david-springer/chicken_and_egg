@@ -126,5 +126,5 @@ Chicken.prototype.shouldLayEgg = function () {
 Chicken.prototype.layEgg = function() {
   this._feed = 0.0;
   this._water = 0.0;
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).publish(this);
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).post(this);
 }

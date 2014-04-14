@@ -62,15 +62,43 @@ test("Lay Egg", function() {
   equal(testChicken.feed(), 0.0);
   // Set up an event listener for the didLayEgg event.
   var didLayEggCount = 0;
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).subscribe(function() {
+  var didLayEgg = function(chicken) {
     didLayEggCount++;
     return false;
-  });
+  };
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).addObserver(didLayEgg);
   testChicken.peckFeed(Chicken.MAX_FEED);
   testChicken.drinkWater(Chicken.MAX_WATER);
   // Max feed & water should produce an egg and reset the chicken.
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
   equal(didLayEggCount, 1);
-  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).unsubscribe();
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).removeObserver(didLayEgg);
+});
+
+test("Lay 2 Eggs", function() {
+  var testChicken = new Chicken();
+  equal(testChicken.feed(), 0.0);
+  // Set up an event listener for the didLayEgg event.
+  var didLayEggCount = 0;
+  var didLayEgg = function(chicken) {
+    didLayEggCount++;
+    return false;
+  };
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).addObserver(didLayEgg);
+  testChicken.peckFeed(Chicken.MAX_FEED);
+  testChicken.drinkWater(Chicken.MAX_WATER);
+  // Max feed & water should produce an egg and reset the chicken.
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), 0.0);
+  equal(didLayEggCount, 1);
+
+  // Verify that a second egg is laid after eating & drinking enough.
+  testChicken.peckFeed(Chicken.MAX_FEED);
+  testChicken.drinkWater(Chicken.MAX_WATER);
+  // Max feed & water should produce an egg and reset the chicken.
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), 0.0);
+  equal(didLayEggCount, 2);
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).removeObserver(didLayEgg);
 });

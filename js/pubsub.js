@@ -8,21 +8,26 @@
  * jQuery gist here: http://api.jquery.com/jQuery.Callbacks/
  */
 
-var notifications = {};
+/**
+ * The singleton that holds the mapping from notification names to jQuery callbacks
+ * for that notification.
+ * @private
+ */
+var _notifications = _notifications || {};
  
 jQuery.Notifcations = function(id) {
   var callbacks;
-  var notifcation = id && notifications[id];
+  var notifcation = id && _notifications[id];
  
   if (!notifcation) {
-    callbacks = jQuery.Callbacks();
+    callbacks = jQuery.Callbacks("unique");
     notifcation = {
-      publish: callbacks.fire,
-      subscribe: callbacks.add,
-      unsubscribe: callbacks.remove
+      post: callbacks.fire,
+      addObserver: callbacks.add,
+      removeObserver: callbacks.remove
     };
     if (id) {
-      notifications[id] = notifcation;
+      _notifications[id] = notifcation;
     }
   }
   return notifcation;
