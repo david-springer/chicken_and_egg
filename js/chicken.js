@@ -40,19 +40,19 @@ Chicken.prototype.constructor = Chicken;
  * Maximum amount the Chicken can eat, measure in grams.
  * @type {Number}
  */
-Chicken.prototype.MAX_FEED = 60.0;
+Chicken.MAX_FEED = 60.0;
 
 /**
  * Maximum amount the Chicken can drink, measure in millilitres.
  * @type {Number}
  */
-Chicken.prototype.MAX_WATER = 120.0;
+Chicken.MAX_WATER = 120.0;
 
 /**
  * Notification sent when a egg is laid.
  * @type {string}
  */
-Chicken.prototype.DID_LAY_EGG_NOTIFICAITON = 'didLayEggNotification';
+Chicken.DID_LAY_EGG_NOTIFICATION = 'didLayEggNotification';
 
 /**
  * Accessors and mutators.
@@ -61,8 +61,22 @@ Chicken.prototype.feed = function() {
   return this._feed;
 }
 
+/**
+ * Exposed for testing.
+ */
+Chicken.prototype.setFeed = function(feed) {
+  this._feed = feed;
+}
+
 Chicken.prototype.water = function() {
   return this._water;
+}
+
+/**
+ * Exposed for testing.
+ */
+Chicken.prototype.setWater = function(water) {
+  this._water = water;
 }
 
 /**
@@ -72,8 +86,8 @@ Chicken.prototype.water = function() {
  */
 Chicken.prototype.peckFeed = function(peckVolume) {
   this._feed += peckVolume;
-  if (this._feed >= Chicken.MAX_FEED)
-    if(this.shouldLayEgg()) {
+  if (this._feed >= Chicken.MAX_FEED) {
+    if (this.shouldLayEgg()) {
       this.layEgg();
     } else {
       this._feed = Chicken.MAX_FEED;
@@ -88,11 +102,29 @@ Chicken.prototype.peckFeed = function(peckVolume) {
  */
 Chicken.prototype.drinkWater = function(waterVolume) {
   this._water += waterVolume;
-  if (this._water >= Chicken.MAX_WATER)
-    if(this.shouldLayEgg()) {
+  if (this._water >= Chicken.MAX_WATER) {
+    if (this.shouldLayEgg()) {
       this.layEgg();
     } else {
       this._water = Chicken.MAX_WATER;
     }
   }
+}
+
+/**
+ * See if the chicken is ready to lay an egg or not.
+ * @return {boolean} whether the egg is ready to lay or not.
+ */
+Chicken.prototype.shouldLayEgg = function () {
+  return this._water >= Chicken.MAX_WATER && this._feed >= Chicken.MAX_FEED;
+}
+
+/**
+ * Lay an egg. Sends the DID_LAY_EGG_NOTIFICATION and resets the feed & water levels
+ * to 0.
+ */
+Chicken.prototype.layEgg = function() {
+  this._feed = 0.0;
+  this._water = 0.0;
+  $.Topic(Chicken.DID_LAY_EGG_NOTIFICATION).publish(this);
 }
