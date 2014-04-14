@@ -16,23 +16,27 @@
     Create a shortcut to the project dir in ~/Sites
       cd ~/Sites
       ln -s ~/Projects/chicken_and_egg .
-    Visit the URL: http://localhost/~<USERNAME>/chicken_and_egg/chicken_and_egg_tests.html
+    Visit the URL: http://localhost/~<USERNAME>/tests/chicken_and_egg/chicken_and_egg_tests.html
 -->
 <head>
   <title>Chicken And Egg Tests</title>    
   <meta charset="utf-8">
   <link href="//code.jquery.com/qunit/qunit-1.14.0.css" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="./third_party/box2dweb/Box2d.min.js"></script>
+  <script type="text/javascript" src="../third_party/box2dweb/Box2d.min.js"></script>
   <script type="text/javascript" src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script type="text/javascript" src="../js/notifications.js"></script>
   <script type="text/javascript" src="../js/body_view.js"></script>
   <script type="text/javascript" src="../js/poly_view.js"></script>
   <script type="text/javascript" src="../js/egg_view.js"></script>
+  <script type="text/javascript" src="../js/chicken.js"></script>
   -->
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
+  <script type="text/javascript" src="./notifications_test.js"></script>
+  <script type="text/javascript" src="./chicken_test.js"></script>
   <script type="text/javascript" src="./body_view_test.js"></script>
   <script type="text/javascript" src="./poly_view_test.js"></script>
   <script type="text/javascript" src="./egg_view_test.js"></script>
