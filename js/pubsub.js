@@ -12,7 +12,6 @@ var notifications = {};
  
 jQuery.Notifcations = function(id) {
   var callbacks;
-  var method;
   var notifcation = id && notifications[id];
  
   if (!notifcation) {
