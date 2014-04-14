@@ -62,7 +62,7 @@ test("Lay Egg", function() {
   equal(testChicken.feed(), 0.0);
   // Set up an event listener for the didLayEgg event.
   var didLayEggCount = 0;
-  $.Topic(Chicken.DID_LAY_EGG_NOTIFICATION).subscribe(function() {
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).subscribe(function() {
     didLayEggCount++;
     return false;
   });
@@ -72,5 +72,5 @@ test("Lay Egg", function() {
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
   equal(didLayEggCount, 1);
-  $.Topic(Chicken.DID_LAY_EGG_NOTIFICATION).unsubscribe();
+  $.Notifcations(Chicken.DID_LAY_EGG_NOTIFICATION).unsubscribe();
 });
