@@ -38,5 +38,15 @@ test("Peck Negative", function() {
 test("Is Empty", function() {
   var testBag = new FeedBag();
   var amountPecked = testBag.peck(FeedBag.MAX_FEED + 60.0);
+  equal(amountPecked, FeedBag.MAX_FEED);
   ok(testBag.isEmpty());
+});
+
+test("Refill", function() {
+  var testBag = new FeedBag();
+  testBag.setFeed(25.0);
+  equal(testBag.isEmpty(), false);
+  ok(testBag.feed() < FeedBag.MAX_FEED);
+  testBag.refill();
+  equal(testBag.feed(), FeedBag.MAX_FEED);
 });
