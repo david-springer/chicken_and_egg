@@ -33,6 +33,13 @@ Chicken = function() {
    * @readonly
    */
   this._water = 0.0;
+  /**
+   * Number of eggs remaining. When this number becomes 0, the chicken dies.
+   * @type {Number}
+   * @private
+   * @readonly
+   */
+  this._eggCount = Chicken.MAX_EGG_COUNT;
 }
 Chicken.prototype.constructor = Chicken;
 
@@ -49,10 +56,22 @@ Chicken.MAX_FEED = 60.0;
 Chicken.MAX_WATER = 120.0;
 
 /**
+ * Maximum number of egg a chicken has. All chickens start with this many eggs.
+ * @type {Number}
+ */
+Chicken.MAX_EGG_COUNT = 36.0;
+
+/**
  * Notification sent when a egg is laid.
  * @type {string}
  */
 Chicken.DID_LAY_EGG_NOTIFICATION = 'didLayEggNotification';
+
+/**
+ * Notification sent when the chicken dies, because she laid all of her eggs.
+ * @type {string}
+ */
+Chicken.DID_DIE_NOTIFICATION = 'didDieNotification';
 
 /**
  * Accessors and mutators.
@@ -61,22 +80,33 @@ Chicken.prototype.feed = function() {
   return this._feed;
 }
 
-/**
- * Exposed for testing.
- */
-Chicken.prototype.setFeed = function(feed) {
-  this._feed = feed;
-}
-
 Chicken.prototype.water = function() {
   return this._water;
 }
 
+Chicken.prototype.eggCount = function() {
+  return this._eggCount;
+}
+
 /**
- * Exposed for testing.
+ * Exposed for testing. Do not use.
  */
 Chicken.prototype.setWater = function(water) {
   this._water = water;
+}
+Chicken.prototype.setFeed = function(feed) {
+  this._feed = feed;
+}
+Chicken.prototype.setEggCount = function(eggCount) {
+  this._eggCount = eggCount;
+}
+
+/**
+ * Indicates that the chicken is still alive.
+ * @return {boolean} Whether the chicken is still alive.
+ */
+Chicken.prototype.isStillAlive = function() {
+  return this._eggCount > 0;
 }
 
 /**
@@ -85,6 +115,9 @@ Chicken.prototype.setWater = function(water) {
  * @param {Number} peckVolume The volume of feed in this peck, measured in grams.
  */
 Chicken.prototype.peckFeed = function(peckVolume) {
+  if (!this.isStillAlive()) {
+    return;
+  }
   this._feed += peckVolume;
   if (this._feed >= Chicken.MAX_FEED) {
     if (this.shouldLayEgg()) {
@@ -101,6 +134,9 @@ Chicken.prototype.peckFeed = function(peckVolume) {
  * @param {Number} waterVolume The volume of water, measured in millilitres.
  */
 Chicken.prototype.drinkWater = function(waterVolume) {
+  if (!this.isStillAlive()) {
+    return;
+  }
   this._water += waterVolume;
   if (this._water >= Chicken.MAX_WATER) {
     if (this.shouldLayEgg()) {
@@ -121,10 +157,18 @@ Chicken.prototype.shouldLayEgg = function () {
 
 /**
  * Lay an egg. Sends the DID_LAY_EGG_NOTIFICATION and resets the feed & water levels
- * to 0.
+ * to 0. If this is the final egg, also sends the DID_DIE_NOTIFICATION. The chicken can
+ * no longer eat or drink after this point.
  */
 Chicken.prototype.layEgg = function() {
+  if (!this.isStillAlive()) {
+    return;
+  }
   this._feed = 0.0;
   this._water = 0.0;
-  NotificationDefaultCenter().postNotification(Chicken.DID_LAY_EGG_NOTIFICATION);
+  NotificationDefaultCenter().postNotification(Chicken.DID_LAY_EGG_NOTIFICATION, this);
+  this._eggCount--;
+  if (this._eggCount == 0) {
+    NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
+  }
 }

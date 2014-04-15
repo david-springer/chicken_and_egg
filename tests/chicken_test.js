@@ -104,3 +104,39 @@ test("Lay 2 Eggs", function() {
   equal(didLayEggCount, 2);
   defaultCenter.removeNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
 });
+
+test("Still Alive", function() {
+  var testChicken = new Chicken();
+  ok(testChicken.isStillAlive());
+  testChicken.setEggCount(0);
+  equal(testChicken.isStillAlive(), false);
+});
+
+test("Lay All Eggs", function() {
+  var testChicken = new Chicken();
+  ok(testChicken.isStillAlive());
+  var didLayEggCount = 0;
+  var didLayEgg = function(chicken) {
+    didLayEggCount++;
+    return false;
+  };
+  var didDieCount = 0;
+  var didDie = function(chicken) {
+    didDieCount++;
+  }
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
+  defaultCenter.addNotificationObserver(Chicken.DID_DIE_NOTIFICATION, didDie);
+  for (var i = 0; i < Chicken.MAX_EGG_COUNT; ++i) {
+    testChicken.layEgg();
+  }
+  equal(testChicken.isStillAlive(), false);
+  equal(didLayEggCount, Chicken.MAX_EGG_COUNT);
+  equal(didDieCount, 1);
+  // Try to lay one more egg, this should do nothing.
+  testChicken.layEgg();
+  equal(didLayEggCount, Chicken.MAX_EGG_COUNT);
+  equal(didDieCount, 1);
+  defaultCenter.removeNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg);
+  defaultCenter.removeNotificationObserver(Chicken.DID_DIE_NOTIFICATION, didDie);
+});
