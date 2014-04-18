@@ -32,13 +32,6 @@ FeedBag.prototype.constructor = FeedBag;
 FeedBag.MAX_FEED = 2000.0;
 
 /**
- * Exposed for testing. Do not use.
- */
-FeedBag.prototype.setFeed = function(feed) {
-  this._feed = feed;
-}
-
-/**
  * Indicates whether the feed bag is empty.
  * @return {boolean} Whether the feed bag is empty.
  */
@@ -52,6 +45,13 @@ FeedBag.prototype.isEmpty = function() {
  */
 FeedBag.prototype.feed = function() {
   return this._feed;
+}
+
+/**
+ * Exposed for testing. Do not use.
+ */
+FeedBag.prototype.setFeed = function(feed) {
+  this._feed = feed;
 }
 
 /**
