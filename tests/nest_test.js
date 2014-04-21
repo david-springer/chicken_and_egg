@@ -55,6 +55,7 @@ test("Hatch Notification", function() {
   // run *before* the test asserts.
   var testHatchCleanup = function() {
     ok(eggHatched);
+    equal(testNest.hasEgg(), false);
     defaultCenter.removeNotificationObserver(
         Nest.EGG_DID_HATCH_NOTIFICATION, eggDidHatch);
     start();

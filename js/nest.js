@@ -88,8 +88,9 @@ Nest.prototype.addEgg = function(opt_incubateCallback) {
  * @private
  */
 Nest.prototype._incubate = function(incubateInterval) {
-  var postHatchNotification = function() {
+  var hatchEgg = function() {
+    this._eggCount = 0;
     NotificationDefaultCenter().postNotification(Nest.EGG_DID_HATCH_NOTIFICATION, this);
   };
-  setTimeout(postHatchNotification.bind(this), incubateInterval * 1000.0);
+  setTimeout(hatchEgg.bind(this), incubateInterval * 1000.0);
 }
