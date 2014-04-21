@@ -6,7 +6,11 @@
 /**
  * @fileoverview Unit tests for the EggCrate object.
  */
-module("EggCrate Object");
+module("EggCrate Object", {
+  teardown: function() {
+    NotificationDefaultCenter().removeAllNotifications();
+  }
+});
 
 test("Default Constructor", function() {
   var testCrate = new EggCrate();
@@ -30,14 +34,14 @@ test("Add Egg When Full", function() {
 });
 
 test("Send Crate Full Notification", function() {
-  // Set up an event listener for the didLayEgg event.
+  // Set up an event listener for the crateDidFill notification.
   var crateFull = false;
   var crateDidFill = function(crate) {
     crateFull = true;
   };
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(
-      EggCrate.CRATE_DID_FILL_NOTIFICATION, crateDidFill);
+      EggCrate.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
   var testCrate = new EggCrate();
   testCrate.setEggCount(EggCrate.MAX_EGG_COUNT - 2);
   ok(testCrate.addEgg());
@@ -45,7 +49,7 @@ test("Send Crate Full Notification", function() {
   ok(testCrate.addEgg());
   ok(crateFull);
   defaultCenter.removeNotificationObserver(
-      EggCrate.CRATE_DID_FILL_NOTIFICATION, crateDidFill);
+      EggCrate.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
 });
 
 test("Reset Crate", function() {

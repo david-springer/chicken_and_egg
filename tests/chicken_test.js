@@ -6,7 +6,11 @@
 /**
  * @fileoverview Unit tests for the Chicken object.
  */
-module("Chicken Object");
+module("Chicken Object", {
+  teardown: function() {
+    NotificationDefaultCenter().removeAllNotifications();
+  }
+});
 
 test("Default Constructor", function() {
   var testChicken = new Chicken();

@@ -8,7 +8,7 @@
  * behaviour of an egg crate:
  *   The egg crate has a maximum capacity of one dozen eggs.
  *   An egg crate starts out empty.
- *   When the egg crate is filled, it posts the {@code CRATE_DID_FILL_NOTIFICATION}.
+ *   When the egg crate is filled, it posts the {@code DID_FILL_CRATE_NOTIFICATION}.
  */
 
 /**
@@ -35,7 +35,7 @@ EggCrate.MAX_EGG_COUNT = 12;
  * Notification sent when a egg is laid.
  * @type {string}
  */
-EggCrate.CRATE_DID_FILL_NOTIFICATION = 'crateDidFillNotification';
+EggCrate.DID_FILL_CRATE_NOTIFICATION = 'didFillCrateNotification';
 
 /**
  * The number of eggs in the crate. In range [0..{@code MAX_EGG_COUNT}].
@@ -56,14 +56,14 @@ EggCrate.prototype.setEggCount = function(eggCount) {
  * Add an egg to the crate. If the crate is full, does nothing and returns {@code false}.
  * @return {boolean} whether the egg was successfully added.
  */
-EggCrate.prototype.addEgg() = function() {
+EggCrate.prototype.addEgg = function() {
   if (this._eggCount == EggCrate.MAX_EGG_COUNT) {
     return false;
   }
   this._eggCount++;
   if (this._eggCount == EggCrate.MAX_EGG_COUNT) {
     NotificationDefaultCenter().postNotification(
-        EggCrate.CRATE_DID_FILL_NOTIFICATION, this);
+        EggCrate.DID_FILL_CRATE_NOTIFICATION, this);
   }
   return true;
 }
