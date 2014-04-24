@@ -104,6 +104,7 @@ test("Death Notice", function() {
   testFarmer.metabolizeForInterval(2);
   ok(isDead);
   equal(testFarmer.isAlive(), false);
+  equal(testFarmer.health(), 0);
   defaultCenter.removeNotificationObserver(
       EggCrate.DID_FILL_CRATE_NOTIFICATION, farmerDidDie);
 });
