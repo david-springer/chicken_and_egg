@@ -79,7 +79,7 @@ test("Metabolize Negative Interval", function() {
   equal(testFarmer.metabolizeForInterval(-1.5), false);
 });
 
-test("Metabolize Dead Farmer", function() {
+test("Metabolize When Dead", function() {
   var testFarmer = new Farmer();
   testFarmer.setHealth(0);
   equal(testFarmer.isAlive(), false);
