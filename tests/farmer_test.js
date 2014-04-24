@@ -47,6 +47,13 @@ test("Eat Too Many Eggs", function() {
   ok(testFarmer.health() > health);
 });
 
+test("Eat Negative Eggs", function() {
+  var testFarmer = new Farmer();
+  var health = testFarmer.health();
+  equal(testFarmer.eatEggs(-2), 0);
+  equal(testFarmer.health(), health);
+});
+
 test("Overeat", function() {
   var testFarmer = new Farmer();
   var health = testFarmer.health();
@@ -70,6 +77,13 @@ test("Metabolize For Interval", function() {
 test("Metabolize Negative Interval", function() {
   var testFarmer = new Farmer();
   equal(testFarmer.metabolizeForInterval(-1.5), false);
+});
+
+test("Metabolize Dead Farmer", function() {
+  var testFarmer = new Farmer();
+  testFarmer.setHealth(0);
+  equal(testFarmer.isAlive(), false);
+  equal(testFarmer.metabolizeForInterval(2.4), false);
 });
 
 test("Death Notice", function() {

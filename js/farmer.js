@@ -68,3 +68,49 @@ Farmer.prototype.health = function() {
   return this._health;
 }
 
+/**
+ * Whether the farmer is still alive or not.
+ * @return {boolean} still alive.
+ */
+Farmer.prototype.isAlive = function() {
+  return this._health > 0;
+}
+
+/**
+ * Eat some eggs. At most {@code MAX_EGG_EAT_COUNT} can be eaten at a time.
+ * @param {number} eggCount The number of eggs to eat at this sitting.
+ * @return {number} the number of eggs actually eaten.
+ */
+Farmer.prototype.eatEggs = function(eggCount) {
+  if (eggCount < 0) {
+    return 0;
+  }
+  var eggsConsumedCount = eggCount > Farmer.MAX_EGG_EAT_COUNT ?
+                          Farmer.MAX_EGG_EAT_COUNT : eggCount;
+  this._health += eggsConsumedCount * Farmer.EGG_STRENGTH;
+  if (this._health > 1.0) {
+    this._health = 1.0;
+  }
+  return eggsConsumedCount;
+}
+
+/**
+ * Metabolize eggs for a given time interval. This reduces the health of the farmer
+ * proportional to the metabolic rate. When the health falls to 0, the farmer dies
+ * and posts the {@code DID_DIE_NOTIFICATION} notification.
+ * @param {number} interval The interval to metabolize. Measured in seconds. Does
+ *     nothing if negative.
+ * @return {boolean} whether the metabolism was successful.
+ */
+Farmer.prototype.metabolizeForInterval = function(interval) {
+  if (!this.isAlive() || interval < 0.0) {
+    return false;
+  }
+  var healthReduced = interval * Farmer.METABOLIC_RATE;
+  this._health -= healthReduced;
+  if (this._health <= 0.0) {
+    this._health = 0.0;
+    NotificationDefaultCenter().postNotification(Farmer.DID_DIE_NOTIFICATION, this);
+  }
+  return true;
+}
