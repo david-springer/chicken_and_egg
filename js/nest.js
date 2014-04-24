@@ -9,7 +9,7 @@
  *   A nest bottle starts empty.
  *   You can only add an egg to an empty nest.
  *   As soon as an egg is added to the nest, it begins to hatch. When the egg hatches,
- *     the EGG_DID_HATCH_NOTIFICATION is posted.
+ *     the DID_HATCH_EGG_NOTIFICATION is posted.
  */
 
 /**
@@ -44,7 +44,7 @@ Nest.INCUBATE_INTERVAL = 30.0;
  * Notification sent when the egg hatches.
  * @type {String}
  */
-Nest.EGG_DID_HATCH_NOTIFICATION = 'eggDidHatchNotification';
+Nest.DID_HATCH_EGG_NOTIFICATION = 'eggDidHatchNotification';
 
 /**
  * Exposed for testing. Do Not use.
@@ -83,14 +83,14 @@ Nest.prototype.addEgg = function(opt_incubateCallback) {
 
 /**
  * Incubate the egg. Starts a timer that runs for {@code incubateInterval} seconds, then
- * hatches the egg by posting the {@code EGG_DID_HATCH_NOTIFICATION} notification.
+ * hatches the egg by posting the {@code DID_HATCH_EGG_NOTIFICATION} notification.
  * @param {number} incubateInterval The incubation time of the egg measured in seconds.
  * @private
  */
 Nest.prototype._incubate = function(incubateInterval) {
   var hatchEgg = function() {
     this._eggCount = 0;
-    NotificationDefaultCenter().postNotification(Nest.EGG_DID_HATCH_NOTIFICATION, this);
+    NotificationDefaultCenter().postNotification(Nest.DID_HATCH_EGG_NOTIFICATION, this);
   };
   setTimeout(hatchEgg.bind(this), incubateInterval * 1000.0);
 }

@@ -8,7 +8,8 @@
  */
 module("Nest Object", {
   teardown: function() {
-    equal(NotificationDefaultCenter().hasObserversForNotification(Nest.EGG_DID_HATCH_NOTIFICATION), false);
+    equal(NotificationDefaultCenter().hasObserversForNotification(
+        Nest.DID_HATCH_EGG_NOTIFICATION), false);
   }
 });
 
@@ -45,7 +46,7 @@ test("Hatch Notification", function() {
     eggHatched = true;
   };
   var defaultCenter = NotificationDefaultCenter();
-  defaultCenter.addNotificationObserver(Nest.EGG_DID_HATCH_NOTIFICATION, eggDidHatch);
+  defaultCenter.addNotificationObserver(Nest.DID_HATCH_EGG_NOTIFICATION, eggDidHatch);
   var testNest = new Nest();
   testNest.setIncubateInterval(0);
   ok(testNest.addEgg());  // Should hatch the egg immediately.
@@ -57,7 +58,7 @@ test("Hatch Notification", function() {
     ok(eggHatched);
     equal(testNest.hasEgg(), false);
     defaultCenter.removeNotificationObserver(
-        Nest.EGG_DID_HATCH_NOTIFICATION, eggDidHatch);
+        Nest.DID_HATCH_EGG_NOTIFICATION, eggDidHatch);
     start();
   };
   // Even though the incubate time is 0, hatching the egg is still asynchronous. Use a
