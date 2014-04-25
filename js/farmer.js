@@ -35,6 +35,12 @@ Farmer.prototype.constructor = Farmer;
 Farmer.EGG_STRENGTH = 0.25;
 
 /**
+ * Can't eat any eggs when health is above this value.
+ * @type {number}
+ */
+Farmer.HUNGER_LEVEL = 0.6;
+
+/**
  * Maximum number of eggs a farmer can eat at a time.
  * @type {number}
  */
@@ -82,7 +88,7 @@ Farmer.prototype.isAlive = function() {
  * @return {number} the number of eggs actually eaten.
  */
 Farmer.prototype.eatEggs = function(eggCount) {
-  if (eggCount < 0) {
+  if (eggCount < 0 || this._health >= Farmer.HUNGER_LEVEL) {
     return 0;
   }
   var eggsConsumedCount = eggCount > Farmer.MAX_EGG_EAT_COUNT ?

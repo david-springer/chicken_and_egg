@@ -28,7 +28,7 @@ test("Is Alive", function() {
 test("Eat Egg", function() {
   var testFarmer = new Farmer();
   var health = testFarmer.health();
-  testFarmer.setHealth(health - 2 * Farmer.EGG_STRENGTH);
+  testFarmer.setHealth(health / 3);
   ok(testFarmer.isAlive());
   ok(testFarmer.health() < health);
   health = testFarmer.health();
@@ -47,6 +47,15 @@ test("Eat Too Many Eggs", function() {
   ok(testFarmer.health() > health);
 });
 
+test("Try Eating Above 50% Health", function() {
+  var testFarmer = new Farmer();
+  testFarmer.setHealth(Farmer.HUNGER_LEVEL + 0.1);
+  var health = testFarmer.health();
+  ok(testFarmer.isAlive());
+  equal(testFarmer.eatEggs(1), 0);
+  equal(testFarmer.health(), health);
+});
+
 test("Eat Negative Eggs", function() {
   var testFarmer = new Farmer();
   var health = testFarmer.health();
@@ -57,8 +66,8 @@ test("Eat Negative Eggs", function() {
 test("Overeat", function() {
   var testFarmer = new Farmer();
   var health = testFarmer.health();
-  // Need one egg to regain full health.
-  testFarmer.setHealth(health - 1 * Farmer.EGG_STRENGTH);
+  // Need two eggs to regain full health.
+  testFarmer.setHealth(Farmer.HUNGER_LEVEL - 0.1);
   testFarmer.eatEggs(2);
   equal(testFarmer.health(), 1);
 });
