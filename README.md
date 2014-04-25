@@ -15,7 +15,7 @@ Direct the egg: When the egg is laid, you have to direct it to the fry pan, the 
 
 To maintain your health, you must eat a fried egg whenever your health level drops below 50%. If you let your health drop to 0, you die and the game ends.
 
-To get more scratch, you fill the egg crate with a dozen eggs. A full egg crate is autmatically converted into a full feed sack.
+To get more scratch, you fill the egg crate with a dozen eggs. A full egg crate is automatically converted into a full feed sack.
 
 Whever the water bottle level falls below 1 litre, you can refill it. Click on the tap to fill the bottle to capacity.
 
