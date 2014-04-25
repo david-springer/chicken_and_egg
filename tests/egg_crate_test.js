@@ -8,7 +8,8 @@
  */
 module("EggCrate Object", {
   teardown: function() {
-    NotificationDefaultCenter().removeAllNotifications();
+    equal(NotificationDefaultCenter().hasObserversForNotification(
+        EggCrate.DID_FILL_CRATE_NOTIFICATION), false);
   }
 });
 

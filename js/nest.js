@@ -6,10 +6,10 @@
 /**
  * @fileoverview  The Nest class. The Nest object implements all the behaviour of a nest:
  *   The nest has a maximum capacity of 1 egg.
- *   A nest bottle starts empty.
+ *   A nest starts empty.
  *   You can only add an egg to an empty nest.
  *   As soon as an egg is added to the nest, it begins to hatch. When the egg hatches,
- *     the DID_HATCH_EGG_NOTIFICATION is posted.
+ *     the {@code DID_HATCH_EGG_NOTIFICATION} is posted.
  */
 
 /**

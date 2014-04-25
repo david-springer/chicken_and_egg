@@ -39,7 +39,7 @@ EggCrate.DID_FILL_CRATE_NOTIFICATION = 'didFillCrateNotification';
 
 /**
  * The number of eggs in the crate. In range [0..{@code MAX_EGG_COUNT}].
- * @return {Number} number of eggs.
+ * @return {number} number of eggs.
  */
 EggCrate.prototype.eggCount = function() {
   return this._eggCount;
@@ -47,6 +47,7 @@ EggCrate.prototype.eggCount = function() {
 
 /**
  * Exposed for testing. Do not use.
+ * @param {number} eggCount The new egg count.
  */
 EggCrate.prototype.setEggCount = function(eggCount) {
   this._eggCount = eggCount;
