@@ -21,16 +21,23 @@ Nest = function() {
    * Number of eggs in the nest.
    * @type {number}
    * @private
-   * @readonly
    */
   this._eggCount = 0;
   /**
    * The time in seconds that an egg takes to incubate. If this value is 0, the egg
    * incubates and hatches immediately. Can be set for testing.
+   * @type {number}
    * @private
-   * @readonly
    */
-  this._incubateInterval = Nest.INCUBATE_INTERVAL;
+  this._incubationInterval = Nest.INCUBATION_INTERVAL;
+  /**
+   * The amount of time spent incubating the egg, in seconds. This value is modified
+   * during successive calls to updateGameTime(). When it reaches
+   * {@code INCUBATION_INTERVAL}, the egg hatches. Has a value of 0 when the nest is empty.
+   * @type {number}
+   * @private
+   */
+  this._incubationTime = 0.0;
 }
 Nest.prototype.constructor = Nest;
 
@@ -38,23 +45,13 @@ Nest.prototype.constructor = Nest;
  * Default incubation time, measured in seconds.
  * @type {number}
  */
-Nest.INCUBATE_INTERVAL = 30.0;
+Nest.INCUBATION_INTERVAL = 30.0;
 
 /**
  * Notification sent when the egg hatches.
  * @type {String}
  */
-Nest.DID_HATCH_EGG_NOTIFICATION = 'eggDidHatchNotification';
-
-/**
- * Exposed for testing. Do Not use.
- * @param {number} incubateInterval The time in seconds that an egg takes to incubate.
- *     Setting this to 0 or a negative number means eggs incubate (and then hatch)
- *     instantly.
- */
-Nest.prototype.setIncubateInterval = function(incubateInterval) {
-  this._incubateInterval = incubateInterval;
-}
+Nest.DID_HATCH_EGG_NOTIFICATION = 'didHatchEggNotification';
 
 /**
  * Whether there is an egg in the nest.
@@ -65,32 +62,47 @@ Nest.prototype.hasEgg = function() {
 }
 
 /**
+ * The time spent incubating so far. Returns 0 if the nest is empty.
+ * @return The incubation time.
+ */
+Nest.prototype.incubationTime = function() {
+  return this._incubationTime;
+}
+
+/**
  * Add an egg. If there is already an egg in the nest, does nothing.
- * @param {Function} opt_incubateCallback An optional callback function to call when the
- *     egg has hatched. Used for testing. By default, the private _incubate() function
- *     is called.
  * @return {boolean} if adding the egg was successful.
  */
-Nest.prototype.addEgg = function(opt_incubateCallback) {
+Nest.prototype.addEgg = function() {
   if (this.hasEgg()) {
     return false;
   }
-  var incubateCB = opt_incubateCallback || this._incubate;
   this._eggCount = 1;
-  incubateCB.bind(this)(this._incubateInterval);
+  this._incubationTime = 0.0;
   return true;
 }
 
 /**
- * Incubate the egg. Starts a timer that runs for {@code incubateInterval} seconds, then
- * hatches the egg by posting the {@code DID_HATCH_EGG_NOTIFICATION} notification.
- * @param {number} incubateInterval The incubation time of the egg measured in seconds.
+ * Incubate and possibly hatch the egg.
+ * @override
+ */
+Nest.prototype.updateGameTime = function(gameTimeNow, gameTimeDelta) {
+  if (!this.hasEgg()) {
+    return;
+  }
+  this._incubationTime += gameTimeDelta;
+  if (this._incubationTime >= this._incubationInterval) {
+    this._hatchEgg();
+  }
+}
+
+/**
+ * Hatches the egg by posting the {@code DID_HATCH_EGG_NOTIFICATION} notification. Resets
+ * the nest to the empty state.
  * @private
  */
-Nest.prototype._incubate = function(incubateInterval) {
-  var hatchEgg = function() {
-    this._eggCount = 0;
-    NotificationDefaultCenter().postNotification(Nest.DID_HATCH_EGG_NOTIFICATION, this);
-  };
-  setTimeout(hatchEgg.bind(this), incubateInterval * 1000.0);
+Nest.prototype._hatchEgg = function() {
+  this._eggCount = 0;
+  this._incubationTime = 0.0;
+  NotificationDefaultCenter().postNotification(Nest.DID_HATCH_EGG_NOTIFICATION, this);
 }

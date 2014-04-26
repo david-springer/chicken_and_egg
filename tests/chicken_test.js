@@ -8,7 +8,10 @@
  */
 module("Chicken Object", {
   teardown: function() {
-    NotificationDefaultCenter().removeAllNotifications();
+    equal(NotificationDefaultCenter().hasObserversForNotification(
+        Chicken.DID_LAY_EGG_NOTIFICATION), false);
+    equal(NotificationDefaultCenter().hasObserversForNotification(
+        Chicken.DID_DIE_NOTIFICATION), false);
   }
 });
 
