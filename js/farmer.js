@@ -18,6 +18,7 @@
  * @constructor
  */
 Farmer = function() {
+  GamePiece.call(this);
   /**
    * Remaining health, as a percentage. Range is [0..1].
    * @type {number}
@@ -26,6 +27,7 @@ Farmer = function() {
    */
   this._health = 1;
 }
+Farmer.prototype = new GamePiece();
 Farmer.prototype.constructor = Farmer;
 
 /**

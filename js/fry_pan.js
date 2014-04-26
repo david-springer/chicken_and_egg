@@ -17,6 +17,7 @@
  * @constructor
  */
 FryPan = function() {
+  GamePiece.call(this);
   /**
    * Number of eggs in the pan.
    * @type {number}
@@ -32,6 +33,7 @@ FryPan = function() {
    */
   this._fryInterval = FryPan.FRY_INTERVAL;
 }
+FryPan.prototype = new GamePiece();
 FryPan.prototype.constructor = Nest;
 
 /**

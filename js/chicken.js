@@ -19,6 +19,7 @@
  * @constructor
  */
 Chicken = function() {
+  GamePiece.call(this);
   /**
    * Amount of feed consumed, measured in grams.
    * @type {Number}
@@ -41,6 +42,7 @@ Chicken = function() {
    */
   this._eggCount = Chicken.MAX_EGG_COUNT;
 }
+Chicken.prototype = new GamePiece();
 Chicken.prototype.constructor = Chicken;
 
 /**

@@ -16,6 +16,7 @@
  * @constructor
  */
 WaterBottle = function() {
+  GamePiece.call(this);
   /**
    * Amount of water remaining, measured in millilitres.
    * @type {Number}
@@ -24,6 +25,7 @@ WaterBottle = function() {
    */
   this._waterLevel = WaterBottle.MAX_WATER_LEVEL;
 }
+WaterBottle.prototype = new GamePiece();
 WaterBottle.prototype.constructor = WaterBottle;
 
 /**

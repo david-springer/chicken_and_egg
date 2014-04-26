@@ -17,6 +17,7 @@
  * @constructor
  */
 Nest = function() {
+  GamePiece.call(this);
   /**
    * Number of eggs in the nest.
    * @type {number}
@@ -39,6 +40,7 @@ Nest = function() {
    */
   this._incubationTime = 0.0;
 }
+Nest.prototype = new GamePiece();
 Nest.prototype.constructor = Nest;
 
 /**

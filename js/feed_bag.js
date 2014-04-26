@@ -16,6 +16,7 @@
  * @constructor
  */
 FeedBag = function() {
+  GamePiece.call(this);
   /**
    * Amount of feed remaining, measured in grams.
    * @type {Number}
@@ -24,6 +25,7 @@ FeedBag = function() {
    */
   this._feed = FeedBag.MAX_FEED;
 }
+FeedBag.prototype = new GamePiece();
 FeedBag.prototype.constructor = FeedBag;
 
 /**

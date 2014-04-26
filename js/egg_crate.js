@@ -16,6 +16,7 @@
  * @constructor
  */
 EggCrate = function() {
+  GamePiece.call(this);
   /**
    * Number of eggs in the crate.
    * @type {Number}
@@ -24,6 +25,7 @@ EggCrate = function() {
    */
   this._eggCount = 0;
 }
+EggCrate.prototype = new GamePiece();
 EggCrate.prototype.constructor = EggCrate;
 
 /**
