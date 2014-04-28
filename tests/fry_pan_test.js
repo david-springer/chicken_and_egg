@@ -95,6 +95,24 @@ test("Send Fried Egg Notification", function() {
       FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
 });
 
+test("Over-cook Egg", function() {
+  // Set up an event listener for the DID_FRY_EGG_NOTIFICATION event.
+  var friedEggCount = 0;
+  var eggDidFry = function(pan) {
+    friedEggCount++;
+  };
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
+  var testPan = new FryPan();
+  ok(testPan.addEgg(new Egg()));
+  // Should fry the egg immediately.
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL * 1.5);
+  equal(friedEggCount, 1);
+  equal(testPan.eggCount(), 0);
+  defaultCenter.removeNotificationObserver(
+      FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
+});
+
 test("Send 2 Fried Egg Notifications", function() {
   // Set up an event listener for the DID_FRY_EGG_NOTIFICATION event.
   var friedEggCount = 0;
