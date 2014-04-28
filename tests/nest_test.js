@@ -40,23 +40,23 @@ test("Hatch Egg", function() {
   equal(testNest.hasEgg(), false);
   ok(testNest.addEgg());
   ok(testNest.hasEgg());
-  testNest.updateGameTime(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL / 2.0);
+  testNest.processGameTick(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL / 2.0);
   ok(testNest.incubationTime() != 0.0);
   testNest._hatchEgg();
   equal(testNest.hasEgg(), false);
   equal(testNest.incubationTime(), 0.0);
 });
 
-test("Update Game Time", function() {
+test("Process Game Tick", function() {
   var testNest = new Nest();
   equal(testNest.incubationTime(), 0.0);
   var gameTimeDelta = Nest.INCUBATION_INTERVAL / 4.0;
-  testNest.updateGameTime(Date.now() / 1000.0, gameTimeDelta);
+  testNest.processGameTick(Date.now() / 1000.0, gameTimeDelta);
   equal(testNest.incubationTime(), 0.0);
   ok(testNest.addEgg());
-  testNest.updateGameTime(Date.now() / 1000.0, gameTimeDelta);
+  testNest.processGameTick(Date.now() / 1000.0, gameTimeDelta);
   equal(testNest.incubationTime(), gameTimeDelta);
-  testNest.updateGameTime(Date.now() / 1000.0, gameTimeDelta);
+  testNest.processGameTick(Date.now() / 1000.0, gameTimeDelta);
   equal(testNest.incubationTime(), gameTimeDelta * 2);
 });
 
@@ -71,7 +71,7 @@ test("Send Hatch Notification", function() {
   var testNest = new Nest();
   ok(testNest.addEgg());
   // Should hatch the egg immediately.
-  testNest.updateGameTime(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL);
+  testNest.processGameTick(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL);
   ok(eggHatched);
   equal(testNest.hasEgg(), false);
   defaultCenter.removeNotificationObserver(

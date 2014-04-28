@@ -33,7 +33,7 @@ Nest = function() {
   this._incubationInterval = Nest.INCUBATION_INTERVAL;
   /**
    * The amount of time spent incubating the egg, in seconds. This value is modified
-   * during successive calls to updateGameTime(). When it reaches
+   * during successive calls to processGameTick(). When it reaches
    * {@code INCUBATION_INTERVAL}, the egg hatches. Has a value of 0 when the nest is empty.
    * @type {number}
    * @private
@@ -88,7 +88,7 @@ Nest.prototype.addEgg = function() {
  * Incubate and possibly hatch the egg.
  * @override
  */
-Nest.prototype.updateGameTime = function(gameTimeNow, gameTimeDelta) {
+Nest.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
   if (!this.hasEgg()) {
     return;
   }

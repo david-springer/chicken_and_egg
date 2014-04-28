@@ -16,32 +16,69 @@ module("FryPan Object", {
 test("Default Constructor", function() {
   var testPan = new FryPan();
   equal(testPan.eggCount(), 0);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 0);
 });
 
 test("Add Egg", function() {
   var testPan = new FryPan();
-  ok(testPan.addEgg(function() {}));
+  ok(testPan.addEgg(new Egg()));
   equal(testPan.eggCount(), 1);
 });
 
 test("Add Egg When Full", function() {
   var testPan = new FryPan();
-  testPan.setEggCount(FryPan.MAX_EGG_COUNT - 1);
-  var emptyFryFunc = function() {};
-  ok(testPan.addEgg(emptyFryFunc));
-  equal(testPan.addEgg(emptyFryFunc), false);
-  equal(testPan.eggCount(), 2);
+  for (var i = 0; i < FryPan.MAX_EGG_COUNT; ++i) {
+    ok(testPan.addEgg(new Egg()));
+  }
+  equal(testPan.addEgg(new Egg()), false);
+  equal(testPan.eggCount(), FryPan.MAX_EGG_COUNT);
 });
 
-test("Fry Egg Callback", function() {
+test("Add duplicate Egg", function() {
   var testPan = new FryPan();
-  var didCallFryEgg = false;
-  ok(testPan.addEgg(function() { didCallFryEgg = true; }));
-  ok(didCallFryEgg);
+  var dupEgg = new Egg();
+  ok(testPan.addEgg(dupEgg));
+  equal(testPan.eggCount(), 1);
+  equal(testPan.addEgg(dupEgg), false);
+  equal(testPan.eggCount(), 1);
 });
 
-test("Fried Egg Notification", function() {
-  // Set up an event listener for the eggDidHatch event.
+test("Fry Egg", function() {
+  var testPan = new FryPan();
+  testPan._fryEggsInIndexSet([]);
+  equal(testPan.eggCount(), 0);
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.eggCount(), 1);
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 1);
+  ok(fryingTimes[0] != 0.0);
+  testPan._fryEggsInIndexSet([0]);
+  equal(testPan.eggCount(), 0);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 0);
+});
+
+test("Process Game Tick", function() {
+  var testPan = new FryPan();
+  var gameTimeDelta = FryPan.FRY_INTERVAL / 4.0;
+  testPan.processGameTick(Date.now() / 1000.0, gameTimeDelta);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 0);
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.eggCount(), 1);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 1);
+  equal(fryingTimes[0], 0.0);
+  testPan.processGameTick(Date.now() / 1000.0, gameTimeDelta);
+  equal(testPan.fryingTimes()[0], gameTimeDelta);
+  testPan.processGameTick(Date.now() / 1000.0, gameTimeDelta);
+  equal(testPan.fryingTimes()[0], gameTimeDelta * 2);
+});
+
+test("Send Fried Egg Notification", function() {
+  // Set up an event listener for the DID_FRY_EGG_NOTIFICATION event.
   var eggFried = false;
   var eggDidFry = function(pan) {
     eggFried = true;
@@ -49,32 +86,17 @@ test("Fried Egg Notification", function() {
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
   var testPan = new FryPan();
-  testPan.setFryInterval(0);
-  ok(testPan.addEgg());  // Should fry the egg immediately.
-  stop();
-  // Perform all the fry notification tests and cleanup in a scheduled function that
-  // gets run asynchronously. If the cleanup code is put outside this function, it gets
-  // run *before* the test asserts.
-  var testFryCleanup = function() {
-    ok(eggFried);
-    equal(testPan.eggCount(), 0);
-    defaultCenter.removeNotificationObserver(
-        FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
-    start();
-  };
-  // Even though the fry time is 0, frying the egg is still asynchronous. Use a
-  // timer function with an interval of 0, which will cause the timer that posts the
-  // fried notification to fire.
-  // TODO(daves): This seems like it should be a flakey test. It relies on the fact that
-  // setTimeout() queues functions sequentially, so that the setTimeout which posts the
-  // notification happens before the setTimeout in this test.
-  setTimeout(testFryCleanup.bind(this), 0);
-  // Note: code after this comment will run *before* the timer function scheduled in the
-  // previous line is called.
+  ok(testPan.addEgg(new Egg()));
+  // Should fry the egg immediately.
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL);
+  ok(eggFried);
+  equal(testPan.eggCount(), 0);
+  defaultCenter.removeNotificationObserver(
+      FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
 });
 
-test("2 Fried Eggs Notification", function() {
-  // Set up an event listener for the eggDidHatch event.
+test("Send 2 Fried Egg Notifications", function() {
+  // Set up an event listener for the DID_FRY_EGG_NOTIFICATION event.
   var friedEggCount = 0;
   var eggDidFry = function(pan) {
     friedEggCount++;
@@ -82,18 +104,20 @@ test("2 Fried Eggs Notification", function() {
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
   var testPan = new FryPan();
-  testPan.setFryInterval(0);
-  ok(testPan.addEgg());  // Should fry the egg immediately.
-  ok(testPan.addEgg());  // Should fry the egg immediately.
-  stop();
-  var testFry2Cleanup = function() {
-    equal(friedEggCount, 2);
-    equal(testPan.eggCount(), 0);
-    defaultCenter.removeNotificationObserver(
-        FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
-    start();
-  };
-  setTimeout(testFry2Cleanup.bind(this), 0);
-  // Note: code after this comment will run *before* the timer function scheduled in the
-  // previous line is called.
+  ok(testPan.addEgg(new Egg()));
+  // Fry the first egg half way, then add the second egg.
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2);
+  equal(friedEggCount, 0);  // No eggs fried yet.
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.eggCount(), 2);
+  // Fry the first egg all the way, fry the second egg half way.
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2);
+  equal(friedEggCount, 1);
+  equal(testPan.eggCount(), 1);
+  // Fry the second egg all the way.
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2);
+  equal(friedEggCount, 2);
+  equal(testPan.eggCount(), 0);
+  defaultCenter.removeNotificationObserver(
+      FryPan.DID_FRY_EGG_NOTIFICATION, eggDidFry);
 });

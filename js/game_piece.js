@@ -32,3 +32,13 @@ GamePiece.prototype.getUuid = function() {
   }
   return this._uuid;
 }
+
+/**
+ * Abstract method to process a "tick" in the game simulation. Subclasses should override
+ * this to update any internal time-based state. Default implementation does nothing.
+ * @param {number} gameTimeNow The wall-clock time when this function was called,
+ *     measured in seconds since the "epoch" (Jan 1, 1970).
+ * @param {number} gameTimeDelta The time since the last call to this method, measured in
+ *     seconds.
+ */
+GamePiece.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {}
