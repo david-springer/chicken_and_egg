@@ -172,19 +172,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   var eggBody;
   for (var e = 0; e < 20; e++) {
-    var eggView = new EggView(this._scale);
-    fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-    fixtureDef.density = 1.031;
-    fixtureDef.friction = 0.3;
-    fixtureDef.restitution = 0.3;
-    fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-    fixtureDef.shape.SetAsArray(eggView.eggVertices(0.17));
-    bodyDef = new Box2D.Dynamics.b2BodyDef();
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-    bodyDef.position.Set(0.1 * e, 0.2);
-    eggBody = this._world.CreateBody(bodyDef)
-    eggBody.CreateFixture(fixtureDef);
-    eggBody.SetUserData(eggView);
+    var egg = new Egg(0.1 * e, 0.2);
+    egg.addToSimulation(this);
   }
 }
 

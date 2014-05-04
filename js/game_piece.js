@@ -6,6 +6,10 @@
 /**
  * @fileoverview  The GamePiece class. The GamePiece class is mostly an abstract super-
  * class for all the in-game objects. A GamePiece provides a UUID for each instance.
+ * At a minimum, subclasses should override these methods:
+ *     GamePiece.prototype.getBodyDef = function() {}
+ *     GamePiece.prototype.addFixturesToBody = function(simulation, body) {}
+ *     GamePiece.prototype.getView = function(simulation) {}
  */
 
 /**
