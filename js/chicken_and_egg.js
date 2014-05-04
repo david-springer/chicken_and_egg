@@ -37,6 +37,27 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._canvas = canvas;
+  /**
+   * The scale factor for canvas coordinates to the Box2D world. Not valid until
+   * initWorld() is called.
+   * @type {number}
+   * @private
+   */
+  this._scale = 0.0;
+  /**
+   * The size in Box2D world coordinates of the canvas. Not valid until initWorld() is
+   * called.
+   * @type {Box2D.Common.Math.b2Vec2}
+   * @private
+   */
+  this._worldSize = new Box2D.Common.Math.b2Vec2(0.0, 0.0);
+  /**
+   * The Box2D world associated with this simulation. Not valid until initWorld() is
+   * called.
+   * @type {Box2D.Dynamics.b2World}
+   * @private
+   */
+  this._world = null;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -46,13 +67,37 @@ ChickenAndEgg.prototype.constructor = ChickenAndEgg;
  */
 ChickenAndEgg.Box2DConsts = {
   GRAVITY: {x: 0, y: 9.81},
-  GROUND_DENSITY: 1.0,
-  GROUND_FRICTION: 0.5,
-  GROUND_RESTITUTION: 0.2,
   FRAME_RATE: 1/60.0,
   VELOCITY_ITERATION_COUNT: 10,
   POSITION_ITERATION_COUNT: 10
 };
+
+/**
+ * Scale factor to transform CANVAS coordinates into Box2D world coordinates. Returns
+ * 0 until initWorld() is called.
+ * @return The scale factor.
+ */
+ChickenAndEgg.prototype.scale = function() {
+  return this._scale;
+}
+
+/**
+ * Scale factor to transform CANVAS coordinates into Box2D world coordinates. Returns
+ * 0 until initWorld() is called.
+ * @return The Box2D world.
+ */
+ChickenAndEgg.prototype.world = function() {
+  return this._world;
+}
+
+/**
+ * The size of the game board in Box2D world coordinates. Returns (0, 0) until
+ * initWorld() is called.
+ * @return The game board size.
+ */
+ChickenAndEgg.prototype.worldSize = function() {
+  return this._worldSize;
+}
 
 /**
  * The run() method initializes and runs the simulation. It never returns.
@@ -80,38 +125,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       true);  // Allow objects to sleep when inactive.
   this._scale = canvas.height / 3;  // 3m tall simulation.
 
-  // Set up the ground plane.
-  var groundFixture = new Box2D.Dynamics.b2FixtureDef();
-  groundFixture.density = ChickenAndEgg.Box2DConsts.GROUND_DENSITY;
-  groundFixture.friction = ChickenAndEgg.Box2DConsts.GROUND_FRICTION;
-  groundFixture.restitution = ChickenAndEgg.Box2DConsts.GROUND_RESTITUTION;
-  groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  groundFixture.shape.SetAsBox(canvas.width / 2 / this._scale, 0.05);
-  var groundBody = new Box2D.Dynamics.b2BodyDef();
-  groundBody.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  groundBody.position.Set(canvas.width / 2 / this._scale,
-                          canvas.height / this._scale);
-  var ground = this._world.CreateBody(groundBody)
-  ground.CreateFixture(groundFixture);
-  ground.SetUserData(new PolyView(this._scale));
-
-  // Set up the incline plane.
-  var wedgeVertices = new Array();
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(0, 0));
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(3, 1));
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(0, 1));
-  var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  fixtureDef.density = 1.0;
-  fixtureDef.friction = 0.2;
-  fixtureDef.restitution = 0.7;
-  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  fixtureDef.shape.SetAsArray(wedgeVertices);
-  var bodyDef = new Box2D.Dynamics.b2BodyDef();
-  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(0, (canvas.height / this._scale) - 1);
-  var wedge = this._world.CreateBody(bodyDef);
-  wedge.CreateFixture(fixtureDef);
-  wedge.SetUserData(new PolyView(this._scale));
+  this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
+                                                 canvas.height / this._scale);
+  var ground = new Ground();
+  ground.addToSimulation(this);
 
   // Add a hinge joint.
   var hingeCenter = new Box2D.Common.Math.b2Vec2(
