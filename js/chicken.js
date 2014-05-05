@@ -24,14 +24,14 @@
 Chicken = function() {
   GamePiece.call(this);
   /**
-   * Amount of feed consumed, measured in grams.
+   * Total amount of feed consumed since the last egg laid, measured in grams.
    * @type {Number}
    * @private
    * @readonly
    */
   this._feed = 0.0;
   /**
-   * Amount of water drunk, measured in millilitres.
+   * Total amount of water drunk since the last egg laid, measured in millilitres.
    * @type {Number}
    * @private
    * @readonly
@@ -50,6 +50,20 @@ Chicken = function() {
    * @private
    */
   this._action = Chicken.Actions.PECK;
+  /**
+   * The amount of scratch pecked in the last peck action. This volume is depleted over
+   * time as the scratch is chewed, at a rate of CHEW_RATE.
+   * @type {number}
+   * @private
+   */
+  this._peckVolume = 0.0;
+  /**
+   * The amount of water lapped in the last drink action. This volume is depleted over
+   * time as the water is swallowed, at a rate of DRINK_RATE.
+   * @type {number}
+   * @private
+   */
+  this._drinkVolume = 0.0;
 
   /**
    * The feed bag. This must be set before the chicken can eat.
@@ -72,7 +86,7 @@ Chicken.prototype.constructor = Chicken;
 Chicken.Constants = {
   MAX_FEED: 60.0,  // Maximum amount of feed.
   MAX_WATER: 120.0,  // Maximum amount of water.
-  MIN_PECK_VOLUME: 5.0,
+  MIN_PECK_VOLUME: 6.0,
   MAX_PECK_VOLUME: 12.0,
   CHEW_RATE: 1.5,  // grams per second
   MIN_DRINK_VOLUME: 10.0,
@@ -86,8 +100,8 @@ Chicken.Constants = {
  * @enum {number}
  */
 Chicken.Actions = {
-  DRINK: 0,
-  PECK: 1
+  DRINK: 1,
+  PECK: 2
 };
 
 /**
@@ -151,15 +165,57 @@ Chicken.prototype.processGameTick = function(gameTimeNow, gameTimeDelta,
     opt_randomFunction, opt_action) {
   var random = opt_randomFunction || Math.random;
   var action = opt_action || this._nextAction();
+  if (!this.isStillAlive()) {
+    return;
+  }
+  switch (action) {
+  case Chicken.Actions.DRINK:
+    if (this._drinkVolume > 0) {
+      var drinkDelta = Chicken.Constants.DRINK_RATE * gameTimeDelta;
+      if (drinkDelta > this._drinkVolume) {
+        drinkDelta = this._drinkVolume;  // Drink all the rest.
+      }
+      this._drinkVolume -= drinkDelta;
+      this._drinkWater(drinkDelta, this.waterBottle);
+    } else {
+      // Take the initial drink of water. Drinking time is incremented at the next game
+      // tick.
+      this._drinkVolume = Chicken.Constants.MIN_DRINK_VOLUME +
+          (Chicken.Constants.MAX_DRINK_VOLUME - Chicken.Constants.MIN_DRINK_VOLUME) *
+          random();
+    }
+    break;
+  case Chicken.Actions.PECK:
+    if (this._peckVolume > 0) {
+      var peckDelta = Chicken.Constants.CHEW_RATE * gameTimeDelta;
+      if (peckDelta > this._peckVolume) {
+        peckDelta = this._peckVolume;  // Drink all the rest.
+      }
+      this._peckVolume -= peckDelta;
+      this._peckFeed(peckDelta, this.feedBag);
+    } else {
+      // Take the initial peck of scratch. Chewing time is incremented at the next game
+      // tick.
+      this._peckVolume = Chicken.Constants.MIN_PECK_VOLUME +
+          (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) *
+          random();
+    }
+    break;
+  }
 }
 
 /**
- * Toggle to the next consumption action (pecking or drinking).
+ * Toggle to the next consumption action (pecking or drinking). Returns the current
+ * action if the action is not yet finished; that is, if the chicken is in the middle
+ * of drinking some water, then this returns DRINK. Toggles to the next action when the
+ * current one if complete.
  * @return The next action (one of DRINK or PECK).
  * @private
  */
 Chicken.prototype._nextAction = function() {
-  this._action = Chicken.Actions.PECK ? Chicken.Actions.DRINK : Chicken.Actions.PECK;
+  if (this._drinkVolume == 0 && this._peckVolume == 0) {
+    this._action = Chicken.Actions.PECK ? Chicken.Actions.DRINK : Chicken.Actions.PECK;
+  }
   return this._action;
 }
 
@@ -172,7 +228,7 @@ Chicken.prototype._nextAction = function() {
  * @private
  */
 Chicken.prototype._peckFeed = function(peckVolume, feedBag) {
-  if (!this.isStillAlive()) {
+  if (!this.isStillAlive() || !feedBag) {
     return;
   }
   this._feed += feedBag.peck(peckVolume);
@@ -194,7 +250,7 @@ Chicken.prototype._peckFeed = function(peckVolume, feedBag) {
  * @private
  */
 Chicken.prototype._drinkWater = function(waterVolume, waterBottle) {
-  if (!this.isStillAlive()) {
+  if (!this.isStillAlive() || !waterBottle) {
     return;
   }
   

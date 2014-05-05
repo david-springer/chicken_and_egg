@@ -19,6 +19,29 @@ FakeWaterBottle.prototype.drink = function(waterVolume) {
 }
 
 /**
+ * Compute a test peck value based on the chicken's feeding parameters.
+ * @param {number} factor The linear factor to use when choosing a feed amount.
+ * @return The test peck value. Guaranteed to lie within the chicken's feeding parameters.
+ */
+var testPeckValue = function(factor) {
+  return Chicken.Constants.MIN_PECK_VOLUME +
+    (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) *
+    factor;
+}
+
+/**
+ * Compute a test drink value based on the chicken's feeding parameters.
+ * @param {number} factor The linear factor to use when choosing a drink amount.
+ * @return The test drink value. Guaranteed to lie within the chicken's feeding
+ *     parameters.
+ */
+var testDrinkValue = function(factor) {
+  return Chicken.Constants.MIN_DRINK_VOLUME +
+    (Chicken.Constants.MAX_DRINK_VOLUME - Chicken.Constants.MIN_DRINK_VOLUME) *
+    factor;
+}
+
+/**
  * @fileoverview Unit tests for the Chicken object.
  */
 module("Chicken Object", {
@@ -77,6 +100,18 @@ test("Next Action", function() {
   var firstAction = testChicken._action;
   testChicken._nextAction();
   ok(firstAction != testChicken._action);
+});
+
+test("Next Action Not Finished", function() {
+  var testChicken = new Chicken();
+  var firstAction = testChicken._action;
+  testChicken._peckVolume = 2.0;
+  testChicken._nextAction();
+  equal(firstAction, testChicken._action);
+  testChicken._peckVolume = 0.0;
+  testChicken._drinkVolume = 2.0;
+  testChicken._nextAction();
+  equal(firstAction, testChicken._action);
 });
 
 test("Should Lay Egg", function() {
@@ -187,8 +222,8 @@ test("Process Game Tick No Egg Lay", function() {
   var fakeRandom = function() {
     return fakeRandomValue;
   }
-  var testPeck = (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) * fakeRandomValue;
-  var testDrink = (Chicken.Constants.MAX_WATER_VOLUME - Chicken.Constants.MIN_WATER_VOLUME) * fakeRandomValue;
+  var testPeck = testPeckValue(fakeRandomValue);
+  var testDrink = testDrinkValue(fakeRandomValue);
   var testChicken = new Chicken();
   testChicken.feedBag = new FakeFeedBag();
   testChicken.waterBottle = new FakeWaterBottle();
@@ -197,47 +232,76 @@ test("Process Game Tick No Egg Lay", function() {
   var gameTimeDelta = 0.5;
   var dateNow = Date.now() / 1000.0;
   testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), 0.0);
+  ok(testChicken._peckVolume > 0.0);
+  equal(testChicken._drinkVolume, 0.0);
+  // Give the chicken enough time to chew all the scratch.
+  gameTimeDelta = (testPeck / Chicken.Constants.CHEW_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
   equal(testChicken.feed(), testPeck);
   equal(testChicken.water(), 0.0);
-  // Give the chicken enough time to chew all the scratch.
-  testChicken.processGameTick(
-      dateNow + (testPeck / Chicken.Constants.CHEW_RATE) + 1,
-      gameTimeDelta,
-      fakeRandom, Chicken.Actions.DRINK);
+  equal(testChicken._peckVolume, 0.0);
+  equal(testChicken._drinkVolume, 0.0);
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
+  equal(testChicken.feed(), testPeck);
+  equal(testChicken.water(), 0.0);
+  equal(testChicken._peckVolume, 0.0);
+  ok(testChicken._drinkVolume > 0.0);
+  // Give the chicken enough time to drink all the water.
+  gameTimeDelta = (testDrink / Chicken.Constants.DRINK_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
   equal(testChicken.feed(), testPeck);
   equal(testChicken.water(), testDrink);
-  // Give the chicken enough time to drink all the water.
-  testChicken.processGameTick(
-      dateNow + (testDrink / Chicken.Constants.DRINK_RATE) + 1,
-      gameTimeDelta,
-      fakeRandom, Chicken.Actions.PECK);
+  equal(testChicken._peckVolume, 0.0);
+  equal(testChicken._drinkVolume, 0.0);
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
+  equal(testChicken.feed(), testPeck);
+  equal(testChicken.water(), testDrink);
+  ok(testChicken._peckVolume > 0.0);
+  equal(testChicken._drinkVolume, 0.0);
+  gameTimeDelta = (testPeck / Chicken.Constants.CHEW_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
   equal(testChicken.feed(), testPeck * 2.0);
   equal(testChicken.water(), testDrink);
-  testChicken.processGameTick(
-      dateNow + (testDrink / Chicken.Constants.CHEW_RATE) + 1,
-      gameTimeDelta,
-      fakeRandom, Chicken.Actions.DRINK);
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
+  equal(testChicken._peckVolume, 0.0);
+  ok(testChicken._drinkVolume > 0.0);
+  gameTimeDelta = (testDrink / Chicken.Constants.DRINK_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
   equal(testChicken.feed(), testPeck * 2.0);
   equal(testChicken.water(), testDrink * 2.0);
 });
 
 test("Process Game Tick Peck Too Soon", function() {
-  var fakeRandomValue = 025;
+  var fakeRandomValue = 0.25;
   var fakeRandom = function() {
     return fakeRandomValue;
   }
-  var testPeck = (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) * fakeRandomValue;
-  var testDrink = (Chicken.Constants.MAX_WATER_VOLUME - Chicken.Constants.MIN_WATER_VOLUME) * fakeRandomValue;
+  var testPeck = testPeckValue(fakeRandomValue);
+  var testDrink = testDrinkValue(fakeRandomValue);
   var testChicken = new Chicken();
+  testChicken.feedBag = new FakeFeedBag();
+  testChicken.waterBottle = new FakeWaterBottle();
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
-  var gameTimeDelta = 0.5;
+  // Pick a time step that's 1/2 of the time needed to chew the scratch.
+  var gameTimeDelta = (testPeck / Chicken.Constants.CHEW_RATE) / 2;
   var dateNow = Date.now() / 1000.0;
   testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
-  equal(testChicken.feed(), testPeck);
+  equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
-  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
-  equal(testChicken.feed(), testPeck);
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.PECK);
+  equal(testChicken.feed(), testPeck / 2.0);
+  equal(testChicken.water(), 0.0);
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.DRINK);
+  equal(testChicken.feed(), testPeck / 2.0);
   equal(testChicken.water(), 0.0);
 });
 
@@ -246,19 +310,27 @@ test("Process Game Tick Drink Too Soon", function() {
   var fakeRandom = function() {
     return fakeRandomValue;
   }
-  var testPeck = (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) * fakeRandomValue;
-  var testDrink = (Chicken.Constants.MAX_WATER_VOLUME - Chicken.Constants.MIN_WATER_VOLUME) * fakeRandomValue;
+  var testPeck = testPeckValue(fakeRandomValue);
+  var testDrink = testDrinkValue(fakeRandomValue);
   var testChicken = new Chicken();
+  testChicken.feedBag = new FakeFeedBag();
+  testChicken.waterBottle = new FakeWaterBottle();
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
-  var gameTimeDelta = 0.5;
+  // Pick a time step that's 1/2 of the time needed to drink the water.
+  var gameTimeDelta = (testDrink / Chicken.Constants.DRINK_RATE) / 2;
   var dateNow = Date.now() / 1000.0;
   testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
   equal(testChicken.feed(), 0.0);
-  equal(testChicken.water(), testDrink);
-  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
+  equal(testChicken.water(), 0.0);
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.DRINK);
   equal(testChicken.feed(), 0.0);
-  equal(testChicken.water(), testDrink);
+  equal(testChicken.water(), testDrink / 2.0);
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.PECK);
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), testDrink / 2.0);
 });
 
 test("Process Game Tick No Feed, No Water", function() {
@@ -266,26 +338,34 @@ test("Process Game Tick No Feed, No Water", function() {
   var fakeRandom = function() {
     return fakeRandomValue;
   }
-  var testPeck = (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) * fakeRandomValue;
-  var testDrink = (Chicken.Constants.MAX_WATER_VOLUME - Chicken.Constants.MIN_WATER_VOLUME) * fakeRandomValue;
+  var testPeck = testPeckValue(fakeRandomValue);
+  var testDrink = testDrinkValue(fakeRandomValue);
   var testChicken = new Chicken();
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
+  var dateNow = Date.now() / 1000.0;
   var gameTimeDelta = 0.5;
-  testChicken.processGameTick(Date.now() / 1000.0, gameTimeDelta, fakeRandom);
+  testChicken.processGameTick(dateNow, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
-  testChicken.feedBag = new FakeFeedBag();
-  testChicken.processGameTick(Date.now() / 1000.0, gameTimeDelta, fakeRandom, Chicken.Actions.PECK);
-  equal(testChicken.feed(), testPeck);
-  equal(testChicken.water(), 0.0);
-  testChicken.feedBag = null;
-  testChicken.setFeed(0);  // Reset the chicken.
-  testChicken.setWater(0);
-  testChicken.waterBottle = new FakeWaterBottle();
-  testChicken.processGameTick(Date.now() / 1000.0, gameTimeDelta, fakeRandom, Chicken.Actions.DRINK);
+  // Give the chicken enough time to chew all the scratch.
+  gameTimeDelta = (testPeck / Chicken.Constants.PECK_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.PECK);
   equal(testChicken.feed(), 0.0);
-  equal(testChicken.water(), testDrink);
+  equal(testChicken.water(), 0.0);
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+       Chicken.Actions.DRINK);
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), 0.0);
+  // Give the chicken enough time to drink all the water.
+  gameTimeDelta = (testDrink / Chicken.Constants.DRINK_RATE) + 1;
+  dateNow += gameTimeDelta;
+  testChicken.processGameTick(dateNow + gameTimeDelta, gameTimeDelta, fakeRandom,
+      Chicken.Actions.DRINK);
+  equal(testChicken.feed(), 0.0);
+  equal(testChicken.water(), 0.0);
 });
 
 test("Process Game Tick Lay Egg", function() {
@@ -293,9 +373,11 @@ test("Process Game Tick Lay Egg", function() {
   var fakeRandom = function() {
     return fakeRandomValue;
   }
-  var testPeck = (Chicken.Constants.MAX_PECK_VOLUME - Chicken.Constants.MIN_PECK_VOLUME) * fakeRandomValue;
-  var testDrink = (Chicken.Constants.MAX_WATER_VOLUME - Chicken.Constants.MIN_WATER_VOLUME) * fakeRandomValue;
+  var testPeck = testPeckValue(fakeRandomValue);
+  var testDrink = testDrinkValue(fakeRandomValue);
   var testChicken = new Chicken();
+  testChicken.feedBag = new FakeFeedBag();
+  testChicken.waterBottle = new FakeWaterBottle();
   equal(testChicken.feed(), 0.0);
   equal(testChicken.water(), 0.0);
   var gameTimeDelta = 0.5;
