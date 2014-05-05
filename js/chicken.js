@@ -9,14 +9,17 @@
  *   A chicken lays an egg when she has eaten 60g of feed, and drank 120 ml of water.
  *   The chicken pecks a certain amount of feed via the peckFeed() method.
  *   The chicken drinks water via the drinkWater() method.
- *   When she lays an egg, she posts the DID_LAY_EGG_NOTIFICATION using jQuery's
- *   .trigger() mechanism.
- *   The chicken dies (gets made into soup) then she's laid {@code MAX_EGG_COUNT} eggs.
+ *   When she lays an egg, she posts the DID_LAY_EGG_NOTIFICATION.
+ *   The chicken dies (gets made into soup) when she's laid {@code MAX_EGG_COUNT} eggs.
+ * The chicken pecks feed from its attached feed bag, and drinks from its attached
+ * water bottle. This way, eating and drinking are autonomous functions performed by the
+ * chicken.
  */
 
 /**
  * Constructor for the Chicken.
  * @constructor
+ * @extends {GamePiece}
  */
 Chicken = function() {
   GamePiece.call(this);
@@ -40,28 +43,52 @@ Chicken = function() {
    * @private
    * @readonly
    */
-  this._eggCount = Chicken.MAX_EGG_COUNT;
+  this._eggCount = Chicken.Constants.MAX_EGG_COUNT;
+  /**
+   * Current consumption action. The chicken toggles between these.
+   * @type {enum}
+   * @private
+   */
+  this._action = Chicken.Actions.PECK;
+
+  /**
+   * The feed bag. This must be set before the chicken can eat.
+   * @type {FeedBag}
+   */
+  this.feedBag = null;
+  /**
+   * The water bottle. This must be set before the chicken can drink.
+   * @type {WaterBottle}
+   */
+  this.watterBottle = null;
 }
 Chicken.prototype = new GamePiece();
 Chicken.prototype.constructor = Chicken;
 
 /**
- * Maximum amount the Chicken can eat, measure in grams.
- * @type {Number}
+ * Various constants, measured in grams (solids) or milliliters (liquid).
+ * @enum {number}
  */
-Chicken.MAX_FEED = 60.0;
+Chicken.Constants = {
+  MAX_FEED: 60.0,  // Maximum amount of feed.
+  MAX_WATER: 120.0,  // Maximum amount of water.
+  MIN_PECK_VOLUME: 5.0,
+  MAX_PECK_VOLUME: 12.0,
+  CHEW_RATE: 1.5,  // grams per second
+  MIN_DRINK_VOLUME: 10.0,
+  MAX_DRINK_VOLUME: 30.0,
+  DRINK_RATE: 25.0,  // ml per second
+  MAX_EGG_COUNT: 36  // All chickens start with this many eggs.
+};
 
 /**
- * Maximum amount the Chicken can drink, measure in millilitres.
- * @type {Number}
+ * Consumption actions.
+ * @enum {number}
  */
-Chicken.MAX_WATER = 120.0;
-
-/**
- * Maximum number of egg a chicken has. All chickens start with this many eggs.
- * @type {Number}
- */
-Chicken.MAX_EGG_COUNT = 36.0;
+Chicken.Actions = {
+  DRINK: 0,
+  PECK: 1
+};
 
 /**
  * Notification sent when a egg is laid.
@@ -112,20 +139,48 @@ Chicken.prototype.isStillAlive = function() {
 }
 
 /**
+ * Peck feed or water and possibly lay an egg.
+ * @param {Function} opt_randomFunction A random number generator that returns a pseudo-
+ *     random number in the range 0..1. The default is Math.random(), but it can be
+ *     replaced with a function that returns a constant value for testing.
+ * @param {enum} opt_action The optional action (peck or drink). Default is to perform
+ *     the opposite of the last action (that is, the actions toggle for every call).
+ * @override
+ */
+Chicken.prototype.processGameTick = function(gameTimeNow, gameTimeDelta,
+    opt_randomFunction, opt_action) {
+  var random = opt_randomFunction || Math.random;
+  var action = opt_action || this._nextAction();
+}
+
+/**
+ * Toggle to the next consumption action (pecking or drinking).
+ * @return The next action (one of DRINK or PECK).
+ * @private
+ */
+Chicken.prototype._nextAction = function() {
+  this._action = Chicken.Actions.PECK ? Chicken.Actions.DRINK : Chicken.Actions.PECK;
+  return this._action;
+}
+
+/**
  * Eat ("peck") some feed. Adds to the internal total until the maximum feed has been
  * eaten, after that no more feed can be eaten. Possibly lays an egg.
- * @param {Number} peckVolume The volume of feed in this peck, measured in grams.
+ * @param {number} peckVolume The volume of feed in this peck, measured in grams.
+ * @param {FeedBag} feedBag The source feed bag for the scratch. Must respond to the
+ *     peck() method.
+ * @private
  */
-Chicken.prototype.peckFeed = function(peckVolume) {
+Chicken.prototype._peckFeed = function(peckVolume, feedBag) {
   if (!this.isStillAlive()) {
     return;
   }
-  this._feed += peckVolume;
-  if (this._feed >= Chicken.MAX_FEED) {
-    if (this.shouldLayEgg()) {
-      this.layEgg();
+  this._feed += feedBag.peck(peckVolume);
+  if (this._feed >= Chicken.Constants.MAX_FEED) {
+    if (this._shouldLayEgg()) {
+      this._layEgg();
     } else {
-      this._feed = Chicken.MAX_FEED;
+      this._feed = Chicken.Constants.MAX_FEED;
     }
   }
 }
@@ -133,18 +188,22 @@ Chicken.prototype.peckFeed = function(peckVolume) {
 /**
  * Drink some water. Adds to the internal total until the maximum water has been drunk,
  * after that no more water can be drunk. Possibly lays an egg.
- * @param {Number} waterVolume The volume of water, measured in millilitres.
+ * @param {number} waterVolume The volume of water, measured in millilitres.
+ * @param {WaterBottle} waterBottle The source water bottle. Must respond to the drink()
+ *     method.
+ * @private
  */
-Chicken.prototype.drinkWater = function(waterVolume) {
+Chicken.prototype._drinkWater = function(waterVolume, waterBottle) {
   if (!this.isStillAlive()) {
     return;
   }
-  this._water += waterVolume;
-  if (this._water >= Chicken.MAX_WATER) {
-    if (this.shouldLayEgg()) {
-      this.layEgg();
+  
+  this._water += waterBottle.drink(waterVolume);
+  if (this._water >= Chicken.Constants.MAX_WATER) {
+    if (this._shouldLayEgg()) {
+      this._layEgg();
     } else {
-      this._water = Chicken.MAX_WATER;
+      this._water = Chicken.Constants.MAX_WATER;
     }
   }
 }
@@ -152,17 +211,20 @@ Chicken.prototype.drinkWater = function(waterVolume) {
 /**
  * See if the chicken is ready to lay an egg or not.
  * @return {boolean} whether the egg is ready to lay or not.
+ * @private
  */
-Chicken.prototype.shouldLayEgg = function () {
-  return this._water >= Chicken.MAX_WATER && this._feed >= Chicken.MAX_FEED;
+Chicken.prototype._shouldLayEgg = function () {
+  return this._water >= Chicken.Constants.MAX_WATER &&
+      this._feed >= Chicken.Constants.MAX_FEED;
 }
 
 /**
  * Lay an egg. Sends the DID_LAY_EGG_NOTIFICATION and resets the feed & water levels
  * to 0. If this is the final egg, also sends the DID_DIE_NOTIFICATION. The chicken can
  * no longer eat or drink after this point.
+ * @private
  */
-Chicken.prototype.layEgg = function() {
+Chicken.prototype._layEgg = function() {
   if (!this.isStillAlive()) {
     return;
   }

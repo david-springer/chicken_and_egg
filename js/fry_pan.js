@@ -15,6 +15,7 @@
 /**
  * Constructor for the FryPan.
  * @constructor
+ * @extends {GamePiece}
  */
 FryPan = function() {
   GamePiece.call(this);

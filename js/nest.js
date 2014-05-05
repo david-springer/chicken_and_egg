@@ -15,6 +15,7 @@
 /**
  * Constructor for the Nest.
  * @constructor
+ * @extends {GamePiece}
  */
 Nest = function() {
   GamePiece.call(this);

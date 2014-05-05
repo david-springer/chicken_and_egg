@@ -14,6 +14,7 @@
 /**
  * Constructor for the WaterBottle.
  * @constructor
+ * @extends {GamePiece}
  */
 WaterBottle = function() {
   GamePiece.call(this);

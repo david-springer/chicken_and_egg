@@ -16,6 +16,7 @@
 /**
  * Constructor for the Farmer.
  * @constructor
+ * @extends {GamePiece}
  */
 Farmer = function() {
   GamePiece.call(this);

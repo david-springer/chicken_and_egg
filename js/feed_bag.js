@@ -14,6 +14,7 @@
 /**
  * Constructor for the FeedBag.
  * @constructor
+ * @extends {GamePiece}
  */
 FeedBag = function() {
   GamePiece.call(this);

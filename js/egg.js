@@ -12,6 +12,7 @@
  * @param {number} xPos The initial x-coordinate of the Egg.
  * @param {number} yPos The initial y-coordinate of the Egg.
  * @constructor
+ * @extends {GamePiece}
  */
 Egg = function(xPos, yPos) {
   GamePiece.call(this);

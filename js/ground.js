@@ -11,6 +11,7 @@
 /**
  * Constructor for the Ground.
  * @constructor
+ * @extends {GamePiece}
  */
 Ground = function() {
   GamePiece.call(this);
