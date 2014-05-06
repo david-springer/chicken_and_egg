@@ -1,0 +1,16 @@
+Name: UUID
+Short Name: UUID
+URL: https://gist.github.com/jed/982883
+Version: 1
+Date: 2014-04-26
+Revision: n/a
+License: Other.
+License File: LICENSE.txt
+Description:
+  Returns a random v4 UUID of the form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx,
+  where each x is replaced with a random hexadecimal digit from 0 to f, and y
+  is replaced with a random hexadecimal digit from 8 to b.
+
+Local Modifications:
+  <none>
+

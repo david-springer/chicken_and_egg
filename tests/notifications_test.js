@@ -78,6 +78,19 @@ test("Post Notification", function() {
   equal(postCount, 2);
 });
 
+test("Post With Sender", function() {
+  var postCount = 0;
+  var notifier = {};
+  var testObserver = function(sender) {
+    postCount++;
+    ok(notifier === sender);
+  };
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver("TEST_NOTIFICATION", testObserver);
+  defaultCenter.postNotification("TEST_NOTIFICATION", notifier);
+  equal(postCount, 1);
+});
+
 test("Multi Post Notification", function() {
   var postCount = 0;
   var otherPostCount = 0;

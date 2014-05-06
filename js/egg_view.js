@@ -50,31 +50,3 @@ EggView.prototype.draw = function(ctx, body) {
 
   ctx.restore();
 }
-
-/**
- * Create the vertices of a polygon that describes an egg.
- * A common hen's egg is 5.7cm tall and 4.45cm in diameter at its widest point, on
- * average (ref: http://www.animalplanet.com/animal-facts/egg-info.htm).
- * @param {Number} opt_ovality The "ovalness" of the egg. This parameter is pretty
- *     narrow in range. 0.17 to 0.2 are good values.
- * @return {Array} the egg vertices.
- */
-EggView.prototype.eggVertices = function(opt_ovality) {
-  var ovality = opt_ovality || 0.2;
-  var eggVertices = new Array();
-
-  var step = Math.PI / 12;
-  var ctr = new Box2D.Common.Math.b2Vec2(0, 0);
-  var radius = new Box2D.Common.Math.b2Vec2(.0445, .057);
-  for (var theta = 0; theta < 2 * Math.PI; theta += step) {
-    var sinTheta = Math.sin(theta);
-    // Scale the x-value by a function of y. I picked e^(0.2y) as the scaling
-    // function. This scale is applied before scaling by the radius, so that y
-    // is in range [-1..1]. Larger values of |y| produce really crazy results.
-    var x = Math.exp(ovality * sinTheta) * radius.x * Math.cos(theta);
-    var y = radius.y * sinTheta;
-    eggVertices.push(new Box2D.Common.Math.b2Vec2(ctr.x + x, ctr.y + y));
-  }
-  return eggVertices;
-}
-

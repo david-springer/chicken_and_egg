@@ -94,13 +94,18 @@ NotificationCenter.prototype.removeAllNotifications = function() {
  * Post the notification, which causes all the observing functions to be called. Calling
  * order is not guaranteed. Does nothing if no observers have been registered.
  * @param {String} notification The notification to post.
+ * @param {=Object} opt_sender The optional sender of the notification.
  */
-NotificationCenter.prototype.postNotification = function(notification) {
+NotificationCenter.prototype.postNotification = function(notification, opt_sender) {
   var callbacks = notification && this._notificationDict[notification];
   if (!callbacks) {
     return;
   }
   if (notification) {
-    callbacks.fire();
+    if (opt_sender) {
+      callbacks.fireWith(this, [opt_sender]);
+    } else {
+      callbacks.fire();
+    }
   }
 }
