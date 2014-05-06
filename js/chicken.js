@@ -214,7 +214,8 @@ Chicken.prototype.processGameTick = function(gameTimeNow, gameTimeDelta,
  */
 Chicken.prototype._nextAction = function() {
   if (this._drinkVolume == 0 && this._peckVolume == 0) {
-    this._action = Chicken.Actions.PECK ? Chicken.Actions.DRINK : Chicken.Actions.PECK;
+    this._action = (this._action == Chicken.Actions.PECK) ?
+        Chicken.Actions.DRINK : Chicken.Actions.PECK;
   }
   return this._action;
 }
