@@ -8,7 +8,7 @@
  * the Feed Bag game entity. The Feed Bag rules:
  *   The feed bag starts with 2kg of feed.
  *   The bag loses feed with each peck from a chicken.
- *   A feed bag can be refilled when an egg crate is filled with a dozen eggs.
+ *   A feed bag can be refilled when an egg carton is filled with a dozen eggs.
  */
 
 /**

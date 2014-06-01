@@ -37,7 +37,7 @@ EggCarton.MAX_EGG_COUNT = 12;
  * Notification sent when a egg is laid.
  * @type {string}
  */
-EggCarton.DID_FILL_CRATE_NOTIFICATION = 'didFillCrateNotification';
+EggCarton.DID_FILL_CARTON_NOTIFICATION = 'didFillCartonNotification';
 
 /**
  * The number of eggs in the crate. In range [0..{@code MAX_EGG_COUNT}].
@@ -66,7 +66,7 @@ EggCarton.prototype.addEgg = function() {
   this._eggCount++;
   if (this._eggCount == EggCarton.MAX_EGG_COUNT) {
     NotificationDefaultCenter().postNotification(
-        EggCarton.DID_FILL_CRATE_NOTIFICATION, this);
+        EggCarton.DID_FILL_CARTON_NOTIFICATION, this);
   }
   return true;
 }
