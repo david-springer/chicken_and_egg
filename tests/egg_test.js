@@ -9,12 +9,12 @@
 module("Egg Object", {
   teardown: function() {
     equal(NotificationDefaultCenter().hasObserversForNotification(
-        EggCrate.DID_FILL_CRATE_NOTIFICATION), false);
+        EggCarton.DID_FILL_CRATE_NOTIFICATION), false);
   }
 });
 
 test("Default Constructor", function() {
-  var testCrate = new EggCrate();
+  var testCrate = new EggCarton();
   equal(testCrate.eggCount(), 0);
 });
 

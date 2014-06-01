@@ -4,22 +4,22 @@
  */
 
 /**
- * @fileoverview Unit tests for the EggCrate object.
+ * @fileoverview Unit tests for the EggCarton object.
  */
-module("EggCrate Object", {
+module("EggCarton Object", {
   teardown: function() {
     equal(NotificationDefaultCenter().hasObserversForNotification(
-        EggCrate.DID_FILL_CRATE_NOTIFICATION), false);
+        EggCarton.DID_FILL_CARTON_NOTIFICATION), false);
   }
 });
 
 test("Default Constructor", function() {
-  var testCrate = new EggCrate();
+  var testCrate = new EggCarton();
   equal(testCrate.eggCount(), 0);
 });
 
 test("Add Egg", function() {
-  var testCrate = new EggCrate();
+  var testCrate = new EggCarton();
   equal(testCrate.eggCount(), 0);
   ok(testCrate.addEgg());
   equal(testCrate.eggCount(), 1);
@@ -28,10 +28,10 @@ test("Add Egg", function() {
 });
 
 test("Add Egg When Full", function() {
-  var testCrate = new EggCrate();
-  testCrate.setEggCount(EggCrate.MAX_EGG_COUNT);
+  var testCrate = new EggCarton();
+  testCrate.setEggCount(EggCarton.MAX_EGG_COUNT);
   equal(testCrate.addEgg(), false);
-  equal(testCrate.eggCount(), EggCrate.MAX_EGG_COUNT);
+  equal(testCrate.eggCount(), EggCarton.MAX_EGG_COUNT);
 });
 
 test("Send Crate Full Notification", function() {
@@ -42,19 +42,19 @@ test("Send Crate Full Notification", function() {
   };
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(
-      EggCrate.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
-  var testCrate = new EggCrate();
-  testCrate.setEggCount(EggCrate.MAX_EGG_COUNT - 2);
+      EggCarton.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
+  var testCrate = new EggCarton();
+  testCrate.setEggCount(EggCarton.MAX_EGG_COUNT - 2);
   ok(testCrate.addEgg());
   equal(crateFull, false);
   ok(testCrate.addEgg());
   ok(crateFull);
   defaultCenter.removeNotificationObserver(
-      EggCrate.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
+      EggCarton.DID_FILL_CRATE_NOTIFICATION, crateDidFill);
 });
 
 test("Reset Crate", function() {
-  var testCrate = new EggCrate();
+  var testCrate = new EggCarton();
   testCrate.setEggCount(4);
   ok(testCrate.eggCount() > 0);
   testCrate.reset();

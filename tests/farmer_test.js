@@ -115,5 +115,5 @@ test("Death Notice", function() {
   equal(testFarmer.isAlive(), false);
   equal(testFarmer.health(), 0);
   defaultCenter.removeNotificationObserver(
-      EggCrate.DID_FILL_CRATE_NOTIFICATION, farmerDidDie);
+      EggCarton.DID_FILL_CRATE_NOTIFICATION, farmerDidDie);
 });
