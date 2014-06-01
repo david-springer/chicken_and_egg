@@ -127,8 +127,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
-  var ground = new Ground();
-  ground.addToSimulation(this);
+  var eggConveyor = new EggConveyor();
+  eggConveyor.addToSimulation(this);
 
   // Add a hinge joint.
   var hingeCenter = new Box2D.Common.Math.b2Vec2(

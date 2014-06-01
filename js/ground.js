@@ -43,7 +43,7 @@ Ground.prototype.getBodyDef = function() {
  * Build up the ground fixtures. There are two: the flat ground plane, and a wedge.
  * @override
  */
-GamePiece.prototype.addFixturesToBody = function(simulation, body) {
+Ground.prototype.addFixturesToBody = function(simulation, body) {
   // Set up the flat ground plane.
   var worldSize = simulation.worldSize();
   var groundVertices = new Array()
@@ -74,6 +74,6 @@ GamePiece.prototype.addFixturesToBody = function(simulation, body) {
   body.CreateFixture(wedgeFixture);
 }
 
-GamePiece.prototype.getView = function(simulation) {
+Ground.prototype.getView = function(simulation) {
   return new PolyView(simulation.scale());
 }
