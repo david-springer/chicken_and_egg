@@ -76,6 +76,14 @@ ChickenAndEgg.Box2DConsts = {
 };
 
 /**
+ * Constants used to refer to the DOM.
+ * @enum {string}
+ */
+ChickenAndEgg.DOMConsts = {
+  BODY: 'body,html'
+};
+
+/**
  * Scale factor to transform CANVAS coordinates into Box2D world coordinates. Returns
  * 0 until initWorld() is called.
  * @return The scale factor.
@@ -106,6 +114,9 @@ ChickenAndEgg.prototype.worldSize = function() {
  * The run() method initializes and runs the simulation. It never returns.
  */
 ChickenAndEgg.prototype.run = function() {
+  // Bind the mouse-down event to the BODY element. This ensures that the conditionally-
+  // bound mouse-up event will fire properly.
+  $(ChickenAndEgg.DOMConsts.BODY).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
   var heartbeat = function() {
     this.simulationTick();
@@ -184,4 +195,37 @@ ChickenAndEgg.prototype.simulationTick = function() {
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
+}
+
+/**
+ * Handle the mouse-down event. Convert the event into Box2D coordinates and issue a
+ * hit-detection. If the sluice handle is hit, start the handle-drag sequence.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseDown = function(event) {
+  console.log('mousedown (' + event.pageX + ', ' + event.pageY + ')');
+  $(ChickenAndEgg.DOMConsts.BODY)
+      .mousemove(this._mouseDrag.bind(this))
+      .mouseup(this._mouseUp.bind(this));
+}
+
+/**
+ * Handle the mouse-drag event. Compute the angle formed by the mouse point and the
+ * origin of the sluice, and rotate the sluice by that angle.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseDrag = function(event) {
+  console.log('mousemove (' + event.pageX + ', ' + event.pageY + ')');
+}
+
+/**
+ * Handle the mouse-up event. End the sluice drag sequence.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseUp = function(event) {
+  console.log('mouseup (' + event.pageX + ', ' + event.pageY + ')');
+  $(ChickenAndEgg.DOMConsts.BODY).unbind('mousemove');
 }
