@@ -58,6 +58,12 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._world = null;
+  /**
+   * The egg conveyor system. Allocated and initialized in initWorld().
+   * @type {EggConveyor}
+   * @private
+   */
+  this._eggConveyor = null;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -126,46 +132,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
-  var eggConveyor = new EggConveyor();
-  eggConveyor.addToSimulation(this);
-
-  // Add a hinge joint.
-  var hingeCenter = new Box2D.Common.Math.b2Vec2(this._worldSize.x / 2, this._worldSize.y / 2);
-  fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  fixtureDef.density = 8.05;  // Density of steel in g/cm^3
-  fixtureDef.friction = 0.2;
-  fixtureDef.restitution = 0.5;
-  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  fixtureDef.shape.SetAsBox(0.005, 0.5);
-  bodyDef = new Box2D.Dynamics.b2BodyDef();
-  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y + 0.5);
-  var link1 = this._world.CreateBody(bodyDef);
-  link1.CreateFixture(fixtureDef);
-  link1.SetUserData(new PolyView());
-  
-  fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  fixtureDef.density = 8.05;  // Density of steel in g/cm^3
-  fixtureDef.friction = 0.2;
-  fixtureDef.restitution = 0.5;
-  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  fixtureDef.shape.SetAsBox(0.005, 0.5);
-  bodyDef = new Box2D.Dynamics.b2BodyDef();
-  bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y - 0.5);
-  this._hinge = this._world.CreateBody(bodyDef);
-  this._hinge.CreateFixture(fixtureDef);
-  this._hinge.SetUserData(new PolyView());
-
-  var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
-  jointDef.Initialize(link1, this._hinge, new Box2D.Common.Math.b2Vec2(
-      hingeCenter.x,
-      hingeCenter.y));
-  jointDef.collideConnected = false;
-  jointDef.lowerAngle = -Math.PI / 2;
-  jointDef.upperAngle = Math.PI / 2;
-  jointDef.enableLimit = true;
-  this._hingeJoint = this._world.CreateJoint(jointDef);
+  this._eggConveyor = new EggConveyor();
+  this._eggConveyor.addToSimulation(this);
 
   var eggBody;
   for (var e = 0; e < 20; e++) {
@@ -210,11 +178,8 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
  * Run a simulation tick, then schedule the next one.
  */
 ChickenAndEgg.prototype.simulationTick = function() {
-  // Apply the return-spring force to the hinge. Uses Hooke's law.
-  var hingeAngle = this._hingeJoint.GetJointAngle();
-  var hingeVel = this._hingeJoint.GetJointSpeed();
-  if (Math.abs(hingeVel) > 0.001) {
-    this._hinge.ApplyTorque(-hingeAngle * 0.02 - hingeVel * 0.05);
+  if (this._eggConveyor) {
+    this._eggConveyor.simulationTick();
   }
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
