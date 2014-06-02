@@ -58,12 +58,6 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._world = null;
-  /**
-   * The egg conveyor system. Allocated and initialized in initWorld().
-   * @type {EggConveyor}
-   * @private
-   */
-  this._eggConveyor = null;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -75,7 +69,10 @@ ChickenAndEgg.Box2DConsts = {
   GRAVITY: {x: 0, y: -9.81},
   FRAME_RATE: 1/60.0,
   VELOCITY_ITERATION_COUNT: 10,
-  POSITION_ITERATION_COUNT: 10
+  POSITION_ITERATION_COUNT: 10,
+  DOUG_FIR_DENSITY: 5.3,  // Density of Douglas Fir in g/cm^3
+  DOUG_FIR_FRICTION: 0.3,
+  DOUG_FIR_RESTITUTION: 0.804
 };
 
 /**
@@ -132,10 +129,15 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
-  this._eggConveyor = new EggConveyor();
-  this._eggConveyor.addToSimulation(this);
+  var roost = new Roost();
+  roost.addToSimulation(this);
+  var ground = new Ground();
+  ground.addToSimulation(this);
+  var sluice = new Sluice();
+  sluice.addToSimulation(this);
+  var coopDoor = new CoopDoor();
+  coopDoor.addToSimulation(this);
 
-  var eggBody;
   for (var e = 0; e < 20; e++) {
     var egg = new Egg(0.1 * e, this._worldSize.y - 0.02);
     egg.addToSimulation(this);
@@ -178,9 +180,6 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
  * Run a simulation tick, then schedule the next one.
  */
 ChickenAndEgg.prototype.simulationTick = function() {
-  if (this._eggConveyor) {
-    this._eggConveyor.simulationTick();
-  }
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
