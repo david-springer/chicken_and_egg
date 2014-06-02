@@ -58,12 +58,13 @@ EggConveyor.prototype.addFixturesToBody = function(simulation, body) {
   // Set up the sluice.
 
   // Set up the flat ground plane.
-  var worldSize = simulation.worldSize();
+  var groundLocation = simulation.worldSize().Copy();
+  groundLocation.y = 0;
   var groundVertices = new Array()
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y + 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y - 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, worldSize.y - 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, worldSize.y + 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y + 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y - 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y - 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y + 0.05));
   var groundFixture = new Box2D.Dynamics.b2FixtureDef();
   groundFixture.density = EggConveyor.Box2DConsts.GROUND_DENSITY;
   groundFixture.friction = EggConveyor.Box2DConsts.GROUND_FRICTION;

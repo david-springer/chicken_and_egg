@@ -28,7 +28,6 @@ EggView.prototype.draw = function(ctx, body) {
   // Draw the polygon of the first fixture.
   // TODO(daves): Replace this with a sprite for the egg.
   var transform = body.GetTransform();
-  var scale = this.scale();
   var egg = body.GetFixtureList().GetShape();
   var vertexCount = parseInt(egg.GetVertexCount());
   var vertices = egg.GetVertices();
@@ -37,13 +36,13 @@ EggView.prototype.draw = function(ctx, body) {
 
   ctx.beginPath();
   var vertex0 = Box2D.Common.Math.b2Math.MulX(transform, vertices[0]);
-  ctx.moveTo(vertex0.x * scale, vertex0.y * scale);
+  ctx.moveTo(vertex0.x, vertex0.y);
   var vertex;
   for (var i = 1; i < vertexCount; i++) {
     vertex = Box2D.Common.Math.b2Math.MulX(transform, vertices[i]);
-    ctx.lineTo(vertex.x * scale, vertex.y * scale);
+    ctx.lineTo(vertex.x, vertex.y);
   }
-  ctx.lineTo(vertex0.x * scale, vertex0.y * scale);
+  ctx.lineTo(vertex0.x, vertex0.y);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();

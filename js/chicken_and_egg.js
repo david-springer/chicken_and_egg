@@ -66,7 +66,7 @@ ChickenAndEgg.prototype.constructor = ChickenAndEgg;
  * @enum {Object}
  */
 ChickenAndEgg.Box2DConsts = {
-  GRAVITY: {x: 0, y: 9.81},
+  GRAVITY: {x: 0, y: -9.81},
   FRAME_RATE: 1/60.0,
   VELOCITY_ITERATION_COUNT: 10,
   POSITION_ITERATION_COUNT: 10
@@ -123,17 +123,14 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       new Box2D.Common.Math.b2Vec2(ChickenAndEgg.Box2DConsts.GRAVITY.x,
                                    ChickenAndEgg.Box2DConsts.GRAVITY.y),
       true);  // Allow objects to sleep when inactive.
-  this._scale = canvas.height / 3;  // 3m tall simulation.
-
+  this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
   var eggConveyor = new EggConveyor();
   eggConveyor.addToSimulation(this);
 
   // Add a hinge joint.
-  var hingeCenter = new Box2D.Common.Math.b2Vec2(
-      (canvas.width / 2 / this._scale),
-      (canvas.height / 2 / this._scale));
+  var hingeCenter = new Box2D.Common.Math.b2Vec2(this._worldSize.x / 2, this._worldSize.y / 2);
   fixtureDef = new Box2D.Dynamics.b2FixtureDef();
   fixtureDef.density = 8.05;  // Density of steel in g/cm^3
   fixtureDef.friction = 0.2;
@@ -142,10 +139,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   fixtureDef.shape.SetAsBox(0.005, 0.5);
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y - 0.5);
+  bodyDef.position.Set(hingeCenter.x, hingeCenter.y + 0.5);
   var link1 = this._world.CreateBody(bodyDef);
   link1.CreateFixture(fixtureDef);
-  link1.SetUserData(new PolyView(this._scale));
+  link1.SetUserData(new PolyView());
   
   fixtureDef = new Box2D.Dynamics.b2FixtureDef();
   fixtureDef.density = 8.05;  // Density of steel in g/cm^3
@@ -155,10 +152,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   fixtureDef.shape.SetAsBox(0.005, 0.5);
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y + 0.5);
+  bodyDef.position.Set(hingeCenter.x, hingeCenter.y - 0.5);
   this._hinge = this._world.CreateBody(bodyDef);
   this._hinge.CreateFixture(fixtureDef);
-  this._hinge.SetUserData(new PolyView(this._scale));
+  this._hinge.SetUserData(new PolyView());
 
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
   jointDef.Initialize(link1, this._hinge, new Box2D.Common.Math.b2Vec2(
@@ -172,7 +169,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   var eggBody;
   for (var e = 0; e < 20; e++) {
-    var egg = new Egg(0.1 * e, 0.2);
+    var egg = new Egg(0.1 * e, this._worldSize.y - 0.02);
     egg.addToSimulation(this);
   }
 }
@@ -192,6 +189,13 @@ ChickenAndEgg.prototype.clearCanvas = function(canvas) {
  */
 ChickenAndEgg.prototype.drawWorld = function(canvas) {
   var ctx = canvas.getContext("2d");
+  // Set up the root transform of the CANVAS such that origin is in the lower-left corner,
+  // y is positive upwards and the scale is in meters.
+  ctx.save();
+  ctx.translate(0, canvas.height);
+  ctx.scale(this._scale, -this._scale);
+  // Hack to deal with weird fact that CANVAS scales the line width.
+  ctx.lineWidth = ctx.lineWidth / this._scale;
   for (var b = this._world.GetBodyList(); b; b = b.m_next) {
     if (b.IsActive() &&
         typeof b.GetUserData() !== 'undefined' &&
@@ -199,6 +203,7 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
         b.GetUserData().draw(ctx, b);
     }
   }
+  ctx.restore();
 }
 
 /**
