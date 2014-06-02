@@ -27,7 +27,7 @@ Sluice.prototype.constructor = Sluice;
  */
 Sluice.prototype.getBodyDef = function() {
   var sluiceBodyDef = new Box2D.Dynamics.b2BodyDef();
-  sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_kinematicBody;
   return sluiceBodyDef;
 }
 
