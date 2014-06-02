@@ -73,6 +73,16 @@ Sluice.prototype.addFixturesToBody = function(simulation, body) {
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 2.65, 1.60 + 0.03));
   sluiceFixture.shape.SetAsArray(sluiceVerts);
   body.CreateFixture(sluiceFixture);
+
+  // Add the handle at the end of the sluice. This is implemented as a separate fixture
+  // to support AABB hit detection.
+  sluiceVerts = new Array();
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15, 1.585));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15 + 0.06, 1.585));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15 + 0.06, 1.585 + 0.06));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15, 1.585 + 0.06));
+  sluiceFixture.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixture);
 }
 
 Sluice.prototype.getView = function(simulation) {
