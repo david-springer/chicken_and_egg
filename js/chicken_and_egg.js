@@ -160,9 +160,11 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var coopDoor = new CoopDoor();
   coopDoor.addToSimulation(this);
 
+  this._eggs = new Array();
   for (var e = 0; e < 20; e++) {
     var egg = new Egg(0.1 * e, this._worldSize.y - 0.02);
     egg.addToSimulation(this);
+    this._eggs.push(egg);
   }
 }
 
@@ -271,6 +273,9 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
       Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
       ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
   this._sluice.body().SetAngle(angle);
+  for (var i = 0; i < this._eggs.length; ++i) {
+    this._eggs[i].SetActive(true);
+  }
 }
 
 /**
