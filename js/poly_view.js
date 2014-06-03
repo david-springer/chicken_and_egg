@@ -26,7 +26,6 @@ PolyView.prototype.constructor = PolyView;
  */
 PolyView.prototype.draw = function(ctx, body) {
   var transform = body.GetTransform();
-  var scale = this.scale();
   for (var fixture = body.GetFixtureList(); fixture != null; fixture = fixture.m_next) {
     var poly = fixture.GetShape();
     var vertexCount = parseInt(poly.GetVertexCount());
@@ -36,12 +35,11 @@ PolyView.prototype.draw = function(ctx, body) {
 
     ctx.beginPath();
     var vertex0 = Box2D.Common.Math.b2Math.MulX(transform, vertices[0]);
-    ctx.moveTo(vertex0.x * scale, vertex0.y * scale);
+    ctx.moveTo(vertex0.x, vertex0.y);
     for (var i = 1; i < vertexCount; i++) {
       var vertex = Box2D.Common.Math.b2Math.MulX(transform, vertices[i]);
-      ctx.lineTo(vertex.x * scale, vertex.y * scale);
+      ctx.lineTo(vertex.x, vertex.y);
     }
-    ctx.lineTo(vertex0.x * scale, vertex0.y * scale);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
