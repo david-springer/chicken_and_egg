@@ -4,8 +4,8 @@
  */
 
 /**
- * @fileoverview  The Ground class. The Ground object implements all static pieces in
- * the game.
+ * @fileoverview  The Ground class. The Ground object implements the static element
+ * representing the ground.
  */
 
 /**
@@ -25,12 +25,12 @@ Ground.prototype.constructor = Ground;
  */
 Ground.Box2DConsts = {
   GROUND_DENSITY: 1.0,
-  GROUND_FRICTION: 0.5,
-  GROUND_RESTITUTION: 0.7
+  GROUND_FRICTION: 0.8,
+  GROUND_RESTITUTION: 0.1
 }
 
 /**
- * Return the body def for the ground. The ground is a static body.
+ * Return the body def for the ground.
  * @override
  */
 Ground.prototype.getBodyDef = function() {
@@ -43,37 +43,27 @@ Ground.prototype.getBodyDef = function() {
  * Build up the ground fixtures. There are two: the flat ground plane, and a wedge.
  * @override
  */
-GamePiece.prototype.addFixturesToBody = function(simulation, body) {
+Ground.prototype.addFixturesToBody = function(simulation, body) {
+  var groundLocation = simulation.worldSize().Copy();
+  groundLocation.y = 0;
   // Set up the flat ground plane.
-  var worldSize = simulation.worldSize();
   var groundVertices = new Array()
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y + 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y - 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, worldSize.y - 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, worldSize.y + 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y + 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y - 0.05));
+  groundVertices.push(
+      new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y - 0.05));
+  groundVertices.push(
+      new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y + 0.05));
   var groundFixture = new Box2D.Dynamics.b2FixtureDef();
   groundFixture.density = Ground.Box2DConsts.GROUND_DENSITY;
   groundFixture.friction = Ground.Box2DConsts.GROUND_FRICTION;
   groundFixture.restitution = Ground.Box2DConsts.GROUND_RESTITUTION;
   groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   groundFixture.shape.SetAsArray(groundVertices);
-
-  // Set up the incline plane.
-  var wedgeVertices = new Array();
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y - 1.5));
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(2, worldSize.y - 0.05));
-  wedgeVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y - 0.05));
-  var wedgeFixture = new Box2D.Dynamics.b2FixtureDef();
-  wedgeFixture.density = Ground.Box2DConsts.GROUND_DENSITY;
-  wedgeFixture.friction = Ground.Box2DConsts.GROUND_FRICTION;
-  wedgeFixture.restitution = Ground.Box2DConsts.GROUND_RESTITUTION;
-  wedgeFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  wedgeFixture.shape.SetAsArray(wedgeVertices);
-
   body.CreateFixture(groundFixture);
-  body.CreateFixture(wedgeFixture);
 }
 
-GamePiece.prototype.getView = function(simulation) {
+Ground.prototype.getView = function(simulation) {
   return new PolyView(simulation.scale());
 }
+

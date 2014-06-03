@@ -38,8 +38,8 @@ Egg.prototype.constructor = Egg;
  */
 Egg.Box2DConsts = {
   EGG_DENSITY: 1.031,
-  EGG_FRICTION: 0.3,
-  EGG_RESTITUTION: 0.3
+  EGG_FRICTION: 0.5,
+  EGG_RESTITUTION: 0.2
 }
 
 /**
@@ -63,7 +63,9 @@ Egg.prototype._eggVertices = function(opt_ovality) {
     // Scale the x-value by a function of y. I picked e^(0.2y) as the scaling
     // function. This scale is applied before scaling by the radius, so that y
     // is in range [-1..1]. Larger values of |y| produce really crazy results.
-    var x = Math.exp(ovality * sinTheta) * radius.x * Math.cos(theta);
+    // Note: the vertices *must* be specified in counter-clockwise order, or the Box2D
+    // collision detector won't work.
+    var x = Math.exp(-ovality * sinTheta) * radius.x * Math.cos(theta);
     var y = radius.y * sinTheta;
     eggVertices.push(new Box2D.Common.Math.b2Vec2(ctr.x + x, ctr.y + y));
   }

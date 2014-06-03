@@ -24,3 +24,23 @@ test("Unique UUID", function() {
   ok(uuid2 != null);
   ok(uuid1 !== uuid2);
 });
+
+test("Body Accessor", function() {
+  var fakeBody = function(bodyDef) {
+    return {
+        SetUserData: function(data) {},
+        GetUserData: function() { return "testBodyData"; }
+    };
+  };
+  var fakeWorld = function() {
+    return { CreateBody: fakeBody };
+  };
+  var fakeSimulation = {
+    world: fakeWorld
+  };
+  var testPiece = new GamePiece();
+  ok(testPiece.body() == null);
+  testPiece.addToSimulation(fakeSimulation);
+  ok(testPiece.body() != null);
+  equal(testPiece.body().GetUserData(), "testBodyData");
+});

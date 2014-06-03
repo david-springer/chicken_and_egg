@@ -4,7 +4,7 @@
  */
 
 /**
- * @fileoverview  The EggCrate class. The EggCrate object implements all the
+ * @fileoverview  The EggCarton class. The EggCarton object implements all the
  * behaviour of an egg crate:
  *   The egg crate has a maximum capacity of one dozen eggs.
  *   An egg crate starts out empty.
@@ -12,10 +12,10 @@
  */
 
 /**
- * Constructor for the EggCrate.
+ * Constructor for the EggCarton.
  * @constructor
  */
-EggCrate = function() {
+EggCarton = function() {
   GamePiece.call(this);
   /**
    * Number of eggs in the crate.
@@ -25,25 +25,25 @@ EggCrate = function() {
    */
   this._eggCount = 0;
 }
-EggCrate.prototype = new GamePiece();
-EggCrate.prototype.constructor = EggCrate;
+EggCarton.prototype = new GamePiece();
+EggCarton.prototype.constructor = EggCarton;
 
 /**
  * The maximum number of eggs that can go in a crate.
  */
-EggCrate.MAX_EGG_COUNT = 12;
+EggCarton.MAX_EGG_COUNT = 12;
 
 /**
  * Notification sent when a egg is laid.
  * @type {string}
  */
-EggCrate.DID_FILL_CRATE_NOTIFICATION = 'didFillCrateNotification';
+EggCarton.DID_FILL_CARTON_NOTIFICATION = 'didFillCartonNotification';
 
 /**
  * The number of eggs in the crate. In range [0..{@code MAX_EGG_COUNT}].
  * @return {number} number of eggs.
  */
-EggCrate.prototype.eggCount = function() {
+EggCarton.prototype.eggCount = function() {
   return this._eggCount;
 }
 
@@ -51,7 +51,7 @@ EggCrate.prototype.eggCount = function() {
  * Exposed for testing. Do not use.
  * @param {number} eggCount The new egg count.
  */
-EggCrate.prototype.setEggCount = function(eggCount) {
+EggCarton.prototype.setEggCount = function(eggCount) {
   this._eggCount = eggCount;
 }
 
@@ -59,14 +59,14 @@ EggCrate.prototype.setEggCount = function(eggCount) {
  * Add an egg to the crate. If the crate is full, does nothing and returns {@code false}.
  * @return {boolean} whether the egg was successfully added.
  */
-EggCrate.prototype.addEgg = function() {
-  if (this._eggCount == EggCrate.MAX_EGG_COUNT) {
+EggCarton.prototype.addEgg = function() {
+  if (this._eggCount == EggCarton.MAX_EGG_COUNT) {
     return false;
   }
   this._eggCount++;
-  if (this._eggCount == EggCrate.MAX_EGG_COUNT) {
+  if (this._eggCount == EggCarton.MAX_EGG_COUNT) {
     NotificationDefaultCenter().postNotification(
-        EggCrate.DID_FILL_CRATE_NOTIFICATION, this);
+        EggCarton.DID_FILL_CARTON_NOTIFICATION, this);
   }
   return true;
 }
@@ -74,6 +74,6 @@ EggCrate.prototype.addEgg = function() {
 /**
  * Reset the crate by emptying out all the eggs. Resets the egg count back to 0.
  */
-EggCrate.prototype.reset = function() {
+EggCarton.prototype.reset = function() {
   this._eggCount = 0;
 }

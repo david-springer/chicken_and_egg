@@ -66,10 +66,32 @@ ChickenAndEgg.prototype.constructor = ChickenAndEgg;
  * @enum {Object}
  */
 ChickenAndEgg.Box2DConsts = {
-  GRAVITY: {x: 0, y: 9.81},
+  GRAVITY: {x: 0, y: -9.81},
   FRAME_RATE: 1/60.0,
   VELOCITY_ITERATION_COUNT: 10,
-  POSITION_ITERATION_COUNT: 10
+  POSITION_ITERATION_COUNT: 10,
+  DOUG_FIR_DENSITY: 5.3,  // Density of Douglas Fir in g/cm^3
+  DOUG_FIR_FRICTION: 0.3,
+  DOUG_FIR_RESTITUTION: 0.804
+};
+
+/**
+ * Constants used to refer to the DOM.
+ * @enum {string}
+ * @private
+ */
+ChickenAndEgg._DOMConsts = {
+  BODY: 'body'
+};
+
+/**
+ * Limits for things like the sluice angle and other game objects.
+ * @enum {Object}
+ * @private
+ */
+ChickenAndEgg._Limits = {
+  SLUICE_MAX_ANGLE: Math.PI / 12.0,
+  SLUICE_MIN_ANGLE: -Math.PI / 12.0
 };
 
 /**
@@ -103,6 +125,9 @@ ChickenAndEgg.prototype.worldSize = function() {
  * The run() method initializes and runs the simulation. It never returns.
  */
 ChickenAndEgg.prototype.run = function() {
+  // Bind the mouse-down event to the BODY element. This ensures that the conditionally-
+  // bound mouse-up event will fire properly.
+  $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
   var heartbeat = function() {
     this.simulationTick();
@@ -123,56 +148,20 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       new Box2D.Common.Math.b2Vec2(ChickenAndEgg.Box2DConsts.GRAVITY.x,
                                    ChickenAndEgg.Box2DConsts.GRAVITY.y),
       true);  // Allow objects to sleep when inactive.
-  this._scale = canvas.height / 3;  // 3m tall simulation.
-
+  this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
+  var roost = new Roost();
+  roost.addToSimulation(this);
   var ground = new Ground();
   ground.addToSimulation(this);
+  this._sluice = new Sluice();
+  this._sluice.addToSimulation(this);
+  var coopDoor = new CoopDoor();
+  coopDoor.addToSimulation(this);
 
-  // Add a hinge joint.
-  var hingeCenter = new Box2D.Common.Math.b2Vec2(
-      (canvas.width / 2 / this._scale),
-      (canvas.height / 2 / this._scale));
-  fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  fixtureDef.density = 8.05;  // Density of steel in g/cm^3
-  fixtureDef.friction = 0.2;
-  fixtureDef.restitution = 0.5;
-  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  fixtureDef.shape.SetAsBox(0.005, 0.5);
-  bodyDef = new Box2D.Dynamics.b2BodyDef();
-  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y - 0.5);
-  var link1 = this._world.CreateBody(bodyDef);
-  link1.CreateFixture(fixtureDef);
-  link1.SetUserData(new PolyView(this._scale));
-  
-  fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  fixtureDef.density = 8.05;  // Density of steel in g/cm^3
-  fixtureDef.friction = 0.2;
-  fixtureDef.restitution = 0.5;
-  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  fixtureDef.shape.SetAsBox(0.005, 0.5);
-  bodyDef = new Box2D.Dynamics.b2BodyDef();
-  bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  bodyDef.position.Set(hingeCenter.x, hingeCenter.y + 0.5);
-  this._hinge = this._world.CreateBody(bodyDef);
-  this._hinge.CreateFixture(fixtureDef);
-  this._hinge.SetUserData(new PolyView(this._scale));
-
-  var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
-  jointDef.Initialize(link1, this._hinge, new Box2D.Common.Math.b2Vec2(
-      hingeCenter.x,
-      hingeCenter.y));
-  jointDef.collideConnected = false;
-  jointDef.lowerAngle = -Math.PI / 2;
-  jointDef.upperAngle = Math.PI / 2;
-  jointDef.enableLimit = true;
-  this._hingeJoint = this._world.CreateJoint(jointDef);
-
-  var eggBody;
   for (var e = 0; e < 20; e++) {
-    var egg = new Egg(0.1 * e, 0.2);
+    var egg = new Egg(0.1 * e, this._worldSize.y - 0.02);
     egg.addToSimulation(this);
   }
 }
@@ -192,6 +181,13 @@ ChickenAndEgg.prototype.clearCanvas = function(canvas) {
  */
 ChickenAndEgg.prototype.drawWorld = function(canvas) {
   var ctx = canvas.getContext("2d");
+  // Set up the root transform of the CANVAS such that origin is in the lower-left corner,
+  // y is positive upwards and the scale is in meters.
+  ctx.save();
+  ctx.translate(0, canvas.height);
+  ctx.scale(this._scale, -this._scale);
+  // Hack to deal with weird fact that CANVAS scales the line width.
+  ctx.lineWidth = ctx.lineWidth / this._scale;
   for (var b = this._world.GetBodyList(); b; b = b.m_next) {
     if (b.IsActive() &&
         typeof b.GetUserData() !== 'undefined' &&
@@ -199,20 +195,89 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
         b.GetUserData().draw(ctx, b);
     }
   }
+  ctx.restore();
 }
 
 /**
  * Run a simulation tick, then schedule the next one.
  */
 ChickenAndEgg.prototype.simulationTick = function() {
-  // Apply the return-spring force to the hinge. Uses Hooke's law.
-  var hingeAngle = this._hingeJoint.GetJointAngle();
-  var hingeVel = this._hingeJoint.GetJointSpeed();
-  if (Math.abs(hingeVel) > 0.001) {
-    this._hinge.ApplyTorque(-hingeAngle * 0.02 - hingeVel * 0.05);
-  }
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
+}
+
+/**
+ * Convert a coordinate in the CANVAS element's coordinate system into a 2D coordinate in
+ * the Box2D simulation's coordinate system.
+ * @param {number} x The x-coordinate
+ * @param {number} y The y-coordinate
+ * @param {Canvas} canvas The canvas that defines the coordinate system.
+ * @return {Box2D.Vec2} The converted coordinate.
+ * @private
+ */
+ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
+  var offset = $(canvas).offset();
+  if (offset) {
+    x = x - offset.left;
+    y = y - offset.top;
+  }
+  return new Box2D.Common.Math.b2Vec2(
+    x / this._scale,
+    (y - canvas.height) / -this._scale);
+}
+
+/**
+ * Handle the mouse-down event. Convert the event into Box2D coordinates and issue a
+ * hit-detection. If the sluice handle is hit, start the handle-drag sequence.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseDown = function(event) {
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  /**
+   * Callback for the QueryPoint() method. If the sluice handle was hit, bind the mouse-
+   * drag and mouse-up event handlers and start dragging the sluice.
+   * @param {Box2D.Dynamics.b2Fixture} fixture The fixture to test.
+   * @return {boolean} Wether to continue with the query. Returns false if the sluice
+   *     handle was hit.
+   */
+  var hitSluiceHandle = function(fixture) {
+    if (this._sluice.isSluiceHandle(fixture)) {
+      $(ChickenAndEgg._DOMConsts.BODY)
+          .mousemove(this._mouseDrag.bind(this))
+          .mouseup(this._mouseUp.bind(this));
+      return false;  // Stop searching.
+    }
+    return true;
+  };
+  this._world.QueryPoint(hitSluiceHandle.bind(this), worldMouse);
+}
+
+/**
+ * Handle the mouse-drag event. Compute the angle formed by the mouse point and the
+ * origin of the sluice, and rotate the sluice by that angle.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseDrag = function(event) {
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  var origin = Sluice.SLUICE_ORIGIN;
+  var angle = Math.atan2(worldMouse.y - origin.y, worldMouse.x - origin.x);
+  angle = Math.min(
+      Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
+      ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
+  this._sluice.body().SetAngle(angle);
+}
+
+/**
+ * Handle the mouse-up event. End the sluice drag sequence.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._mouseUp = function(event) {
+  $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }
