@@ -78,9 +78,20 @@ ChickenAndEgg.Box2DConsts = {
 /**
  * Constants used to refer to the DOM.
  * @enum {string}
+ * @private
  */
-ChickenAndEgg.DOMConsts = {
+ChickenAndEgg._DOMConsts = {
   BODY: 'body'
+};
+
+/**
+ * Limits for things like the sluice angle and other game objects.
+ * @enum {Object}
+ * @private
+ */
+ChickenAndEgg._Limits = {
+  SLUICE_MAX_ANGLE: Math.PI / 12.0,
+  SLUICE_MIN_ANGLE: -Math.PI / 12.0
 };
 
 /**
@@ -235,7 +246,7 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
    */
   var hitSluiceHandle = function(fixture) {
     if (this._sluice.isSluiceHandle(fixture)) {
-      $(ChickenAndEgg.DOMConsts.BODY)
+      $(ChickenAndEgg._DOMConsts.BODY)
           .mousemove(this._mouseDrag.bind(this))
           .mouseup(this._mouseUp.bind(this));
       return false;  // Stop searching.
@@ -255,8 +266,11 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
   var origin = Sluice.SLUICE_ORIGIN;
-  this._sluice.body().SetAngle(Math.PI / 6.0);
-  console.log('mousemove (' + worldMouse.x + ', ' + worldMouse.y + ')');
+  var angle = Math.atan2(worldMouse.y - origin.y, worldMouse.x - origin.x);
+  angle = Math.min(
+      Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
+      ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
+  this._sluice.body().SetAngle(angle);
 }
 
 /**
@@ -265,6 +279,5 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
  * @private
  */
 ChickenAndEgg.prototype._mouseUp = function(event) {
-  console.log('mouseup (' + event.pageX + ', ' + event.pageY + ')');
-  $(ChickenAndEgg.DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
+  $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }
