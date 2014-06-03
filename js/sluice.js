@@ -30,8 +30,14 @@ Sluice.prototype.constructor = Sluice;
 Sluice._SLUICE_HANDLE_CONTEXT = "sluiceHandleContext";
 
 /**
+ * The origin in world coordinates of the sluice.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.60 + 0.015);
+
+/**
  * Test whether a fixture is the sluice handle.
- * @param {Box2D.Dynamics.b2FixtureDef} fixture The fixture to test.
+ * @param {Box2D.Dynamics.b2Fixture} fixture The fixture to test.
  * @return {boolean} Whether the fixture is the sluice handle or not.
  */
 Sluice.prototype.isSluiceHandle = function(fixture) {

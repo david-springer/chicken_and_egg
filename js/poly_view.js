@@ -40,7 +40,6 @@ PolyView.prototype.draw = function(ctx, body) {
       var vertex = Box2D.Common.Math.b2Math.MulX(transform, vertices[i]);
       ctx.lineTo(vertex.x, vertex.y);
     }
-    ctx.lineTo(vertex0.x, vertex0.y);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();

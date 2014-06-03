@@ -226,14 +226,23 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
 ChickenAndEgg.prototype._mouseDown = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
-  var isSluiceHandle = function(fixture) {
+  /**
+   * Callback for the QueryPoint() method. If the sluice handle was hit, bind the mouse-
+   * drag and mouse-up event handlers and start dragging the sluice.
+   * @param {Box2D.Dynamics.b2Fixture} fixture The fixture to test.
+   * @return {boolean} Wether to continue with the query. Returns false if the sluice
+   *     handle was hit.
+   */
+  var hitSluiceHandle = function(fixture) {
     if (this._sluice.isSluiceHandle(fixture)) {
       $(ChickenAndEgg.DOMConsts.BODY)
           .mousemove(this._mouseDrag.bind(this))
           .mouseup(this._mouseUp.bind(this));
+      return false;  // Stop searching.
     }
+    return true;
   };
-  this._world.QueryPoint(isSluiceHandle.bind(this), worldMouse);
+  this._world.QueryPoint(hitSluiceHandle.bind(this), worldMouse);
 }
 
 /**
@@ -245,6 +254,8 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
 ChickenAndEgg.prototype._mouseDrag = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
+  var origin = Sluice.SLUICE_ORIGIN;
+  this._sluice.body().SetAngle(Math.PI / 6.0);
   console.log('mousemove (' + worldMouse.x + ', ' + worldMouse.y + ')');
 }
 

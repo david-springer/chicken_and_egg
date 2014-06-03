@@ -18,8 +18,16 @@
  */
 GamePiece = function() {
   /**
+   * The Box2D body that represents this game piece. Not valid until addToSimulation()
+   * is called.
+   * @type {Box2D.Dynamics.b2Body}
+   * @private
+   */
+  this._body = null;
+
+  /**
    * The UUID for this instance. Generated lazily.
-   * @type {number}
+   * @type {string}
    * @private
    */
   this._uuid = null;
@@ -35,6 +43,15 @@ GamePiece.prototype.getUuid = function() {
     this._uuid = uuid();
   }
   return this._uuid;
+}
+
+/**
+ * Accessor for the Box2D body that represents this game piece. Not valid until after
+ * addToSimulation() has returned.
+ * @return {Box2D.Dynamics.b2Body} The Box2D body.
+ */
+GamePiece.prototype.body = function() {
+  return this._body;
 }
 
 /**
@@ -94,7 +111,7 @@ GamePiece.prototype.getView = function(simulation) {}
  */
 GamePiece.prototype.addToSimulation = function(simulation) {
   var bodyDef = this.getBodyDef();
-  var body = simulation.world().CreateBody(bodyDef);
-  this.addFixturesToBody(simulation, body);
-  body.SetUserData(this.getView(simulation));
+  this._body = simulation.world().CreateBody(bodyDef);
+  this.addFixturesToBody(simulation, this._body);
+  this._body.SetUserData(this.getView(simulation));
 }
