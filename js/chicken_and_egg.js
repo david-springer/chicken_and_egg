@@ -80,7 +80,7 @@ ChickenAndEgg.Box2DConsts = {
  * @enum {string}
  */
 ChickenAndEgg.DOMConsts = {
-  BODY: 'body,html'
+  BODY: 'body'
 };
 
 /**
@@ -116,7 +116,7 @@ ChickenAndEgg.prototype.worldSize = function() {
 ChickenAndEgg.prototype.run = function() {
   // Bind the mouse-down event to the BODY element. This ensures that the conditionally-
   // bound mouse-up event will fire properly.
-  $(ChickenAndEgg.DOMConsts.BODY).mousedown(this._mouseDown.bind(this));
+  $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
   var heartbeat = function() {
     this.simulationTick();
@@ -144,8 +144,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   roost.addToSimulation(this);
   var ground = new Ground();
   ground.addToSimulation(this);
-  var sluice = new Sluice();
-  sluice.addToSimulation(this);
+  this._sluice = new Sluice();
+  this._sluice.addToSimulation(this);
   var coopDoor = new CoopDoor();
   coopDoor.addToSimulation(this);
 
@@ -198,16 +198,42 @@ ChickenAndEgg.prototype.simulationTick = function() {
 }
 
 /**
+ * Convert a coordinate in the CANVAS element's coordinate system into a 2D coordinate in
+ * the Box2D simulation's coordinate system.
+ * @param {number} x The x-coordinate
+ * @param {number} y The y-coordinate
+ * @param {Canvas} canvas The canvas that defines the coordinate system.
+ * @return {Box2D.Vec2} The converted coordinate.
+ * @private
+ */
+ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
+  var offset = $(canvas).offset();
+  if (offset) {
+    x = x - offset.left;
+    y = y - offset.top;
+  }
+  return new Box2D.Common.Math.b2Vec2(
+    x / this._scale,
+    (y - canvas.height) / -this._scale);
+}
+
+/**
  * Handle the mouse-down event. Convert the event into Box2D coordinates and issue a
  * hit-detection. If the sluice handle is hit, start the handle-drag sequence.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
  * @private
  */
 ChickenAndEgg.prototype._mouseDown = function(event) {
-  console.log('mousedown (' + event.pageX + ', ' + event.pageY + ')');
-  $(ChickenAndEgg.DOMConsts.BODY)
-      .mousemove(this._mouseDrag.bind(this))
-      .mouseup(this._mouseUp.bind(this));
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  var isSluiceHandle = function(fixture) {
+    if (this._sluice.isSluiceHandle(fixture)) {
+      $(ChickenAndEgg.DOMConsts.BODY)
+          .mousemove(this._mouseDrag.bind(this))
+          .mouseup(this._mouseUp.bind(this));
+    }
+  };
+  this._world.QueryPoint(isSluiceHandle.bind(this), worldMouse);
 }
 
 /**
@@ -217,7 +243,9 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
  * @private
  */
 ChickenAndEgg.prototype._mouseDrag = function(event) {
-  console.log('mousemove (' + event.pageX + ', ' + event.pageY + ')');
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  console.log('mousemove (' + worldMouse.x + ', ' + worldMouse.y + ')');
 }
 
 /**
@@ -227,5 +255,5 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
  */
 ChickenAndEgg.prototype._mouseUp = function(event) {
   console.log('mouseup (' + event.pageX + ', ' + event.pageY + ')');
-  $(ChickenAndEgg.DOMConsts.BODY).unbind('mousemove');
+  $(ChickenAndEgg.DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }

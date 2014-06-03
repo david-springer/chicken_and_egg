@@ -22,6 +22,24 @@ Sluice.prototype = new GamePiece();
 Sluice.prototype.constructor = Sluice;
 
 /**
+ * The sluice handle context. This value is used to determine if a fixture is the sluice
+ * handle.
+ * @type {string}
+ * @private
+ */
+Sluice._SLUICE_HANDLE_CONTEXT = "sluiceHandleContext";
+
+/**
+ * Test whether a fixture is the sluice handle.
+ * @param {Box2D.Dynamics.b2FixtureDef} fixture The fixture to test.
+ * @return {boolean} Whether the fixture is the sluice handle or not.
+ */
+Sluice.prototype.isSluiceHandle = function(fixture) {
+  var fixtureUserData = fixture.GetUserData();
+  return fixtureUserData && fixtureUserData === Sluice._SLUICE_HANDLE_CONTEXT;
+}
+
+/**
  * Return the body def for the sluice.
  * @override
  */
@@ -36,43 +54,43 @@ Sluice.prototype.getBodyDef = function() {
  * @override
  */
 Sluice.prototype.addFixturesToBody = function(simulation, body) {
-  var sluiceFixture = new Box2D.Dynamics.b2FixtureDef();
-  sluiceFixture.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
-  sluiceFixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
-  sluiceFixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
-  sluiceFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  var sluiceFixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  sluiceFixtureDef.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
+  sluiceFixtureDef.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
+  sluiceFixtureDef.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
+  sluiceFixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
 
   var sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.20, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.20, 1.60 + 0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.60 + 0.03));
-  sluiceFixture.shape.SetAsArray(sluiceVerts);
-  body.CreateFixture(sluiceFixture);
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.15, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.15 + 0.60, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.15 + 0.60, 1.60 + 0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.15, 1.60 + 0.03));
-  sluiceFixture.shape.SetAsArray(sluiceVerts);
-  body.CreateFixture(sluiceFixture);
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.90, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.90 + 0.60, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.90 + 0.60, 1.60 + 0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 1.90, 1.60 + 0.03));
-  sluiceFixture.shape.SetAsArray(sluiceVerts);
-  body.CreateFixture(sluiceFixture);
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 2.65, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 2.65 + 0.50, 1.60));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 2.65 + 0.50, 1.60 + 0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 2.65, 1.60 + 0.03));
-  sluiceFixture.shape.SetAsArray(sluiceVerts);
-  body.CreateFixture(sluiceFixture);
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   // Add the handle at the end of the sluice. This is implemented as a separate fixture
   // to support AABB hit detection.
@@ -81,8 +99,9 @@ Sluice.prototype.addFixturesToBody = function(simulation, body) {
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15 + 0.06, 1.585));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15 + 0.06, 1.585 + 0.06));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 3.15, 1.585 + 0.06));
-  sluiceFixture.shape.SetAsArray(sluiceVerts);
-  body.CreateFixture(sluiceFixture);
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  var sluiceFixture = body.CreateFixture(sluiceFixtureDef);
+  sluiceFixture.SetUserData(Sluice._SLUICE_HANDLE_CONTEXT);
 }
 
 Sluice.prototype.getView = function(simulation) {
