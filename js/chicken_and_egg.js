@@ -274,7 +274,7 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
       ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
   this._sluice.body().SetAngle(angle);
   for (var i = 0; i < this._eggs.length; ++i) {
-    this._eggs[i].SetActive(true);
+    this._eggs[i].body().SetAwake(true);
   }
 }
 
