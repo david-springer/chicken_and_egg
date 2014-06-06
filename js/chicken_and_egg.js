@@ -90,8 +90,8 @@ ChickenAndEgg._DOMConsts = {
  * @private
  */
 ChickenAndEgg._Limits = {
-  SLUICE_MAX_ANGLE: Math.PI / 12.0,
-  SLUICE_MIN_ANGLE: -Math.PI / 12.0
+  SLUICE_MAX_ANGLE: Math.PI / 6.0,
+  SLUICE_MIN_ANGLE: -Math.PI / 6.0
 };
 
 /**
