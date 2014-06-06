@@ -54,10 +54,10 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
 
   var vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
   vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.40));
   fixture.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
@@ -68,10 +68,10 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
 
   // Create the dynamic part of the door.
   vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 1.7));
   vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
   fixture.density = 2.0;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
@@ -84,10 +84,21 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   // Create the joint that represents the hinge.
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
   jointDef.Initialize(this._coopWall, this.coopDoor, new Box2D.Common.Math.b2Vec2(
-      0.60 + 0.80 + 0.015, 2.0));
+      0.60 + 0.80 - 0.015, 2.0));
   jointDef.collideConnected = false;
   jointDef.lowerAngle = -Math.PI / 12;
   jointDef.upperAngle = Math.PI / 4;
   jointDef.enableLimit = true;
   this.coopDoorHinge = simulation.world().CreateJoint(jointDef);
+}
+
+/**
+ * Apply Hooke's law dampening to the coop door hinge.
+ */
+CoopDoor.prototype.applyHingeTorque = function() {
+  var hingeAngle = this.coopDoorHinge.GetJointAngle();
+  var hingeVel = this.coopDoorHinge.GetJointSpeed();
+  if (Math.abs(hingeVel) > 0.001) {
+    this.coopDoor.ApplyTorque(-hingeAngle * 0.008 - hingeVel * 0.0003);
+  }
 }

@@ -39,8 +39,8 @@ Roost.prototype.addFixturesToBody = function(simulation, body) {
   var roostChuteVerts = new Array();
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60, 1.80));
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50, 1.80));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.30, 1.80 - 0.20));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.30, 1.80 - 0.20 + 0.03));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.40, 1.80 - 0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.40, 1.80 - 0.25 + 0.03));
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50, 1.80 + 0.03));
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60, 1.80 + 0.03));
   var roostChuteFixture = new Box2D.Dynamics.b2FixtureDef();

@@ -157,8 +157,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   ground.addToSimulation(this);
   this._sluice = new Sluice();
   this._sluice.addToSimulation(this);
-  var coopDoor = new CoopDoor();
-  coopDoor.addToSimulation(this);
+  this._coopDoor = new CoopDoor();
+  this._coopDoor.addToSimulation(this);
 
   this._eggs = new Array();
   for (var e = 0; e < 20; e++) {
@@ -204,6 +204,7 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
  * Run a simulation tick, then schedule the next one.
  */
 ChickenAndEgg.prototype.simulationTick = function() {
+  this._coopDoor.applyHingeTorque();
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
