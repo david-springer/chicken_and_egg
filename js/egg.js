@@ -28,6 +28,12 @@ Egg = function(xPos, yPos) {
    * @private
    */
   this._yPos = yPos || 0.0;
+  /**
+   * Identify this game pice as an egg.
+   * @type {boolean}
+   * @public
+   */
+  this.isEgg = true;
 }
 Egg.prototype = new GamePiece();
 Egg.prototype.constructor = Egg;

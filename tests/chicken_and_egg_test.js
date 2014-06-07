@@ -17,18 +17,18 @@ test("Game Piece With UUID", function() {
   };
   var testChickenAndEgg = new ChickenAndEgg(fakeCanvas);
   // Test with no game pieces.
-  var testPiece = testChickenAndEgg._gamePieceWithUuid([], "fakeuuid");
-  equal(testPiece, null);
+  var testPiece = testChickenAndEgg._indexOfGamePieceWithUuid([], "fakeuuid");
+  equal(testPiece, -1);
   // Test with some valid game pieces.
   var testPiece = new GamePiece();
   var testGamePieces = [new GamePiece(), new GamePiece(), testPiece];
   var testUuid = testPiece.uuid();
-  var checkPiece = testChickenAndEgg._gamePieceWithUuid(testGamePieces, testUuid);
-  equal(checkPiece, testPiece);
-  equal(checkPiece.uuid(), testPiece.uuid());
+  var checkPiece = testChickenAndEgg._indexOfGamePieceWithUuid(testGamePieces, testUuid);
+  equal(checkPiece, 2);
+  equal(testGamePieces[checkPiece].uuid(), testPiece.uuid());
   // Test with non-extant UUID.
-  checkPiece = testChickenAndEgg._gamePieceWithUuid(testGamePieces, "bogusuuid");
-  equal(checkPiece, null);
+  checkPiece = testChickenAndEgg._indexOfGamePieceWithUuid(testGamePieces, "bogusuuid");
+  equal(checkPiece, -1);
 });
 
 test("Convert To Sim Coords", function() {

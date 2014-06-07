@@ -8,6 +8,25 @@
  * Requires Box2Dweb.min.js: http://box2dweb.googlecode.com/svn/trunk/Box2d.min.js
  */
 
+// Add the contact listener for the ground. This detects when eggs hit the ground and
+// makes them splat and leave the game.
+var GroundContactListener = function(simulation) {
+  Box2D.Dynamics.b2ContactListener.call(this);
+  this._sim = simulation;
+}
+GroundContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
+GroundContactListener.prototype.constructor = GroundContactListener;
+GroundContactListener.prototype.BeginContact = function(contact) {
+  var bodyA = contact.GetFixtureA().GetBody();
+  var bodyB = contact.GetFixtureB().GetBody();
+  var groundUuid = this._sim._ground.uuid();
+  if (bodyA.GetUserData() === groundUuid) {
+    this._sim.releaseGamePieceWithUuid(bodyB.GetUserData());
+  } else if (bodyB.GetUserData() === groundUuid) {
+    this._sim.releaseGamePieceWithUuid(bodyA.GetUserData());
+  }
+}
+
 /**
  * Constructor for the ChickenAndEgg class.  Use the run() method to populate
  * the object with controllers and wire up the events.
@@ -65,12 +84,14 @@ ChickenAndEgg = function(canvas) {
    */
   this._gamePieces = new Array();
   /**
-   * The list of currently active eggs. An egg is active if it has been laid, and hasn't
-   * yet been fried, smashed on the ground, put in the carton or put in the nest.
-   * @type {Array.Egg}
+   * The list of UUIDs that need to be removed at the end of a simulation tick. These are
+   * typically eggs that have hit the ground, or got fried, or left the game in some way.
+   * This array is cleared out at the end of each simulation tick. Add a UUID with the
+   * releaseGamePieceWithUuid() method.
+   * @type {Array.GamePiece}
    * @private
    */
-  this._activeEggs = new Array();
+  this._deactiveGamePieces = new Array();
   /**
    * The timestamp for the previous simulation tick, measured in seconds.
    * @type {number}
@@ -170,10 +191,11 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
+  this._world.SetContactListener(new GroundContactListener(this));
+  this._ground = new Ground();
+  this._gamePieces.push(this._ground);  
   var roost = new Roost();
   this._gamePieces.push(roost);
-  var ground = new Ground();
-  this._gamePieces.push(ground);
   this._sluice = new Sluice();
   this._gamePieces.push(this._sluice);
   this._coopDoor = new CoopDoor();
@@ -194,7 +216,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var didLayEgg = function(chicken) {
     var egg = new Egg(0.60 + 0.45, 1.87);
     this._gamePieces.push(egg);
-    this._activeEggs.push(egg);
     egg.addToSimulation(this);
     var eggBody = egg.body();
     eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0), eggBody.GetPosition());
@@ -247,23 +268,40 @@ ChickenAndEgg.prototype.simulationTick = function() {
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
+  // Remove all the game pieces that are scheduled to be deactivated.
+  for (var i = 0; i < this._deactiveGamePieces.length; ++i) {
+    var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
+        this._gamePieces, this._deactiveGamePieces[i]);
+    if (releasedGamePieceIdx != -1) {
+      this._world.DestroyBody(this._gamePieces[releasedGamePieceIdx].body());
+      this._gamePieces.splice(releasedGamePieceIdx, 1);
+    }
+  }
+}
+
+/**
+ * Mark a game piece for deactivation (removal from the simulation).
+ * @param {string} uuid The game piece's UUID.
+ */
+ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
+  this._deactiveGamePieces.push(uuid);
 }
 
 /**
  * Find the game piece with the given UUID.
  * @param {Array.GamePiece} gamePieces The array of game pieces to search.
  * @param {string} uuid The UUID to look for.
- * @return {GamePiece} the game piece with the matching UUID. Returns null if no such
- *     game piece exists.
+ * @return {number} the index of the game piece with the matching UUID. Returns -1 if no
+ *     such game piece exists.
  * @private
  */
-ChickenAndEgg.prototype._gamePieceWithUuid = function(gamePieces, uuid) {
+ChickenAndEgg.prototype._indexOfGamePieceWithUuid = function(gamePieces, uuid) {
   for (var i = 0; i < gamePieces.length; ++i) {
     if (uuid === gamePieces[i].uuid()) {
-      return gamePieces[i];
+      return i;
     }
   }
-  return null;
+  return -1;
 }
 
 /**
@@ -329,8 +367,11 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
       Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
       ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
   this._sluice.body().SetAngle(angle);
-  for (var i = 0; i < this._activeEggs.length; ++i) {
-    this._activeEggs[i].body().SetAwake(true);
+  for (var i = 0; i < this._gamePieces.length; ++i) {
+    var gamePiece = this._gamePieces[i];
+    if (gamePiece.hasOwnProperty('isEgg')) {
+      gamePiece.body().SetAwake(true);
+    }
   }
 }
 
