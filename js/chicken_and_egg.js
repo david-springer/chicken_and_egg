@@ -201,7 +201,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     return false;
   };
   var defaultCenter = NotificationDefaultCenter();
-  defaultCenter.addNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
+  defaultCenter.addNotificationObserver(
+      Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
 }
 
 /**
@@ -246,6 +247,23 @@ ChickenAndEgg.prototype.simulationTick = function() {
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
+}
+
+/**
+ * Find the game piece with the given UUID.
+ * @param {Array.GamePiece} gamePieces The array of game pieces to search.
+ * @param {string} uuid The UUID to look for.
+ * @return {GamePiece} the game piece with the matching UUID. Returns null if no such
+ *     game piece exists.
+ * @private
+ */
+ChickenAndEgg.prototype._gamePieceWithUuid = function(gamePieces, uuid) {
+  for (var i = 0; i < gamePieces.length; ++i) {
+    if (uuid === gamePieces[i].uuid()) {
+      return gamePieces[i];
+    }
+  }
+  return null;
 }
 
 /**

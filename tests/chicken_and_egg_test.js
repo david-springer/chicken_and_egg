@@ -8,6 +8,29 @@
  */
 module("ChickenAndEgg Object");
 
+test("Game Piece With UUID", function() {
+  var fakeCanvas = {
+    width: 900,
+    height: 600,
+    offset: function() { return {x: 0, y: 0}; },
+    id: "test_canvas"
+  };
+  var testChickenAndEgg = new ChickenAndEgg(fakeCanvas);
+  // Test with no game pieces.
+  var testPiece = testChickenAndEgg._gamePieceWithUuid([], "fakeuuid");
+  equal(testPiece, null);
+  // Test with some valid game pieces.
+  var testPiece = new GamePiece();
+  var testGamePieces = [new GamePiece(), new GamePiece(), testPiece];
+  var testUuid = testPiece.uuid();
+  var checkPiece = testChickenAndEgg._gamePieceWithUuid(testGamePieces, testUuid);
+  equal(checkPiece, testPiece);
+  equal(checkPiece.uuid(), testPiece.uuid());
+  // Test with non-extant UUID.
+  checkPiece = testChickenAndEgg._gamePieceWithUuid(testGamePieces, "bogusuuid");
+  equal(checkPiece, null);
+});
+
 test("Convert To Sim Coords", function() {
   var fakeCanvas = {
     width: 900,
