@@ -209,15 +209,6 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
   for (var i = 0; i < this._gamePieces.length; ++i) {
     this._gamePieces[i].draw(ctx, this);
   }
-  /*
-  for (var b = this._world.GetBodyList(); b; b = b.m_next) {
-    if (b.IsActive() &&
-        typeof b.GetUserData() !== 'undefined' &&
-        b.GetUserData() != null) {
-        b.GetUserData().draw(ctx, b);
-    }
-  }
-  */
   ctx.restore();
 }
 

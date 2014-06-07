@@ -107,19 +107,16 @@ Farmer.prototype.eatEggs = function(eggCount) {
  * Metabolize eggs for a given time interval. This reduces the health of the farmer
  * proportional to the metabolic rate. When the health falls to 0, the farmer dies
  * and posts the {@code DID_DIE_NOTIFICATION} notification.
- * @param {number} interval The interval to metabolize. Measured in seconds. Does
- *     nothing if negative.
- * @return {boolean} whether the metabolism was successful.
+ * @override
  */
-Farmer.prototype.metabolizeForInterval = function(interval) {
-  if (!this.isAlive() || interval < 0.0) {
-    return false;
+Farmer.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
+  if (!this.isAlive() || gameTimeDelta < 0.0) {
+    return;
   }
-  var healthReduced = interval * Farmer.METABOLIC_RATE;
+  var healthReduced = gameTimeDelta * Farmer.METABOLIC_RATE;
   this._health -= healthReduced;
   if (this._health <= 0.0) {
     this._health = 0.0;
     NotificationDefaultCenter().postNotification(Farmer.DID_DIE_NOTIFICATION, this);
   }
-  return true;
 }
