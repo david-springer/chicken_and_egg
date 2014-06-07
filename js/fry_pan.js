@@ -78,7 +78,7 @@ FryPan.prototype.fryingTimes = function() {
 
 /**
  * Add an egg. If there is already an egg in the nest, does nothing.
- * @param {Egg} egg The egg game piece to add. The egg must respond to the getUuid()
+ * @param {Egg} egg The egg game piece to add. The egg must respond to the uuid()
  * method.
  * @return {boolean} if adding the egg was successful.
  */
@@ -86,7 +86,7 @@ FryPan.prototype.addEgg = function(egg) {
   if (this.eggCount() == FryPan.MAX_EGG_COUNT) {
     return false;
   }
-  var eggUuid = egg.getUuid();
+  var eggUuid = egg.uuid();
   for (var i = 0; i < this._eggs.length; ++i) {
     if (this._eggs[i].uuid === eggUuid)
       // Egg already exists.

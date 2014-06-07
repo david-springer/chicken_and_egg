@@ -37,7 +37,7 @@ GamePiece = function() {
    * @type {string}
    * @private
    */
-  this._uuid = null;
+  this._uuid = uuid();
 }
 GamePiece.prototype.constructor = GamePiece;
 
@@ -45,10 +45,7 @@ GamePiece.prototype.constructor = GamePiece;
  * Return the UUID for this instance.
  * @return {String} UUID
  */
-GamePiece.prototype.getUuid = function() {
-  if (!this._uuid) {
-    this._uuid = uuid();
-  }
+GamePiece.prototype.uuid = function() {
   return this._uuid;
 }
 
@@ -120,10 +117,8 @@ GamePiece.prototype.loadView = function(simulation) {
  */
 GamePiece.prototype.draw = function(ctx, simulation) {
   var b = this.body();
-  if (b && (b.IsActive() &&
-      typeof b.GetUserData() !== 'undefined' &&
-      b.GetUserData() != null)) {
-      b.GetUserData().draw(ctx, b);
+  if (b && b.IsActive()) {
+    this.view.draw(ctx, b);
   }
 }
 
@@ -146,7 +141,7 @@ GamePiece.prototype.addToSimulation = function(simulation) {
     this._body = simulation.world().CreateBody(bodyDef);
     this.addFixturesToBody(simulation, this._body);
     this.loadView();
-    this._body.SetUserData(this.view);
+    this._body.SetUserData(this.uuid());
   } else {
     this._body = null;
   }
