@@ -26,16 +26,16 @@ CoopDoor = function() {
   /**
    * The dynamic door. Not valid until addToSimulation() is called.
    * @type {Box2D.body}
-   * @public
+   * @private
    */
-  this.coopDoor = null;
+  this._coopDoor = null;
   /**
    * The revolute joint representing the hinge. Not valid until addToSimulation() is
    * called.
    * @type {Box2D.RevoluteJoint}
-   * @public
+   * @private
    */
-  this.coopDoorHinge = null;
+  this._coopDoorHinge = null;
 }
 CoopDoor.prototype = new GamePiece();
 CoopDoor.prototype.constructor = CoopDoor;
@@ -51,7 +51,7 @@ CoopDoor.prototype.draw = function(ctx, simulation) {
     }
   }
   drawCoopDoorPart(ctx, this._coopWall);
-  drawCoopDoorPart(ctx, this.coopDoor);
+  drawCoopDoorPart(ctx, this._coopDoor);
 }
 
 /**
@@ -92,19 +92,19 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
   fixture.shape.SetAsArray(vertices);
   bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  this.coopDoor = simulation.world().CreateBody(bodyDef);
-  this.coopDoor.CreateFixture(fixture);
-  this.coopDoor.SetUserData(new PolyView(simulation.scale()));
+  this._coopDoor = simulation.world().CreateBody(bodyDef);
+  this._coopDoor.CreateFixture(fixture);
+  this._coopDoor.SetUserData(new PolyView(simulation.scale()));
 
   // Create the joint that represents the hinge.
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
-  jointDef.Initialize(this._coopWall, this.coopDoor, new Box2D.Common.Math.b2Vec2(
+  jointDef.Initialize(this._coopWall, this._coopDoor, new Box2D.Common.Math.b2Vec2(
       0.60 + 0.80 - 0.015, 2.0));
   jointDef.collideConnected = false;
   jointDef.lowerAngle = -Math.PI / 12;
   jointDef.upperAngle = Math.PI / 4;
   jointDef.enableLimit = true;
-  this.coopDoorHinge = simulation.world().CreateJoint(jointDef);
+  this._coopDoorHinge = simulation.world().CreateJoint(jointDef);
 }
 
 /**
@@ -112,9 +112,9 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
  * @override
  */
 CoopDoor.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
-  var hingeAngle = this.coopDoorHinge.GetJointAngle();
-  var hingeVel = this.coopDoorHinge.GetJointSpeed();
+  var hingeAngle = this._coopDoorHinge.GetJointAngle();
+  var hingeVel = this._coopDoorHinge.GetJointSpeed();
   if (Math.abs(hingeVel) > 0.001) {
-    this.coopDoor.ApplyTorque(-hingeAngle * 0.008 - hingeVel * 0.0003);
+    this._coopDoor.ApplyTorque(-hingeAngle * 0.008 - hingeVel * 0.0003);
   }
 }

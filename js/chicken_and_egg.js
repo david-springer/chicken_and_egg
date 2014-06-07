@@ -141,6 +141,9 @@ ChickenAndEgg.prototype.run = function() {
   // bound mouse-up event will fire properly.
   $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
+  var eggBody = this._eggs[0].body();
+  eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0),
+     eggBody.GetPosition());
   var heartbeat = function() {
     this.simulationTick();
     this.clearCanvas(this._canvas);
@@ -172,6 +175,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._coopDoor = new CoopDoor();
   this._gamePieces.push(this._coopDoor);
   var chicken = new Chicken();
+  chicken.feedBag = new FeedBag();
+  chicken.waterBottle = new WaterBottle();
+  this._gamePieces.push(chicken.feedBag);
+  this._gamePieces.push(chicken.waterBottle);
   this._gamePieces.push(chicken);
 
   this._eggs = new Array();

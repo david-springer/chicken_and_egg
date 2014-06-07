@@ -40,24 +40,35 @@ Ground.prototype.getBodyDef = function() {
 }
 
 /**
- * Build up the ground fixtures. There are two: the flat ground plane, and a wedge.
+ * Build up the ground two fixtures which form an L-shape whose legs go along the bottom
+ * and right edges of the game world. When an egg collides with the ground, it breaks and
+ * is removed from
+ * the game.
  * @override
  */
 Ground.prototype.addFixturesToBody = function(simulation, body) {
-  var groundLocation = simulation.worldSize().Copy();
-  groundLocation.y = 0;
-  // Set up the flat ground plane.
-  var groundVertices = new Array()
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y + 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, groundLocation.y - 0.05));
-  groundVertices.push(
-      new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y - 0.05));
-  groundVertices.push(
-      new Box2D.Common.Math.b2Vec2(groundLocation.x, groundLocation.y + 0.05));
+  var worldSize = simulation.worldSize().Copy();
   var groundFixture = new Box2D.Dynamics.b2FixtureDef();
   groundFixture.density = Ground.Box2DConsts.GROUND_DENSITY;
   groundFixture.friction = Ground.Box2DConsts.GROUND_FRICTION;
   groundFixture.restitution = Ground.Box2DConsts.GROUND_RESTITUTION;
+
+  // Set up the flat ground plane.
+  var groundVertices = new Array()
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, -0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, -0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, 0.05));
+  groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  groundFixture.shape.SetAsArray(groundVertices);
+  body.CreateFixture(groundFixture);
+
+  // The right-most wall.
+  groundVertices = new Array()
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, worldSize.y));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, worldSize.y));
   groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   groundFixture.shape.SetAsArray(groundVertices);
   body.CreateFixture(groundFixture);
