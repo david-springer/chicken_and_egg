@@ -52,7 +52,7 @@ Roost.prototype.addFixturesToBody = function(simulation, body) {
   body.CreateFixture(roostChuteFixture);
 }
 
-Roost.prototype.getView = function(simulation) {
-  return new PolyView();
+Roost.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
 }
 

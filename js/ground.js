@@ -84,7 +84,7 @@ Ground.prototype.addFixturesToBody = function(simulation, body) {
   body.CreateFixture(groundFixture);
 }
 
-Ground.prototype.getView = function(simulation) {
-  return new PolyView();
+Ground.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
 }
 

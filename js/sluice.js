@@ -111,6 +111,6 @@ Sluice.prototype.addFixturesToBody = function(simulation, body) {
   sluiceFixture.SetUserData(Sluice._SLUICE_HANDLE_CONTEXT);
 }
 
-Sluice.prototype.getView = function(simulation) {
-  return new PolyView();
+Sluice.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
 }

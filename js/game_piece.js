@@ -9,7 +9,7 @@
  * At a minimum, subclasses should override these methods:
  *     GamePiece.prototype.getBodyDef = function() {}
  *     GamePiece.prototype.addFixturesToBody = function(simulation, body) {}
- *     GamePiece.prototype.getView = function(simulation) {}
+ *     GamePiece.prototype.loadView = function(simulation) {}
  */
 
 /**
@@ -24,6 +24,13 @@ GamePiece = function() {
    * @private
    */
   this._body = null;
+
+  /**
+   * The view associated with this game piece. Set via the loadView() method.
+   * @type {BodyView}
+   * @public
+   */
+  this.view = null;
 
   /**
    * The UUID for this instance. Generated lazily.
@@ -86,7 +93,9 @@ GamePiece.prototype.getBodyDef = function() { return null; }
 GamePiece.prototype.addFixturesToBody = function(simulation, body) {}
 
 /**
- * Abstract method to create and return the view used to draw this game piece.
+ * Load the game piece's view and set the |view| object. On return, the |view| object
+ * must point to a valid BodyView subclass. The default implementation sets the view
+ * to a generic BodyView.
  * @param {Object} simulation The simulation. This object is expected to implement these
  *     methods:
  *       world() The Box2D world
@@ -94,7 +103,9 @@ GamePiece.prototype.addFixturesToBody = function(simulation, body) {}
  *       scale() The scale factor from CANVAS to Box2D world
  * @return {BodyView} The BodyView subclass used to draw this GamePiece.
  */
-GamePiece.prototype.getView = function(simulation) { return null; }
+GamePiece.prototype.loadView = function(simulation) {
+  this.view = new BodyView();
+}
 
 /**
  * Draw the game piece geometry that is attached to it's Box2D body representation.
@@ -134,7 +145,8 @@ GamePiece.prototype.addToSimulation = function(simulation) {
   if (bodyDef) {
     this._body = simulation.world().CreateBody(bodyDef);
     this.addFixturesToBody(simulation, this._body);
-    this._body.SetUserData(this.getView(simulation));
+    this.loadView();
+    this._body.SetUserData(this.view);
   } else {
     this._body = null;
   }

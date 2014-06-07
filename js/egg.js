@@ -97,6 +97,6 @@ Egg.prototype.addFixturesToBody = function(simulation, body) {
  * Return a new EggView.
  * @override
  */
-Egg.prototype.getView = function(simulation) {
-  return new EggView();
+Egg.prototype.loadView = function(simulation) {
+  this.view = new EggView();
 }
