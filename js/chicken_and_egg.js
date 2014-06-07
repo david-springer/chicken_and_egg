@@ -141,9 +141,6 @@ ChickenAndEgg.prototype.run = function() {
   // bound mouse-up event will fire properly.
   $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
-  var eggBody = this._eggs[0].body();
-  eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0),
-     eggBody.GetPosition());
   var heartbeat = function() {
     this.simulationTick();
     this.clearCanvas(this._canvas);
@@ -181,14 +178,22 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(chicken.waterBottle);
   this._gamePieces.push(chicken);
 
-  this._eggs = new Array();
-  var egg = new Egg(0.60 + 0.45, 1.87);
-  this._eggs.push(egg);
-  this._gamePieces.push(egg);
-
   for (var i = 0; i < this._gamePieces.length; ++i) {
     this._gamePieces[i].addToSimulation(this);
   }
+
+  // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
+  // nudge so it rolls down the chute onto the sluice.
+  var didLayEgg = function(chicken) {
+    var egg = new Egg(0.60 + 0.45, 1.87);
+    this._gamePieces.push(egg);
+    egg.addToSimulation(this);
+    var eggBody = egg.body();
+    eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0), eggBody.GetPosition());
+    return false;
+  };
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
 }
 
 /**
