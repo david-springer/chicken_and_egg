@@ -14,8 +14,8 @@
  * @inherit BodyView
  * @constructor
  */
-PolyView = function(opt_scale) {
-  BodyView.call(this, opt_scale);
+PolyView = function() {
+  BodyView.call(this);
 }
 PolyView.prototype = new BodyView();
 PolyView.prototype.constructor = PolyView;

@@ -85,6 +85,6 @@ Ground.prototype.addFixturesToBody = function(simulation, body) {
 }
 
 Ground.prototype.getView = function(simulation) {
-  return new PolyView(simulation.scale());
+  return new PolyView();
 }
 

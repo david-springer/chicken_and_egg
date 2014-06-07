@@ -79,7 +79,7 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   fixture.shape.SetAsArray(vertices);
   this._coopWall = simulation.world().CreateBody(bodyDef);
   this._coopWall.CreateFixture(fixture);
-  this._coopWall.SetUserData(new PolyView(simulation.scale()));
+  this._coopWall.SetUserData(new PolyView());
 
   // Create the dynamic part of the door.
   vertices = new Array()
@@ -94,7 +94,7 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
   this._coopDoor = simulation.world().CreateBody(bodyDef);
   this._coopDoor.CreateFixture(fixture);
-  this._coopDoor.SetUserData(new PolyView(simulation.scale()));
+  this._coopDoor.SetUserData(new PolyView());
 
   // Create the joint that represents the hinge.
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();

@@ -53,6 +53,6 @@ Roost.prototype.addFixturesToBody = function(simulation, body) {
 }
 
 Roost.prototype.getView = function(simulation) {
-  return new PolyView(simulation.scale());
+  return new PolyView();
 }
 

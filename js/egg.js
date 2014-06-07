@@ -98,5 +98,5 @@ Egg.prototype.addFixturesToBody = function(simulation, body) {
  * @override
  */
 Egg.prototype.getView = function(simulation) {
-  return new EggView(simulation.scale());
+  return new EggView();
 }
