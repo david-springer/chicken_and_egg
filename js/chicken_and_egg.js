@@ -226,12 +226,9 @@ ChickenAndEgg.prototype.simulationTick = function() {
   var simTime = Date.now() / 1000.0;
   var simDelta = simTime - this._lastSimTime;
   for (var i = 0; i < this._gamePieces.length; ++i) {
-    if (this._gamePieces[i].processGameTick) {
-      this._gamePieces[i].processGameTick(simTime, simDelta);
-    }
+    this._gamePieces[i].processGameTick(simTime, simDelta);
   }
   this._lastSimTime = simTime;
-  //this._coopDoor.applyHingeTorque();
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
