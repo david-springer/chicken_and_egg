@@ -65,6 +65,13 @@ ChickenAndEgg = function(canvas) {
    */
   this._gamePieces = new Array();
   /**
+   * The list of currently active eggs. An egg is active if it has been laid, and hasn't
+   * yet been fried, smashed on the ground, put in the carton or put in the nest.
+   * @type {Array.Egg}
+   * @private
+   */
+  this._activeEggs = new Array();
+  /**
    * The timestamp for the previous simulation tick, measured in seconds.
    * @type {number}
    * @private
@@ -187,6 +194,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var didLayEgg = function(chicken) {
     var egg = new Egg(0.60 + 0.45, 1.87);
     this._gamePieces.push(egg);
+    this._activeEggs.push(egg);
     egg.addToSimulation(this);
     var eggBody = egg.body();
     eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0), eggBody.GetPosition());
@@ -303,8 +311,8 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
       Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
       ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
   this._sluice.body().SetAngle(angle);
-  for (var i = 0; i < this._eggs.length; ++i) {
-    this._eggs[i].body().SetAwake(true);
+  for (var i = 0; i < this._activeEggs.length; ++i) {
+    this._activeEggs[i].body().SetAwake(true);
   }
 }
 

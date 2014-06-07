@@ -40,8 +40,8 @@ Ground.prototype.getBodyDef = function() {
 }
 
 /**
- * Build up the ground two fixtures which form an L-shape whose legs go along the bottom
- * and right edges of the game world. When an egg collides with the ground, it breaks and
+ * Build up the ground two fixtures which form an U-shape around the left, bottom and
+ * right edges of the game board. When an egg collides with the ground, it breaks and
  * is removed from
  * the game.
  * @override
@@ -55,15 +55,25 @@ Ground.prototype.addFixturesToBody = function(simulation, body) {
 
   // Set up the flat ground plane.
   var groundVertices = new Array()
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, 0.05));
-  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, -0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(-0.1, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(-0.1, -0.05));
   groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, -0.05));
   groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, 0.05));
   groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   groundFixture.shape.SetAsArray(groundVertices);
   body.CreateFixture(groundFixture);
 
-  // The right-most wall.
+  // The left wall.
+  groundVertices = new Array()
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(-0.1, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, 0.05));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(0, worldSize.y));
+  groundVertices.push(new Box2D.Common.Math.b2Vec2(-0.1, worldSize.y));
+  groundFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  groundFixture.shape.SetAsArray(groundVertices);
+  body.CreateFixture(groundFixture);
+
+  // The right wall.
   groundVertices = new Array()
   groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x, 0.05));
   groundVertices.push(new Box2D.Common.Math.b2Vec2(worldSize.x + 0.1, 0.05));
