@@ -8,25 +8,6 @@
  * Requires Box2Dweb.min.js: http://box2dweb.googlecode.com/svn/trunk/Box2d.min.js
  */
 
-// Add the contact listener for the ground. This detects when eggs hit the ground and
-// makes them splat and leave the game.
-var GroundContactListener = function(simulation) {
-  Box2D.Dynamics.b2ContactListener.call(this);
-  this._sim = simulation;
-}
-GroundContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
-GroundContactListener.prototype.constructor = GroundContactListener;
-GroundContactListener.prototype.BeginContact = function(contact) {
-  var bodyA = contact.GetFixtureA().GetBody();
-  var bodyB = contact.GetFixtureB().GetBody();
-  var groundUuid = this._sim._ground.uuid();
-  if (bodyA.GetUserData() === groundUuid) {
-    this._sim.releaseGamePieceWithUuid(bodyB.GetUserData());
-  } else if (bodyB.GetUserData() === groundUuid) {
-    this._sim.releaseGamePieceWithUuid(bodyA.GetUserData());
-  }
-}
-
 /**
  * Constructor for the ChickenAndEgg class.  Use the run() method to populate
  * the object with controllers and wire up the events.
@@ -191,7 +172,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._scale = canvas.width / 4;  // 4m wide simulation.
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
-  this._world.SetContactListener(new GroundContactListener(this));
+  this._world.SetContactListener(new ContactListener(this));
   this._ground = new Ground();
   this._gamePieces.push(this._ground);  
   var roost = new Roost();
@@ -285,6 +266,22 @@ ChickenAndEgg.prototype.simulationTick = function() {
  */
 ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
   this._deactiveGamePieces.push(uuid);
+}
+
+/**
+ * Handle the collision of two game pieces. Delegate method of ContactListener.
+ * @param {Box2D.Dynamics.b2contact} contact The object that describes the contact.
+ * @param {string} uuidA One of the two bodies that collided.
+ * @param {string} uuidB The other of the two bodies that collided.
+ */
+ChickenAndEgg.prototype.gamePiecesWillCollide = function(contact, uuidA, uuidB) {
+  // Anything that collides with the ground gets removed from the game.
+  var groundUuid = this._ground.uuid();
+  if (uuidA === groundUuid) {
+    this.releaseGamePieceWithUuid(uuidB);
+  } else if (uuidB === groundUuid) {
+    this.releaseGamePieceWithUuid(uuidA);
+  }
 }
 
 /**
