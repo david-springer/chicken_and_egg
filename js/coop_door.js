@@ -13,8 +13,10 @@
 /**
  * Constructor for the CoopDoor.
  * @constructor
+ * @extends {GamePiece}
  */
 CoopDoor = function() {
+  GamePiece.call(this);
   /**
    * The static wall. Not valid until addToSimulation() is called.
    * @type {Box2D.Body}
@@ -35,15 +37,28 @@ CoopDoor = function() {
    */
   this.coopDoorHinge = null;
 }
+CoopDoor.prototype = new GamePiece();
 CoopDoor.prototype.constructor = CoopDoor;
 
 /**
- * Method to add the coop door pieces to the Box2D world.
- * @param {Object} simulation The simulation. This object is expected to implement these
- *     methods:
- *       world() The Box2D world
- *       worldSize() The size of the game board in Box2D world coordinates
- *       scale() The scale factor from CANVAS to Box2D world
+ * Draw the coop door.
+ * @override
+ */
+CoopDoor.prototype.draw = function(ctx, simulation) {
+  var drawCoopDoorPart = function(ctx, b) {
+    if (b.IsActive()) {
+        b.GetUserData().draw(ctx, b);
+    }
+  }
+  drawCoopDoorPart(ctx, this._coopWall);
+  drawCoopDoorPart(ctx, this.coopDoor);
+}
+
+/**
+ * Method to add the coop door pieces to the Box2D world. Customise this method to create
+ * three Box2D bodies that represent the coop door: the coop wall (static), the coop door
+ * (dynamic, the swinging part) and the coop hinge.
+ * @override
  */
 CoopDoor.prototype.addToSimulation = function(simulation) {
   // Create the static coop wall.
@@ -94,8 +109,9 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
 
 /**
  * Apply Hooke's law dampening to the coop door hinge.
+ * @override
  */
-CoopDoor.prototype.applyHingeTorque = function() {
+CoopDoor.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
   var hingeAngle = this.coopDoorHinge.GetJointAngle();
   var hingeVel = this.coopDoorHinge.GetJointSpeed();
   if (Math.abs(hingeVel) > 0.001) {

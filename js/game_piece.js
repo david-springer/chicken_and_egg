@@ -70,7 +70,7 @@ GamePiece.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {}
  * this method.
  * @return {Box2D.Dynamics.b2BodyDef} the Box2D body associated with this GamePiece.
  */
-GamePiece.prototype.getBodyDef = function() {}
+GamePiece.prototype.getBodyDef = function() { return null; }
 
 /**
  * Abstract method to create and and add the Box2D fixtures used to represent the
@@ -94,7 +94,27 @@ GamePiece.prototype.addFixturesToBody = function(simulation, body) {}
  *       scale() The scale factor from CANVAS to Box2D world
  * @return {BodyView} The BodyView subclass used to draw this GamePiece.
  */
-GamePiece.prototype.getView = function(simulation) {}
+GamePiece.prototype.getView = function(simulation) { return null; }
+
+/**
+ * Draw the game piece geometry that is attached to it's Box2D body representation.
+ * Game pieces that do not have a corresponding Box2D body representation can override
+ * this method to do custom drawing.
+ * @param {Context2D} ctx The 2D drawing context for the CANVAS.
+ * @param {Object} simulation The simulation. This object is expected to implement these
+ *     methods:
+ *       world() The Box2D world
+ *       worldSize() The size of the game board in Box2D world coordinates
+ *       scale() The scale factor from CANVAS to Box2D world
+ */
+GamePiece.prototype.draw = function(ctx, simulation) {
+  var b = this.body();
+  if (b && (b.IsActive() &&
+      typeof b.GetUserData() !== 'undefined' &&
+      b.GetUserData() != null)) {
+      b.GetUserData().draw(ctx, b);
+  }
+}
 
 /**
  * Method to add this game piece to the Box2D world. Calls abstract methods to create
@@ -111,7 +131,11 @@ GamePiece.prototype.getView = function(simulation) {}
  */
 GamePiece.prototype.addToSimulation = function(simulation) {
   var bodyDef = this.getBodyDef();
-  this._body = simulation.world().CreateBody(bodyDef);
-  this.addFixturesToBody(simulation, this._body);
-  this._body.SetUserData(this.getView(simulation));
+  if (bodyDef) {
+    this._body = simulation.world().CreateBody(bodyDef);
+    this.addFixturesToBody(simulation, this._body);
+    this._body.SetUserData(this.getView(simulation));
+  } else {
+    this._body = null;
+  }
 }

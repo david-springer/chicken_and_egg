@@ -26,6 +26,35 @@ test("Unique UUID", function() {
 });
 
 test("Body Accessor", function() {
+  var FakeGamePiece = function() {
+    GamePiece.call(this);
+  }
+  FakeGamePiece.prototype = new GamePiece();
+  FakeGamePiece.prototype.constructor = FakeGamePiece;
+  FakeGamePiece.prototype.getBodyDef = function() {
+    return { bodyType: "fake" };
+  }
+
+  var fakeBody = function(bodyDef) {
+    return {
+        SetUserData: function(data) {},
+        GetUserData: function() { return "testBodyData"; }
+    };
+  };
+  var fakeWorld = function() {
+    return { CreateBody: fakeBody };
+  };
+  var fakeSimulation = {
+    world: fakeWorld
+  };
+  var testPiece = new FakeGamePiece();
+  ok(testPiece.body() == null);
+  testPiece.addToSimulation(fakeSimulation);
+  ok(testPiece.body() != null);
+  equal(testPiece.body().GetUserData(), "testBodyData");
+});
+
+test("Body Accessor Null BodyDef", function() {
   var fakeBody = function(bodyDef) {
     return {
         SetUserData: function(data) {},
@@ -41,6 +70,5 @@ test("Body Accessor", function() {
   var testPiece = new GamePiece();
   ok(testPiece.body() == null);
   testPiece.addToSimulation(fakeSimulation);
-  ok(testPiece.body() != null);
-  equal(testPiece.body().GetUserData(), "testBodyData");
+  ok(testPiece.body() == null);
 });

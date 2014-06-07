@@ -58,6 +58,18 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._world = null;
+  /**
+   * All the game pieces. These are each called to process a simulation tick.
+   * @type {Array.GamePiece}
+   * @private
+   */
+  this._gamePieces = new Array();
+  /**
+   * The timestamp for the previous simulation tick, measured in seconds.
+   * @type {number}
+   * @private
+   */
+  this._lastSimTime = 0.0;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -152,19 +164,23 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
   var roost = new Roost();
-  roost.addToSimulation(this);
+  this._gamePieces.push(roost);
   var ground = new Ground();
-  ground.addToSimulation(this);
+  this._gamePieces.push(ground);
   this._sluice = new Sluice();
-  this._sluice.addToSimulation(this);
+  this._gamePieces.push(this._sluice);
   this._coopDoor = new CoopDoor();
-  this._coopDoor.addToSimulation(this);
+  this._gamePieces.push(this._coopDoor);
+  var chicken = new Chicken();
+  this._gamePieces.push(chicken);
 
   this._eggs = new Array();
-  for (var e = 0; e < 20; e++) {
-    var egg = new Egg(0.1 * e, this._worldSize.y - 0.02);
-    egg.addToSimulation(this);
-    this._eggs.push(egg);
+  var egg = new Egg(0.60 + 0.45, 1.87);
+  this._eggs.push(egg);
+  this._gamePieces.push(egg);
+
+  for (var i = 0; i < this._gamePieces.length; ++i) {
+    this._gamePieces[i].addToSimulation(this);
   }
 }
 
@@ -190,6 +206,10 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
   ctx.scale(this._scale, -this._scale);
   // Hack to deal with weird fact that CANVAS scales the line width.
   ctx.lineWidth = ctx.lineWidth / this._scale;
+  for (var i = 0; i < this._gamePieces.length; ++i) {
+    this._gamePieces[i].draw(ctx, this);
+  }
+  /*
   for (var b = this._world.GetBodyList(); b; b = b.m_next) {
     if (b.IsActive() &&
         typeof b.GetUserData() !== 'undefined' &&
@@ -197,6 +217,7 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
         b.GetUserData().draw(ctx, b);
     }
   }
+  */
   ctx.restore();
 }
 
@@ -204,7 +225,15 @@ ChickenAndEgg.prototype.drawWorld = function(canvas) {
  * Run a simulation tick, then schedule the next one.
  */
 ChickenAndEgg.prototype.simulationTick = function() {
-  this._coopDoor.applyHingeTorque();
+  var simTime = Date.now() / 1000.0;
+  var simDelta = simTime - this._lastSimTime;
+  for (var i = 0; i < this._gamePieces.length; ++i) {
+    if (this._gamePieces[i].processGameTick) {
+      this._gamePieces[i].processGameTick(simTime, simDelta);
+    }
+  }
+  this._lastSimTime = simTime;
+  //this._coopDoor.applyHingeTorque();
   this._world.Step(ChickenAndEgg.Box2DConsts.FRAME_RATE,
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
