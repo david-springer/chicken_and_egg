@@ -131,3 +131,62 @@ FryPan.prototype._fryEggsInIndexSet = function(fryIndexSet) {
     NotificationDefaultCenter().postNotification(FryPan.DID_FRY_EGG_NOTIFICATION, this);
   }
 }
+
+/**
+ * Allocate the Box2D body definition for this fry pan.
+ * @override
+ */
+FryPan.prototype.getBodyDef = function() {
+  bodyDef = new Box2D.Dynamics.b2BodyDef();
+  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 0.425, 1.0);
+  return bodyDef;
+}
+
+/**
+ * Add geometry for a fry pan.
+ * @override
+ */
+FryPan.prototype.addFixturesToBody = function(simulation, body) {
+  var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  fixtureDef.density = 7.3;  // Density of cast iron.
+  fixtureDef.friction = 0.1;
+  fixtureDef.restitution = 0.5;
+  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  var fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, 0));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.015, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16 + 0.015, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16 + 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065 - 0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025 - 0.13, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025 - 0.13, 0.075));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+}
+
+/**
+ * Return a new PolyView.
+ * @override
+ */
+FryPan.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
+}

@@ -187,6 +187,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(chicken.feedBag);
   this._gamePieces.push(chicken.waterBottle);
   this._gamePieces.push(chicken);
+  var fryPan = new FryPan();
+  this._gamePieces.push(fryPan);
 
   for (var i = 0; i < this._gamePieces.length; ++i) {
     this._gamePieces[i].addToSimulation(this);
