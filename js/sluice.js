@@ -74,6 +74,12 @@ Sluice.prototype.addFixturesToBody = function(simulation, body) {
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0, 0.015));
   sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
   body.CreateFixture(sluiceFixtureDef);
+  sluiceVerts = new Array();
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.29, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.35, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.35, 0.045));
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.015));
@@ -82,12 +88,24 @@ Sluice.prototype.addFixturesToBody = function(simulation, body) {
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.015));
   sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
   body.CreateFixture(sluiceFixtureDef);
+  sluiceVerts = new Array();
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.54, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60, 0.045));
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
 
   sluiceVerts = new Array();
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25, -0.015));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25 + 0.60, -0.015));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25 + 0.60, 0.015));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25, 0.015));
+  sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
+  body.CreateFixture(sluiceFixtureDef);
+  sluiceVerts = new Array();
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25 + 0.54, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25 + 0.60, 0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(1.25 + 0.60, 0.045));
   sluiceFixtureDef.shape.SetAsArray(sluiceVerts);
   body.CreateFixture(sluiceFixtureDef);
 

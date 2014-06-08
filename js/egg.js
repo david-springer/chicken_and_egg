@@ -97,6 +97,7 @@ Egg.prototype.addFixturesToBody = function(simulation, body) {
   eggFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   eggFixture.shape.SetAsArray(this._eggVertices(0.17));
   body.CreateFixture(eggFixture);
+  body.SetBullet(true);
 }
 
 /**
