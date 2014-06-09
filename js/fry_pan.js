@@ -77,7 +77,7 @@ FryPan.prototype.fryingTimes = function() {
 }
 
 /**
- * Add an egg. If there is already an egg in the nest, does nothing.
+ * Add an egg. If there is already an egg in the fry pan, does nothing.
  * @param {Egg} egg The egg game piece to add. The egg must respond to the uuid()
  * method.
  * @return {boolean} if adding the egg was successful.

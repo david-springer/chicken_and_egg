@@ -187,8 +187,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(chicken.feedBag);
   this._gamePieces.push(chicken.waterBottle);
   this._gamePieces.push(chicken);
-  var fryPan = new FryPan();
-  this._gamePieces.push(fryPan);
+  this._fryPan = new FryPan();
+  this._gamePieces.push(this._fryPan);
 
   for (var i = 0; i < this._gamePieces.length; ++i) {
     this._gamePieces[i].addToSimulation(this);
@@ -279,10 +279,24 @@ ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
 ChickenAndEgg.prototype.gamePiecesWillCollide = function(contact, uuidA, uuidB) {
   // Anything that collides with the ground gets removed from the game.
   var groundUuid = this._ground.uuid();
-  if (uuidA === groundUuid) {
-    this.releaseGamePieceWithUuid(uuidB);
-  } else if (uuidB === groundUuid) {
-    this.releaseGamePieceWithUuid(uuidA);
+  if (uuidA === groundUuid || uuidB === groundUuid) {
+    if (uuidA === groundUuid) {
+      this.releaseGamePieceWithUuid(uuidB);
+    } else {
+      this.releaseGamePieceWithUuid(uuidA);
+    }
+    return;
+  }
+  // Process a collision with the fry pan.
+  var fryPanUuid = this._fryPan.uuid();
+  if (uuidA === fryPanUuid || uuidB === fryPanUuid) {
+    var eggUuid = uuidA === fryPanUuid ? uuidB : uuidA;
+    var eggIdx = this._indexOfGamePieceWithUuid(this._gamePieces, eggUuid);
+    if (eggIdx >= 0) {
+      this._fryPan.addEgg(this._gamePieces[eggIdx]);
+    }
+    this.releaseGamePieceWithUuid(eggUuid);
+    return;
   }
 }
 
