@@ -151,7 +151,7 @@ FryPan.prototype.addFixturesToBody = function(simulation, body) {
   var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
   fixtureDef.density = 7.3;  // Density of cast iron.
   fixtureDef.friction = 0.1;
-  fixtureDef.restitution = 0.5;
+  fixtureDef.restitution = 0.1;
   fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   var fryPanVerts = new Array();
   fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));

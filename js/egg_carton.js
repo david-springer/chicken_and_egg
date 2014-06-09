@@ -77,3 +77,55 @@ EggCarton.prototype.addEgg = function() {
 EggCarton.prototype.reset = function() {
   this._eggCount = 0;
 }
+
+/**
+ * Allocate the Box2D body definition for this egg carton.
+ * @override
+ */
+EggCarton.prototype.getBodyDef = function() {
+  bodyDef = new Box2D.Dynamics.b2BodyDef();
+  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.175, 1.0);
+  return bodyDef;
+}
+
+/**
+ * Add geometry for an egg carton.
+ * @override
+ */
+EggCarton.prototype.addFixturesToBody = function(simulation, body) {
+  var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  fixtureDef.density = 0.7;  // Density of cardboard in g/cm^3
+  fixtureDef.friction = 0.1;
+  fixtureDef.restitution = 0.1;
+  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  var cartonVerts = new Array();
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.15, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.15, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.15, 0));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.15, 0));
+  fixtureDef.shape.SetAsArray(cartonVerts);
+  body.CreateFixture(fixtureDef);
+  cartonVerts = new Array();
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.15, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.15, 0.10));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, 0.10));
+  fixtureDef.shape.SetAsArray(cartonVerts);
+  body.CreateFixture(fixtureDef);
+  cartonVerts = new Array();
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.15, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.16, -0.01));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.16, 0.10));
+  cartonVerts.push(new Box2D.Common.Math.b2Vec2(0.15, 0.10));
+  fixtureDef.shape.SetAsArray(cartonVerts);
+  body.CreateFixture(fixtureDef);
+}
+
+/**
+ * Return a new PolyView.
+ * @override
+ */
+EggCarton.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
+}

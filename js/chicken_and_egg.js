@@ -189,6 +189,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(chicken);
   this._fryPan = new FryPan();
   this._gamePieces.push(this._fryPan);
+  this._eggCarton = new EggCarton();
+  this._gamePieces.push(this._eggCarton);
+  this._nest = new Nest();
+  this._gamePieces.push(this._nest);
 
   for (var i = 0; i < this._gamePieces.length; ++i) {
     this._gamePieces[i].addToSimulation(this);
@@ -295,6 +299,22 @@ ChickenAndEgg.prototype.gamePiecesWillCollide = function(contact, uuidA, uuidB) 
     if (eggIdx >= 0) {
       this._fryPan.addEgg(this._gamePieces[eggIdx]);
     }
+    this.releaseGamePieceWithUuid(eggUuid);
+    return;
+  }
+  // Process a collision with the egg carton.
+  var eggCartonUuid = this._eggCarton.uuid();
+  if (uuidA === eggCartonUuid || uuidB === eggCartonUuid) {
+    var eggUuid = uuidA === eggCartonUuid ? uuidB : uuidA;
+    this._eggCarton.addEgg();
+    this.releaseGamePieceWithUuid(eggUuid);
+    return;
+  }
+  // Process a collision with the nest.
+  var nestUuid = this._nest.uuid();
+  if (uuidA === nestUuid || uuidB === nestUuid) {
+    var eggUuid = uuidA === nestUuid ? uuidB : uuidA;
+    this._nest.addEgg();
     this.releaseGamePieceWithUuid(eggUuid);
     return;
   }
