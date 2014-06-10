@@ -53,7 +53,7 @@ Farmer.MAX_EGG_EAT_COUNT = 2;
  * Amount of health the farmer loses per second.
  * @type {number}
  */
-Farmer.METABOLIC_RATE = 0.01667;  // About 1/60 of a second.
+Farmer.METABOLIC_RATE = 0.005;
 
 /**
  * Notification sent when the farmer dies.

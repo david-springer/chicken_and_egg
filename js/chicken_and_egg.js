@@ -86,6 +86,14 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._isRunning = false;
+  /**
+   * Chickens that have hatched but are not active layers yet. Whenever a laying hen
+   * dies (lays all her eggs), one of these pullets takes her place. When there are no
+   * more pullets left, the game ends as soon as the current laying hen dies.
+   * @type {Array.Chicken}
+   * @private
+   */
+  this._pullets = new Array();
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -186,8 +194,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
   this._world.SetContactListener(new ContactListener(this));
-  var farmer = new Farmer();
-  this._gamePieces.push(farmer);
+  this._farmer = new Farmer();
+  this._gamePieces.push(this._farmer);
   this._ground = new Ground();
   this._gamePieces.push(this._ground);  
   var roost = new Roost();
@@ -196,12 +204,12 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._sluice);
   this._coopDoor = new CoopDoor();
   this._gamePieces.push(this._coopDoor);
-  var chicken = new Chicken();
-  chicken.feedBag = new FeedBag();
-  chicken.waterBottle = new WaterBottle();
-  this._gamePieces.push(chicken.feedBag);
-  this._gamePieces.push(chicken.waterBottle);
-  this._gamePieces.push(chicken);
+  this._chicken = new Chicken();
+  this._chicken.feedBag = new FeedBag();
+  this._chicken.waterBottle = new WaterBottle();
+  this._gamePieces.push(this._chicken.feedBag);
+  this._gamePieces.push(this._chicken.waterBottle);
+  this._gamePieces.push(this._chicken);
   this._fryPan = new FryPan();
   this._gamePieces.push(this._fryPan);
   this._eggCarton = new EggCarton();
@@ -220,6 +228,16 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     }
   }
 
+  // Set up all the game piece notifications.
+  var defaultCenter = NotificationDefaultCenter();
+
+  // The game ends when the farmer dies.
+  var farmerDied = function(farmer) {
+    this._isRunning = false;
+  }
+  defaultCenter.addNotificationObserver(
+      Farmer.DID_DIE_NOTIFICATION, farmerDied.bind(this));
+
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
   var didLayEgg = function(chicken) {
@@ -230,15 +248,47 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     eggBody.ApplyForce(new Box2D.Common.Math.b2Vec2(1, 0), eggBody.GetPosition());
     return false;
   };
-  var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(
       Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
 
-  var farmerDied = function(farmer) {
-    this._isRunning = false;
+  // Feed the farmer whenever an egg is fried.
+  var feedFarmer = function(fryPan) {
+    this._farmer.eatEggs(1);
   }
   defaultCenter.addNotificationObserver(
-      Farmer.DID_DIE_NOTIFICATION, farmerDied.bind(this));
+      FryPan.DID_FRY_EGG_NOTIFICATION, feedFarmer.bind(this));
+  
+  // Refill the feed bag when the egg carton is filled.
+  var refillFeed = function(eggCarton) {
+    this._chicken.feedBag.refill();
+    eggCarton.reset();
+    // TODO(daves): this should be in response to a mouse action.
+    this._chicken.waterBottle.refill();
+  }
+  defaultCenter.addNotificationObserver(
+      EggCarton.DID_FILL_CARTON_NOTIFICATION, refillFeed.bind(this));
+
+  // Add a chicken every time one hatches. Release a chicken when one dies. When all the
+  // chickens are gone, the game is over.
+  var chickenHatched = function(nest) {
+    this._pullets.push(new Chicken());
+  }
+  var chickenDied = function(chicken) {
+    if (this._pullets.length == 0) {
+      this._isRunning = false;
+      return;
+    }
+    var chicken = this._pullets.pop();
+    chicken.feedBag = this._chicken.feedBag;
+    chicken.waterBottle = this._chicken.waterBottle;
+    this.releaseGamePieceWithUuid(this._chicken.uuid());
+    this._chicken = chicken;
+    this._gamePieces.push(this._chicken);
+  }
+  defaultCenter.addNotificationObserver(
+      Nest.DID_HATCH_EGG_NOTIFICATION, chickenHatched.bind(this));
+  defaultCenter.addNotificationObserver(
+      Chicken.DID_DIE_NOTIFICATION, chickenDied.bind(this));
 }
 
 /**
