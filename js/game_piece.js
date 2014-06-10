@@ -123,6 +123,33 @@ GamePiece.prototype.draw = function(ctx, simulation) {
 }
 
 /**
+ * Return whether this game piece reports stats for the stats panel. Default
+ * implementation returns false.
+ * @return {boolean} whether this game piece reports stats.
+ */
+GamePiece.prototype.hasStats = function() {
+  return false;
+}
+
+/**
+ * Return the display name of this game piece. This is used for things like the stats
+ * panel. Default implementation returns "<unnamed>".
+ * @return {string} the display name of this game pieces.
+ */
+GamePiece.prototype.displayName = function() {
+  return "<unnamed>";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece, formatted for display. Default implementation
+ * returns "0".
+ * @return {string} the stats formatted for display.
+ */
+GamePiece.prototype.statsDisplayString = function() {
+  return "0";
+}
+
+/**
  * Method to add this game piece to the Box2D world. Calls abstract methods to create
  * the Box2D body and fixture(s) that represent this GamePiece. Also calls the method to
  * add the BodyView subclass that draws this GamePiece and attaches that to the Box2D
