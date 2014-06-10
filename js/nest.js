@@ -117,7 +117,7 @@ Nest.prototype._hatchEgg = function() {
 Nest.prototype.getBodyDef = function() {
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.925, 1.0);
+  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.925, 1.0 + 0.25);
   return bodyDef;
 }
 

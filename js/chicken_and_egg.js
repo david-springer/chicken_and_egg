@@ -198,6 +198,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     this._gamePieces[i].addToSimulation(this);
   }
 
+  var tbodyElt = $('#game_stats_table').find('tbody');
+  tbodyElt.append('<tr><td>Farmer</td><td>90%</td></tr>');
+  tbodyElt.append('<tr><td>Nest</td><td>10:15</td></tr>');
+
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
   var didLayEgg = function(chicken) {
