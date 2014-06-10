@@ -210,7 +210,7 @@ FryPan.prototype.hasStats = function() {
  * @override
  */
 FryPan.prototype.displayName = function() {
-  return "Fry Pan";  // TODO(daves): localize this?
+  return "Egg fry %:";  // TODO(daves): localize this?
 }
 
 /**

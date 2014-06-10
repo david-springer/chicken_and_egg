@@ -106,7 +106,7 @@ WaterBottle.prototype.hasStats = function() {
  * @override
  */
 WaterBottle.prototype.displayName = function() {
-  return "Water Bottle";  // TODO(daves): localize this?
+  return "Water Level";  // TODO(daves): localize this?
 }
 
 /**
@@ -114,6 +114,5 @@ WaterBottle.prototype.displayName = function() {
  * @override
  */
 WaterBottle.prototype.statsDisplayString = function() {
-  var waterPercent = this._waterLevel / WaterBottle.MAX_WATER_LEVEL * 100.0;
-  return Math.floor(waterPercent * 100) / 100 + "%";
+  return this._waterLevel.toFixed() + "ml";
 }

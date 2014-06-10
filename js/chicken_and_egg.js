@@ -79,6 +79,13 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._lastSimTime = 0.0;
+  /**
+   * Bit to indicate that the game is still running. When this bit is cleared, the game
+   * heartbeat stops.
+   * @type {boolean}
+   * @private
+   */
+  this._isRunning = false;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -151,11 +158,17 @@ ChickenAndEgg.prototype.run = function() {
   $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);
   var heartbeat = function() {
+    if (!this._isRunning) {
+      alert('Game over!');
+      return;  // Stop the game.
+    }
     this.simulationTick();
     this.clearCanvas(this._canvas);
     this.drawWorld(this._canvas);
     window.wrappedRequestAnimationFrame(heartbeat.bind(this));
   };
+  this._lastSimTime = Date.now() / 1000.0;
+  this._isRunning = true;
   heartbeat.bind(this)();
 }
 
@@ -173,6 +186,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._worldSize = new Box2D.Common.Math.b2Vec2(canvas.width / this._scale,
                                                  canvas.height / this._scale);
   this._world.SetContactListener(new ContactListener(this));
+  var farmer = new Farmer();
+  this._gamePieces.push(farmer);
   this._ground = new Ground();
   this._gamePieces.push(this._ground);  
   var roost = new Roost();
@@ -218,6 +233,12 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var defaultCenter = NotificationDefaultCenter();
   defaultCenter.addNotificationObserver(
       Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
+
+  var farmerDied = function(farmer) {
+    this._isRunning = false;
+  }
+  defaultCenter.addNotificationObserver(
+      Farmer.DID_DIE_NOTIFICATION, farmerDied.bind(this));
 }
 
 /**

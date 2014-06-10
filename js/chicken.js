@@ -307,7 +307,7 @@ Chicken.prototype.hasStats = function() {
  * @override
  */
 Chicken.prototype.displayName = function() {
-  return "Chicken";  // TODO(daves): localize this?
+  return "Eggs to Lay:";  // TODO(daves): localize this?
 }
 
 /**

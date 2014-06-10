@@ -134,7 +134,7 @@ Farmer.prototype.hasStats = function() {
  * @override
  */
 Farmer.prototype.displayName = function() {
-  return "Farmer";  // TODO(daves): localize this?
+  return "Farmer Health";  // TODO(daves): localize this?
 }
 
 /**
@@ -143,5 +143,5 @@ Farmer.prototype.displayName = function() {
  */
 Farmer.prototype.statsDisplayString = function() {
   var healthPercent = this._health * 100.0;
-  return healthPercent + "%";
+  return healthPercent.toPrecision(4) + "%";
 }

@@ -63,13 +63,11 @@ test("Display Name", function() {
 
 test("Stats Display String", function() {
   var testBag = new FeedBag();
-  equal(testBag.statsDisplayString(), "100%");
-  testBag.setFeed(FeedBag.MAX_FEED / 2);
-  equal(testBag.statsDisplayString(), "50%");
-  testBag.setFeed(FeedBag.MAX_FEED / 3);
-  equal(testBag.statsDisplayString(), "33.33%");
-  testBag.setFeed(FeedBag.MAX_FEED / 4);
-  equal(testBag.statsDisplayString(), "25%");
+  equal(testBag.statsDisplayString(), FeedBag.MAX_FEED + "g");
+  testBag.setFeed(500.123456);
+  equal(testBag.statsDisplayString(), "500g");
+  testBag.setFeed(5.723456);
+  equal(testBag.statsDisplayString(), "6g");
   testBag.setFeed(0);
-  equal(testBag.statsDisplayString(), "0%");
+  equal(testBag.statsDisplayString(), "0g");
 });

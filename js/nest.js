@@ -172,7 +172,7 @@ Nest.prototype.hasStats = function() {
  * @override
  */
 Nest.prototype.displayName = function() {
-  return "Nest";  // TODO(daves): localize this?
+  return "Hatch time left:";  // TODO(daves): localize this?
 }
 
 /**

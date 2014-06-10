@@ -73,13 +73,11 @@ test("Display Name", function() {
 
 test("Stats Display String", function() {
   var testBottle = new WaterBottle();
-  equal(testBottle.statsDisplayString(), "100%");
-  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 2);
-  equal(testBottle.statsDisplayString(), "50%");
-  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 3);
-  equal(testBottle.statsDisplayString(), "33.33%");
-  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 4);
-  equal(testBottle.statsDisplayString(), "25%");
+  equal(testBottle.statsDisplayString(), WaterBottle.MAX_WATER_LEVEL + "ml");
+  testBottle.setWaterLevel(345.678912398);
+  equal(testBottle.statsDisplayString(), "346ml");
+  testBottle.setWaterLevel(6.678912398);
+  equal(testBottle.statsDisplayString(), "7ml");
   testBottle.setWaterLevel(0);
-  equal(testBottle.statsDisplayString(), "0%");
+  equal(testBottle.statsDisplayString(), "0ml");
 });

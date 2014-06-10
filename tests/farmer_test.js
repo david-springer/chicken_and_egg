@@ -134,9 +134,13 @@ test("Display Name", function() {
 
 test("Stats Display String", function() {
   var testFarmer = new Farmer();
-  equal(testFarmer.statsDisplayString(), "100%");
+  equal(testFarmer.statsDisplayString(), "100.0%");
   testFarmer.setHealth(0.5);
-  equal(testFarmer.statsDisplayString(), "50%");
+  equal(testFarmer.statsDisplayString(), "50.00%");
+  testFarmer.setHealth(0.3146728937);
+  equal(testFarmer.statsDisplayString(), "31.47%");
+  testFarmer.setHealth(0.03146728937);
+  equal(testFarmer.statsDisplayString(), "3.147%");
   testFarmer.setHealth(0);
-  equal(testFarmer.statsDisplayString(), "0%");
+  equal(testFarmer.statsDisplayString(), "0.000%");
 });

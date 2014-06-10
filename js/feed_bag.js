@@ -95,7 +95,7 @@ FeedBag.prototype.hasStats = function() {
  * @override
  */
 FeedBag.prototype.displayName = function() {
-  return "Feed Bag";  // TODO(daves): localize this?
+  return "Feed Left";  // TODO(daves): localize this?
 }
 
 /**
@@ -103,6 +103,5 @@ FeedBag.prototype.displayName = function() {
  * @override
  */
 FeedBag.prototype.statsDisplayString = function() {
-  var feedPercent = this._feed / FeedBag.MAX_FEED * 100.0;
-  return Math.floor(feedPercent * 100) / 100 + "%";
+  return this._feed.toFixed() + "g";
 }
