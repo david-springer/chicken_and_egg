@@ -44,17 +44,97 @@ test("Add duplicate Egg", function() {
   equal(testPan.eggCount(), 1);
 });
 
+test("Has Stats", function() {
+  var testPan = new FryPan();
+  ok(testPan.hasStats());
+});
+
+test("Display Name", function() {
+  var testPan = new FryPan();
+  equal(testPan.displayName(), "Fry Pan");
+});
+
+test("Stats Display String 1 Egg", function() {
+  var testPan = new FryPan();
+  equal(testPan.statsDisplayString(), "-%, -%");
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.statsDisplayString(), "0%, -%");
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  equal(testPan.statsDisplayString(), "50%, -%");
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  equal(testPan.statsDisplayString(), "-%, -%");
+});
+
+test("Stats Display String 2 Eggs", function() {
+  var testPan = new FryPan();
+  equal(testPan.statsDisplayString(), "-%, -%");
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.statsDisplayString(), "0%, -%");
+  ok(testPan.addEgg(new Egg()));
+  equal(testPan.statsDisplayString(), "0%, 0%");
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  equal(testPan.statsDisplayString(), "50%, 50%");
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  equal(testPan.statsDisplayString(), "-%, -%");
+});
+
+test("Stats Display String Interleave Eggs", function() {
+  var testPan = new FryPan();
+  equal(testPan.statsDisplayString(), "-%, -%");
+  ok(testPan.addEgg(new Egg()));
+  var statsString = testPan.statsDisplayString();
+  ok(statsString.match("0%"));
+  ok(statsString.match("-%"));
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  statsString = testPan.statsDisplayString();
+  ok(statsString.match("50%"));
+  ok(statsString.match("-%"));
+  ok(testPan.addEgg(new Egg()));
+  statsString = testPan.statsDisplayString();
+  ok(statsString.match("50%"));
+  ok(statsString.match("0%"));
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  statsString = testPan.statsDisplayString();
+  ok(statsString.match("-%"));
+  ok(statsString.match("50%"));
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
+  statsString = testPan.statsDisplayString();
+  ok(statsString.match("-%"));
+  ok(statsString.match("-%"));
+});
+
 test("Fry Egg", function() {
   var testPan = new FryPan();
-  testPan._fryEggsInIndexSet([]);
+  testPan._fryEggsWithUuids([]);
   equal(testPan.eggCount(), 0);
-  ok(testPan.addEgg(new Egg()));
+  var egg1 = new Egg();
+  ok(testPan.addEgg(egg1));
   equal(testPan.eggCount(), 1);
   testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2.0);
   var fryingTimes = testPan.fryingTimes();
   equal(fryingTimes.length, 1);
   ok(fryingTimes[0] != 0.0);
-  testPan._fryEggsInIndexSet([0]);
+  testPan._fryEggsWithUuids([egg1.uuid()]);
+  equal(testPan.eggCount(), 0);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 0);
+});
+
+test("Fry 2 Eggs", function() {
+  var testPan = new FryPan();
+  testPan._fryEggsWithUuids([]);
+  equal(testPan.eggCount(), 0);
+  var egg1 = new Egg();
+  var egg2 = new Egg();
+  ok(testPan.addEgg(egg1));
+  ok(testPan.addEgg(egg2));
+  equal(testPan.eggCount(), 2);
+  testPan.processGameTick(Date.now() / 1000.0, FryPan.FRY_INTERVAL / 2);
+  var fryingTimes = testPan.fryingTimes();
+  equal(fryingTimes.length, 2);
+  ok(fryingTimes[0] != 0.0);
+  ok(fryingTimes[1] != 0.0);
+  testPan._fryEggsWithUuids([egg1.uuid(), egg2.uuid()]);
   equal(testPan.eggCount(), 0);
   var fryingTimes = testPan.fryingTimes();
   equal(fryingTimes.length, 0);

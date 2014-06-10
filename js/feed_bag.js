@@ -91,18 +91,16 @@ FeedBag.prototype.hasStats = function() {
 }
 
 /**
- * Return the display name of this game piece. This is used for things like the stats
- * panel. Default implementation returns "<unnamed>".
- * @return {string} the display name of this game pieces.
+ * Return the display name of this game piece.
+ * @override
  */
 FeedBag.prototype.displayName = function() {
   return "Feed Bag";  // TODO(daves): localize this?
 }
 
 /**
- * Return the stats for this game piece, formatted for display. Default implementation
- * returns "0".
- * @return {string} the stats formatted for display.
+ * Return the stats for this game piece.
+ * @override
  */
 FeedBag.prototype.statsDisplayString = function() {
   var feedPercent = this._feed / FeedBag.MAX_FEED * 100.0;
