@@ -58,7 +58,7 @@ test("Has Stats", function() {
 
 test("Display Name", function() {
   var testBag = new FeedBag();
-  equal(testBag.displayName(), "Feed Bag");
+  ok(testBag.displayName() !== "<unnamed>");
 });
 
 test("Stats Display String", function() {
@@ -66,6 +66,8 @@ test("Stats Display String", function() {
   equal(testBag.statsDisplayString(), "100%");
   testBag.setFeed(FeedBag.MAX_FEED / 2);
   equal(testBag.statsDisplayString(), "50%");
+  testBag.setFeed(FeedBag.MAX_FEED / 3);
+  equal(testBag.statsDisplayString(), "33.33%");
   testBag.setFeed(FeedBag.MAX_FEED / 4);
   equal(testBag.statsDisplayString(), "25%");
   testBag.setFeed(0);

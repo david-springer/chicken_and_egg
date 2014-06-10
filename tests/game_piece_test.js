@@ -72,3 +72,18 @@ test("Body Accessor Null BodyDef", function() {
   testPiece.addToSimulation(fakeSimulation);
   ok(testPiece.body() == null);
 });
+
+test("Has Stats", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.hasStats(), false);
+});
+
+test("Display Name", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.displayName(), "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.statsDisplayString(), "0");
+});

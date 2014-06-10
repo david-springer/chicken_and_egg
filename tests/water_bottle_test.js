@@ -60,3 +60,26 @@ test("Refill Above Max Refill", function() {
   equal(testBottle.refill(), false);
   equal(testBottle.waterLevel(), waterLevel);
 });
+
+test("Has Stats", function() {
+  var testBottle = new WaterBottle();
+  ok(testBottle.hasStats());
+});
+
+test("Display Name", function() {
+  var testBottle = new WaterBottle();
+  ok(testBottle.displayName() !== "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testBottle = new WaterBottle();
+  equal(testBottle.statsDisplayString(), "100%");
+  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 2);
+  equal(testBottle.statsDisplayString(), "50%");
+  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 3);
+  equal(testBottle.statsDisplayString(), "33.33%");
+  testBottle.setWaterLevel(WaterBottle.MAX_WATER_LEVEL / 4);
+  equal(testBottle.statsDisplayString(), "25%");
+  testBottle.setWaterLevel(0);
+  equal(testBottle.statsDisplayString(), "0%");
+});

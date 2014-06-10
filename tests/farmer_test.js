@@ -129,7 +129,7 @@ test("Has Stats", function() {
 
 test("Display Name", function() {
   var testFarmer = new Farmer();
-  equal(testFarmer.displayName(), "Farmer");
+  ok(testFarmer.displayName() !== "<unnamed>");
 });
 
 test("Stats Display String", function() {

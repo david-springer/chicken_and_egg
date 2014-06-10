@@ -158,3 +158,32 @@ Nest.prototype.addFixturesToBody = function(simulation, body) {
 Nest.prototype.loadView = function(simulation) {
   this.view = new PolyView();
 }
+
+/**
+ * The egg carton reports stats.
+ * @override
+ */
+Nest.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Nest.prototype.displayName = function() {
+  return "Nest";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Nest.prototype.statsDisplayString = function() {
+  if (this.hasEgg()) {
+    var timeRemaining = this._incubationInterval - this._incubationTime;
+    return Math.floor(timeRemaining * 100) / 100 + "s";
+  } else {
+    return "-s";
+  }
+}

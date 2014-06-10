@@ -140,7 +140,6 @@ test("Should Lay Egg", function() {
   equal(testChicken._shouldLayEgg(), true);
 });
 
-
 test("Has Stats", function() {
   var testChicken = new Chicken();
   ok(testChicken.hasStats());
@@ -148,7 +147,7 @@ test("Has Stats", function() {
 
 test("Display Name", function() {
   var testChicken = new Chicken();
-  equal(testChicken.displayName(), "Chicken");
+  ok(testChicken.displayName() !== "<unnamed>");
 });
 
 test("Stats Display String", function() {

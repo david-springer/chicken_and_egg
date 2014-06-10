@@ -129,3 +129,27 @@ EggCarton.prototype.addFixturesToBody = function(simulation, body) {
 EggCarton.prototype.loadView = function(simulation) {
   this.view = new PolyView();
 }
+
+/**
+ * The egg carton reports stats.
+ * @override
+ */
+EggCarton.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+EggCarton.prototype.displayName = function() {
+  return "Egg Carton";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+EggCarton.prototype.statsDisplayString = function() {
+  return this._eggCount.toString();
+}

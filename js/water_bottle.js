@@ -92,3 +92,28 @@ WaterBottle.prototype.refill = function() {
   }
   return false;
 }
+
+/**
+ * The water bottle reports stats.
+ * @override
+ */
+WaterBottle.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name of this game piece.
+ * @override
+ */
+WaterBottle.prototype.displayName = function() {
+  return "Water Bottle";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+WaterBottle.prototype.statsDisplayString = function() {
+  var waterPercent = this._waterLevel / WaterBottle.MAX_WATER_LEVEL * 100.0;
+  return Math.floor(waterPercent * 100) / 100 + "%";
+}

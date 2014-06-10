@@ -34,6 +34,27 @@ test("Add Egg When Full", function() {
   ok(testNest.hasEgg());
 });
 
+test("Has Stats", function() {
+  var testNest = new Nest();
+  ok(testNest.hasStats());
+});
+
+test("Display Name", function() {
+  var testNest = new Nest();
+  ok(testNest.displayName() !== "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testNest = new Nest();
+  equal(testNest.statsDisplayString(), "-s");
+  ok(testNest.addEgg());
+  equal(testNest.statsDisplayString(), Nest.INCUBATION_INTERVAL + "s");
+  testNest.processGameTick(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL / 2.0);
+  equal(testNest.statsDisplayString(), Nest.INCUBATION_INTERVAL / 2 + "s");
+  testNest.processGameTick(Date.now() / 1000.0, Nest.INCUBATION_INTERVAL / 2.0);
+  equal(testNest.statsDisplayString(), "-s");
+});
+
 test("Hatch Egg", function() {
   var testNest = new Nest();
   testNest._hatchEgg();

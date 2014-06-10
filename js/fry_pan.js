@@ -223,10 +223,9 @@ FryPan.prototype.statsDisplayString = function() {
   for (var i = 0; i < FryPan.MAX_EGG_COUNT; ++i) {
     if (i < this._eggs.length) {
       var fryPercent = (this._eggs[i].fryingTime / this._fryInterval * 100.0);
-      // toPrecision() doesn't format 50 to "50", it formats it to "50.00".
-      statString += connector + (Math.floor(fryPercent * 100) / 100);
+      statString += connector + fryPercent.toPrecision(4);
     } else {
-      statString += connector + "-";
+      statString += connector + "--.--";
     }
     statString += "%";
     connector = ", ";
