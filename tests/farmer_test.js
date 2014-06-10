@@ -121,3 +121,22 @@ test("Death Notice", function() {
   defaultCenter.removeNotificationObserver(
       EggCarton.DID_FILL_CARTON_NOTIFICATION, farmerDidDie);
 });
+
+test("Has Stats", function() {
+  var testFarmer = new Farmer();
+  ok(testFarmer.hasStats());
+});
+
+test("Display Name", function() {
+  var testFarmer = new Farmer();
+  equal(testFarmer.displayName(), "Farmer");
+});
+
+test("Stats Display String", function() {
+  var testFarmer = new Farmer();
+  equal(testFarmer.statsDisplayString(), "100%");
+  testFarmer.setHealth(0.5);
+  equal(testFarmer.statsDisplayString(), "50%");
+  testFarmer.setHealth(0);
+  equal(testFarmer.statsDisplayString(), "0%");
+});

@@ -120,3 +120,28 @@ Farmer.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
     NotificationDefaultCenter().postNotification(Farmer.DID_DIE_NOTIFICATION, this);
   }
 }
+
+/**
+ * The farmer reports stats.
+ * @override
+ */
+Farmer.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Farmer.prototype.displayName = function() {
+  return "Farmer";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Farmer.prototype.statsDisplayString = function() {
+  var healthPercent = this._health * 100.0;
+  return healthPercent + "%";
+}
