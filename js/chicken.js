@@ -293,3 +293,27 @@ Chicken.prototype._layEgg = function() {
     NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
   }
 }
+
+/**
+ * The chicken reports stats.
+ * @override
+ */
+Chicken.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Chicken.prototype.displayName = function() {
+  return "Chicken";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Chicken.prototype.statsDisplayString = function() {
+  return this._eggCount.toString();
+}
