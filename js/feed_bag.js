@@ -82,3 +82,29 @@ FeedBag.prototype.refill = function() {
   this._feed = FeedBag.MAX_FEED;
 }
 
+/**
+ * The feed bag reports stats.
+ * @override
+ */
+FeedBag.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name of this game piece. This is used for things like the stats
+ * panel. Default implementation returns "<unnamed>".
+ * @return {string} the display name of this game pieces.
+ */
+FeedBag.prototype.displayName = function() {
+  return "Feed Bag";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece, formatted for display. Default implementation
+ * returns "0".
+ * @return {string} the stats formatted for display.
+ */
+FeedBag.prototype.statsDisplayString = function() {
+  var feedPercent = this._feed / FeedBag.MAX_FEED * 100.0;
+  return feedPercent + "%";
+}
