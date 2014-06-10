@@ -104,5 +104,5 @@ FeedBag.prototype.displayName = function() {
  */
 FeedBag.prototype.statsDisplayString = function() {
   var feedPercent = this._feed / FeedBag.MAX_FEED * 100.0;
-  return feedPercent + "%";
+  return Math.floor(feedPercent * 100) / 100 + "%";
 }

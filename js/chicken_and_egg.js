@@ -194,13 +194,16 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._nest = new Nest();
   this._gamePieces.push(this._nest);
 
-  for (var i = 0; i < this._gamePieces.length; ++i) {
-    this._gamePieces[i].addToSimulation(this);
-  }
-
   var tbodyElt = $('#game_stats_table').find('tbody');
-  tbodyElt.append('<tr><td>Farmer</td><td>90%</td></tr>');
-  tbodyElt.append('<tr><td>Nest</td><td>10:15</td></tr>');
+  for (var i = 0; i < this._gamePieces.length; ++i) {
+    var gamePiece = this._gamePieces[i];
+    gamePiece.addToSimulation(this);
+    if (gamePiece.hasStats()) {
+      tbodyElt.append('<tr><td>' + gamePiece.displayName() + '</td>' +
+          '<td id=' + gamePiece.uuid() +'>' +
+          gamePiece.statsDisplayString() + '</td></tr>');
+    }
+  }
 
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
@@ -259,6 +262,7 @@ ChickenAndEgg.prototype.simulationTick = function() {
                    ChickenAndEgg.Box2DConsts.VELOCITY_ITERATION_COUNT,
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
+  this._updateGameStats(this._gamePieces);
   // Remove all the game pieces that are scheduled to be deactivated.
   for (var i = 0; i < this._deactiveGamePieces.length; ++i) {
     var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
@@ -339,6 +343,21 @@ ChickenAndEgg.prototype._indexOfGamePieceWithUuid = function(gamePieces, uuid) {
     }
   }
   return -1;
+}
+
+/**
+ * Update the game stats.
+ * @param {Array.GamePiece} gamePieces The array of game pieces to use when updating
+ *     the game stats.
+ * @private
+ */
+ChickenAndEgg.prototype._updateGameStats = function(gamePieces) {
+  for (var i = 0; i < gamePieces.length; ++i) {
+    var gamePiece = gamePieces[i];
+    if (gamePiece.hasStats()) {
+      $('#' + gamePiece.uuid()).text(gamePiece.statsDisplayString());
+    }
+  }
 }
 
 /**
