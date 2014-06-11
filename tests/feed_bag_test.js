@@ -50,3 +50,24 @@ test("Refill", function() {
   testBag.refill();
   equal(testBag.feed(), FeedBag.MAX_FEED);
 });
+
+test("Has Stats", function() {
+  var testBag = new FeedBag();
+  ok(testBag.hasStats());
+});
+
+test("Display Name", function() {
+  var testBag = new FeedBag();
+  ok(testBag.displayName() !== "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testBag = new FeedBag();
+  equal(testBag.statsDisplayString(), FeedBag.MAX_FEED + "g");
+  testBag.setFeed(500.123456);
+  equal(testBag.statsDisplayString(), "500g");
+  testBag.setFeed(5.723456);
+  equal(testBag.statsDisplayString(), "6g");
+  testBag.setFeed(0);
+  equal(testBag.statsDisplayString(), "0g");
+});

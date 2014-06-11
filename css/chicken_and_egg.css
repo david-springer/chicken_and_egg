@@ -41,3 +41,17 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+/**
+ * Information panel about game and farmer stats.
+ */
+#game_stats_panel_container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  font-family: "Lucida Console", Monospace;
+  font-size: 12px;
+  border: 2px solid red;
+  background-color: white;
+}

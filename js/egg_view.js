@@ -14,8 +14,8 @@
  * @inherit BodyView
  * @constructor
  */
-EggView = function(opt_scale) {
-  BodyView.call(this, opt_scale);
+EggView = function() {
+  BodyView.call(this);
 }
 EggView.prototype = new BodyView();
 EggView.prototype.constructor = EggView;

@@ -28,6 +28,12 @@ Egg = function(xPos, yPos) {
    * @private
    */
   this._yPos = yPos || 0.0;
+  /**
+   * Identify this game pice as an egg.
+   * @type {boolean}
+   * @public
+   */
+  this.isEgg = true;
 }
 Egg.prototype = new GamePiece();
 Egg.prototype.constructor = Egg;
@@ -38,8 +44,8 @@ Egg.prototype.constructor = Egg;
  */
 Egg.Box2DConsts = {
   EGG_DENSITY: 1.031,
-  EGG_FRICTION: 0.5,
-  EGG_RESTITUTION: 0.2
+  EGG_FRICTION: 0.2,
+  EGG_RESTITUTION: 0.7
 }
 
 /**
@@ -91,12 +97,13 @@ Egg.prototype.addFixturesToBody = function(simulation, body) {
   eggFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
   eggFixture.shape.SetAsArray(this._eggVertices(0.17));
   body.CreateFixture(eggFixture);
+  body.SetBullet(true);
 }
 
 /**
  * Return a new EggView.
  * @override
  */
-Egg.prototype.getView = function(simulation) {
-  return new EggView(simulation.scale());
+Egg.prototype.loadView = function(simulation) {
+  this.view = new EggView();
 }

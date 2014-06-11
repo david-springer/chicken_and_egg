@@ -13,26 +13,10 @@
 
 /**
  * Constructor for the BodyView.
- * @parameter {Number} opt_scale The scale factor from Box2D units to pixels. Default
- *     value is 30 (a magic number widely recommended by the Internet).
  * @constructor
  */
-BodyView = function(opt_scale) {
-  /**
-   * Scale factor from Box2D units to pixels.
-   * @type {Number}
-   * @private
-   */
-  this._scale = parseFloat(opt_scale) || 30.0;
-}
+BodyView = function() {}
 BodyView.prototype.constructor = BodyView;
-
-/**
- * Accessors and mutators.
- */
-BodyView.prototype.scale = function() {
-  return this._scale;
-}
 
 /**
  * Draw the body. Abstract method. Default does nothing.

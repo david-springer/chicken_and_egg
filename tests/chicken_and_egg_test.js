@@ -8,6 +8,78 @@
  */
 module("ChickenAndEgg Object");
 
+test("Game Piece With UUID", function() {
+  var fakeCanvas = {
+    width: 900,
+    height: 600
+  };
+  var testChickenAndEgg = new ChickenAndEgg(fakeCanvas);
+  // Test with no game pieces.
+  var testPiece = testChickenAndEgg._indexOfGamePieceWithUuid([], "fakeuuid");
+  equal(testPiece, -1);
+  // Test with some valid game pieces.
+  var testPiece = new GamePiece();
+  var testGamePieces = [new GamePiece(), new GamePiece(), testPiece];
+  var testUuid = testPiece.uuid();
+  var checkPiece = testChickenAndEgg._indexOfGamePieceWithUuid(testGamePieces, testUuid);
+  equal(checkPiece, 2);
+  equal(testGamePieces[checkPiece].uuid(), testPiece.uuid());
+  // Test with non-extant UUID.
+  checkPiece = testChickenAndEgg._indexOfGamePieceWithUuid(testGamePieces, "bogusuuid");
+  equal(checkPiece, -1);
+});
+
+test("Chicken Died With Pullets", function() {
+  var fakeCanvas = {
+    width: 900,
+    height: 600
+  };
+  var fakeWorld = {
+    DestroyBody: function(body) {}
+  }
+  var testChickenAndEgg = new ChickenAndEgg(fakeCanvas);
+  testChickenAndEgg._world = fakeWorld;
+  var fakeFeedBag = new FakeFeedBag();
+  var fakeWaterBottle = new FakeWaterBottle();
+  var testChicken = new Chicken();
+  testChicken.feedBag = fakeFeedBag;
+  testChicken.waterBottle = fakeWaterBottle;
+  testChickenAndEgg._chicken = testChicken;
+  testChickenAndEgg._gamePieces.push(testChickenAndEgg._chicken);
+  // Add a pullet.
+  testChickenAndEgg._eggHatched({});  // Hatch from a fake nest.
+  equal(testChickenAndEgg._pullets.length, 1);
+  var testPullet = testChickenAndEgg._pullets[0];
+  // Verify the game pieces.
+  testChickenAndEgg._deallocateInactiveGamePieces();
+  ok(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testChicken.uuid()) >= 0);
+  equal(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testPullet.uuid()), -1);
+  equal(testChickenAndEgg._chicken.uuid(), testChicken.uuid());
+  ok(testChickenAndEgg._chicken.uuid() !== testPullet.uuid());
+  equal(testPullet.feedBag, null);
+  equal(testPullet.waterBottle, null);
+  // Kill the original hen. This should cause a CHICKEN_DID_DIE notification, which
+  // should in turn replace the hen with the pullet.
+  testChickenAndEgg._chickenDied(testChicken);
+  // Verify the game pieces.
+  testChickenAndEgg._deallocateInactiveGamePieces();
+  equal(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testChicken.uuid()), -1);
+  ok(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testPullet.uuid()) >= 0);
+  equal(testChickenAndEgg._pullets.length, 0);
+  equal(testChickenAndEgg._chicken.uuid(), testPullet.uuid());
+  equal(testPullet.feedBag.uuid(), fakeFeedBag.uuid());
+  equal(testPullet.waterBottle.uuid(), fakeWaterBottle.uuid());
+  // No more pullets should result in game over.
+  testChicken = testPullet;
+  testChickenAndEgg._chickenDied(testChicken);
+  equal(testChickenAndEgg._pullets.length, 0);
+  equal(testChickenAndEgg._isRunning, false);
+});
+
 test("Convert To Sim Coords", function() {
   var fakeCanvas = {
     width: 900,

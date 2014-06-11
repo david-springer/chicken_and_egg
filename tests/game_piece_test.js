@@ -10,22 +10,51 @@ module("GamePiece Object");
 
 test("Get UUID", function() {
   var testPiece = new GamePiece();
-  var uuid = testPiece.getUuid();
+  var uuid = testPiece.uuid();
   ok(uuid != null);
-  equal(testPiece.getUuid(), uuid);
+  equal(testPiece.uuid(), uuid);
 });
 
 test("Unique UUID", function() {
   var testPiece1 = new GamePiece();
   var testPiece2 = new GamePiece();
-  var uuid1 = testPiece1.getUuid();
+  var uuid1 = testPiece1.uuid();
   ok(uuid1 != null);
-  var uuid2 = testPiece2.getUuid();
+  var uuid2 = testPiece2.uuid();
   ok(uuid2 != null);
   ok(uuid1 !== uuid2);
 });
 
 test("Body Accessor", function() {
+  var FakeGamePiece = function() {
+    GamePiece.call(this);
+  }
+  FakeGamePiece.prototype = new GamePiece();
+  FakeGamePiece.prototype.constructor = FakeGamePiece;
+  FakeGamePiece.prototype.getBodyDef = function() {
+    return { bodyType: "fake" };
+  }
+
+  var fakeBody = function(bodyDef) {
+    return {
+        SetUserData: function(data) {},
+        GetUserData: function() { return "testBodyData"; }
+    };
+  };
+  var fakeWorld = function() {
+    return { CreateBody: fakeBody };
+  };
+  var fakeSimulation = {
+    world: fakeWorld
+  };
+  var testPiece = new FakeGamePiece();
+  ok(testPiece.body() == null);
+  testPiece.addToSimulation(fakeSimulation);
+  ok(testPiece.body() != null);
+  equal(testPiece.body().GetUserData(), "testBodyData");
+});
+
+test("Body Accessor Null BodyDef", function() {
   var fakeBody = function(bodyDef) {
     return {
         SetUserData: function(data) {},
@@ -41,6 +70,20 @@ test("Body Accessor", function() {
   var testPiece = new GamePiece();
   ok(testPiece.body() == null);
   testPiece.addToSimulation(fakeSimulation);
-  ok(testPiece.body() != null);
-  equal(testPiece.body().GetUserData(), "testBodyData");
+  ok(testPiece.body() == null);
+});
+
+test("Has Stats", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.hasStats(), false);
+});
+
+test("Display Name", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.displayName(), "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testPiece = new GamePiece();
+  equal(testPiece.statsDisplayString(), "0");
 });
