@@ -4,21 +4,6 @@
  */
 
 /**
- * Fakes for this test.
- */
-FakeFeedBag = function() {}
-FakeFeedBag.prototype.constructor = FakeFeedBag;
-FakeFeedBag.prototype.peck = function(peckVolume) {
-  return peckVolume;
-}
-
-FakeWaterBottle = function() {}
-FakeWaterBottle.prototype.constructor = FakeWaterBottle;
-FakeWaterBottle.prototype.drink = function(waterVolume) {
-  return waterVolume;
-}
-
-/**
  * Compute a test peck value based on the chicken's feeding parameters.
  * @param {number} factor The linear factor to use when choosing a feed amount.
  * @return The test peck value. Guaranteed to lie within the chicken's feeding parameters.
@@ -138,6 +123,25 @@ test("Should Lay Egg", function() {
   testChicken.setFeed(Chicken.Constants.MAX_FEED);
   testChicken.setWater(Chicken.Constants.MAX_WATER);
   equal(testChicken._shouldLayEgg(), true);
+});
+
+test("Has Stats", function() {
+  var testChicken = new Chicken();
+  ok(testChicken.hasStats());
+});
+
+test("Display Name", function() {
+  var testChicken = new Chicken();
+  ok(testChicken.displayName() !== "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testChicken = new Chicken();
+  equal(testChicken.statsDisplayString(), Chicken.Constants.MAX_EGG_COUNT.toString());
+  testChicken.setEggCount(12);
+  equal(testChicken.statsDisplayString(), "12");
+  testChicken.setEggCount(0);
+  equal(testChicken.statsDisplayString(), "0");
 });
 
 /*

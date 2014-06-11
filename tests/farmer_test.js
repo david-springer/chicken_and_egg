@@ -76,23 +76,27 @@ test("Metabolize For Interval", function() {
   var testFarmer = new Farmer();
   var health = testFarmer.health();
   equal(health, 1);
-  ok(testFarmer.metabolizeForInterval(1));
+
+  testFarmer.processGameTick(Date.now() / 1000.0, 1);
   ok(testFarmer.health() < health);
   health = testFarmer.health();
-  ok(testFarmer.metabolizeForInterval(2.147));
+  testFarmer.processGameTick(Date.now() / 1000.0, 2.147);
   ok(testFarmer.health() < health);
 });
 
 test("Metabolize Negative Interval", function() {
   var testFarmer = new Farmer();
-  equal(testFarmer.metabolizeForInterval(-1.5), false);
+  var health = testFarmer.health();
+  testFarmer.processGameTick(Date.now() / 1000.0, -1.5);
+  equal(testFarmer.health(), 1);
 });
 
 test("Metabolize When Dead", function() {
   var testFarmer = new Farmer();
   testFarmer.setHealth(0);
   equal(testFarmer.isAlive(), false);
-  equal(testFarmer.metabolizeForInterval(2.4), false);
+  testFarmer.processGameTick(Date.now() / 1000.0, 2.4);
+  equal(testFarmer.health(), 0);
 });
 
 test("Death Notice", function() {
@@ -110,10 +114,33 @@ test("Death Notice", function() {
   var testFarmer = new Farmer();
   testFarmer.setHealth(Farmer.METABOLIC_RATE);  // 1 second of health left.
   ok(testFarmer.isAlive());
-  testFarmer.metabolizeForInterval(2);
+  testFarmer.processGameTick(Date.now() / 1000.0, 2);
   ok(isDead);
   equal(testFarmer.isAlive(), false);
   equal(testFarmer.health(), 0);
   defaultCenter.removeNotificationObserver(
       EggCarton.DID_FILL_CARTON_NOTIFICATION, farmerDidDie);
+});
+
+test("Has Stats", function() {
+  var testFarmer = new Farmer();
+  ok(testFarmer.hasStats());
+});
+
+test("Display Name", function() {
+  var testFarmer = new Farmer();
+  ok(testFarmer.displayName() !== "<unnamed>");
+});
+
+test("Stats Display String", function() {
+  var testFarmer = new Farmer();
+  equal(testFarmer.statsDisplayString(), "100.0%");
+  testFarmer.setHealth(0.5);
+  equal(testFarmer.statsDisplayString(), "50.00%");
+  testFarmer.setHealth(0.3146728937);
+  equal(testFarmer.statsDisplayString(), "31.47%");
+  testFarmer.setHealth(0.03146728937);
+  equal(testFarmer.statsDisplayString(), "3.147%");
+  testFarmer.setHealth(0);
+  equal(testFarmer.statsDisplayString(), "0.000%");
 });

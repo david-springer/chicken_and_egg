@@ -86,13 +86,13 @@ Chicken.prototype.constructor = Chicken;
 Chicken.Constants = {
   MAX_FEED: 60.0,  // Maximum amount of feed.
   MAX_WATER: 120.0,  // Maximum amount of water.
-  MIN_PECK_VOLUME: 6.0,
-  MAX_PECK_VOLUME: 12.0,
-  CHEW_RATE: 1.5,  // grams per second
-  MIN_DRINK_VOLUME: 10.0,
-  MAX_DRINK_VOLUME: 30.0,
+  MIN_PECK_VOLUME: 20.0,
+  MAX_PECK_VOLUME: 30.0,
+  CHEW_RATE: 15.0,  // grams per second
+  MIN_DRINK_VOLUME: 30.0,
+  MAX_DRINK_VOLUME: 60.0,
   DRINK_RATE: 25.0,  // ml per second
-  MAX_EGG_COUNT: 36  // All chickens start with this many eggs.
+  MAX_EGG_COUNT: 20  // All chickens start with this many eggs.
 };
 
 /**
@@ -292,4 +292,28 @@ Chicken.prototype._layEgg = function() {
   if (this._eggCount == 0) {
     NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
   }
+}
+
+/**
+ * The chicken reports stats.
+ * @override
+ */
+Chicken.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Chicken.prototype.displayName = function() {
+  return "Eggs to Lay:";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Chicken.prototype.statsDisplayString = function() {
+  return this._eggCount.toString();
 }

@@ -21,11 +21,18 @@
 <head>
   <title>Chicken And Egg Tests</title>    
   <meta charset="utf-8">
+  <!-- Use this link for prod to improve caching:
   <link href="//code.jquery.com/qunit/qunit-1.14.0.css" rel="stylesheet" type="text/css">
+  -->
+  <link href="../third_party/qunit/qunit-1.14.0.css" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="../third_party/box2dweb/Box2d.min.js"></script>
   <script type="text/javascript" src="../third_party/uuid/uuid.js"></script>
+  <!-- Use these links for prod to improve caching:
   <script type="text/javascript" src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  -->
+  <script type="text/javascript" src="../third_party/qunit/qunit-1.14.0.js"></script>
+  <script type="text/javascript" src="../third_party/jquery/jquery-1.11.0.min.js"></script>
   <script type="text/javascript" src="../js/notifications.js"></script>
   <script type="text/javascript" src="../js/body_view.js"></script>
   <script type="text/javascript" src="../js/poly_view.js"></script>
@@ -33,6 +40,7 @@
   <script type="text/javascript" src="../js/game_piece.js"></script>
   <script type="text/javascript" src="../js/chicken.js"></script>
   <script type="text/javascript" src="../js/chicken_and_egg.js"></script>
+  <script type="text/javascript" src="../js/contact_listener.js"></script>
   <script type="text/javascript" src="../js/feed_bag.js"></script>
   <script type="text/javascript" src="../js/water_bottle.js"></script>
   <script type="text/javascript" src="../js/egg_carton.js"></script>
@@ -45,19 +53,17 @@
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
-  <script type="text/javascript" src="./body_view_test.js"></script>
+  <script type="text/javascript" src="./test_fakes.js"></script>
   <script type="text/javascript" src="./chicken_and_egg_test.js"></script>
   <script type="text/javascript" src="./chicken_test.js"></script>
   <script type="text/javascript" src="./egg_test.js"></script>
   <script type="text/javascript" src="./egg_carton_test.js"></script>
-  <script type="text/javascript" src="./egg_view_test.js"></script>
   <script type="text/javascript" src="./farmer_test.js"></script>
   <script type="text/javascript" src="./feed_bag_test.js"></script>
   <script type="text/javascript" src="./fry_pan_test.js"></script>
   <script type="text/javascript" src="./game_piece_test.js"></script>
   <script type="text/javascript" src="./nest_test.js"></script>
   <script type="text/javascript" src="./notifications_test.js"></script>
-  <script type="text/javascript" src="./poly_view_test.js"></script>
   <script type="text/javascript" src="./water_bottle_test.js"></script>
 </body>
 </html>

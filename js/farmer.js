@@ -53,7 +53,7 @@ Farmer.MAX_EGG_EAT_COUNT = 2;
  * Amount of health the farmer loses per second.
  * @type {number}
  */
-Farmer.METABOLIC_RATE = 0.01667;  // About 1/60 of a second.
+Farmer.METABOLIC_RATE = 0.005;
 
 /**
  * Notification sent when the farmer dies.
@@ -107,19 +107,41 @@ Farmer.prototype.eatEggs = function(eggCount) {
  * Metabolize eggs for a given time interval. This reduces the health of the farmer
  * proportional to the metabolic rate. When the health falls to 0, the farmer dies
  * and posts the {@code DID_DIE_NOTIFICATION} notification.
- * @param {number} interval The interval to metabolize. Measured in seconds. Does
- *     nothing if negative.
- * @return {boolean} whether the metabolism was successful.
+ * @override
  */
-Farmer.prototype.metabolizeForInterval = function(interval) {
-  if (!this.isAlive() || interval < 0.0) {
-    return false;
+Farmer.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
+  if (!this.isAlive() || gameTimeDelta < 0.0) {
+    return;
   }
-  var healthReduced = interval * Farmer.METABOLIC_RATE;
+  var healthReduced = gameTimeDelta * Farmer.METABOLIC_RATE;
   this._health -= healthReduced;
   if (this._health <= 0.0) {
     this._health = 0.0;
     NotificationDefaultCenter().postNotification(Farmer.DID_DIE_NOTIFICATION, this);
   }
+}
+
+/**
+ * The farmer reports stats.
+ * @override
+ */
+Farmer.prototype.hasStats = function() {
   return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Farmer.prototype.displayName = function() {
+  return "Farmer Health";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Farmer.prototype.statsDisplayString = function() {
+  var healthPercent = this._health * 100.0;
+  return healthPercent.toPrecision(4) + "%";
 }

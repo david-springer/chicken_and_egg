@@ -13,8 +13,10 @@
 /**
  * Constructor for the CoopDoor.
  * @constructor
+ * @extends {GamePiece}
  */
 CoopDoor = function() {
+  GamePiece.call(this);
   /**
    * The static wall. Not valid until addToSimulation() is called.
    * @type {Box2D.Body}
@@ -24,26 +26,39 @@ CoopDoor = function() {
   /**
    * The dynamic door. Not valid until addToSimulation() is called.
    * @type {Box2D.body}
-   * @public
+   * @private
    */
-  this.coopDoor = null;
+  this._coopDoor = null;
   /**
    * The revolute joint representing the hinge. Not valid until addToSimulation() is
    * called.
    * @type {Box2D.RevoluteJoint}
-   * @public
+   * @private
    */
-  this.coopDoorHinge = null;
+  this._coopDoorHinge = null;
 }
+CoopDoor.prototype = new GamePiece();
 CoopDoor.prototype.constructor = CoopDoor;
 
 /**
- * Method to add the coop door pieces to the Box2D world.
- * @param {Object} simulation The simulation. This object is expected to implement these
- *     methods:
- *       world() The Box2D world
- *       worldSize() The size of the game board in Box2D world coordinates
- *       scale() The scale factor from CANVAS to Box2D world
+ * Draw the coop door.
+ * @override
+ */
+CoopDoor.prototype.draw = function(ctx, simulation) {
+  var drawCoopDoorPart = function(ctx, b) {
+    if (b.IsActive()) {
+        b.GetUserData().draw(ctx, b);
+    }
+  }
+  drawCoopDoorPart(ctx, this._coopWall);
+  drawCoopDoorPart(ctx, this._coopDoor);
+}
+
+/**
+ * Method to add the coop door pieces to the Box2D world. Customise this method to create
+ * three Box2D bodies that represent the coop door: the coop wall (static), the coop door
+ * (dynamic, the swinging part) and the coop hinge.
+ * @override
  */
 CoopDoor.prototype.addToSimulation = function(simulation) {
   // Create the static coop wall.
@@ -54,40 +69,52 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
 
   var vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
   vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.40));
   fixture.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
   fixture.shape.SetAsArray(vertices);
   this._coopWall = simulation.world().CreateBody(bodyDef);
   this._coopWall.CreateFixture(fixture);
-  this._coopWall.SetUserData(new PolyView(simulation.scale()));
+  this._coopWall.SetUserData(new PolyView());
 
   // Create the dynamic part of the door.
   vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 1.7));
   vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 + 0.03, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
   fixture.density = 2.0;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
   fixture.shape.SetAsArray(vertices);
   bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  this.coopDoor = simulation.world().CreateBody(bodyDef);
-  this.coopDoor.CreateFixture(fixture);
-  this.coopDoor.SetUserData(new PolyView(simulation.scale()));
+  this._coopDoor = simulation.world().CreateBody(bodyDef);
+  this._coopDoor.CreateFixture(fixture);
+  this._coopDoor.SetUserData(new PolyView());
 
   // Create the joint that represents the hinge.
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
-  jointDef.Initialize(this._coopWall, this.coopDoor, new Box2D.Common.Math.b2Vec2(
-      0.60 + 0.80 + 0.015, 2.0));
+  jointDef.Initialize(this._coopWall, this._coopDoor, new Box2D.Common.Math.b2Vec2(
+      0.60 + 0.80 - 0.015, 2.0));
   jointDef.collideConnected = false;
   jointDef.lowerAngle = -Math.PI / 12;
   jointDef.upperAngle = Math.PI / 4;
   jointDef.enableLimit = true;
-  this.coopDoorHinge = simulation.world().CreateJoint(jointDef);
+  this._coopDoorHinge = simulation.world().CreateJoint(jointDef);
+}
+
+/**
+ * Apply Hooke's law dampening to the coop door hinge.
+ * @override
+ */
+CoopDoor.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
+  var hingeAngle = this._coopDoorHinge.GetJointAngle();
+  var hingeVel = this._coopDoorHinge.GetJointSpeed();
+  if (Math.abs(hingeVel) > 0.001) {
+    this._coopDoor.ApplyTorque(-hingeAngle * 0.008 - hingeVel * 0.0003);
+  }
 }

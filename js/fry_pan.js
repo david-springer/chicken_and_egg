@@ -77,8 +77,8 @@ FryPan.prototype.fryingTimes = function() {
 }
 
 /**
- * Add an egg. If there is already an egg in the nest, does nothing.
- * @param {Egg} egg The egg game piece to add. The egg must respond to the getUuid()
+ * Add an egg. If there is already an egg in the fry pan, does nothing.
+ * @param {Egg} egg The egg game piece to add. The egg must respond to the uuid()
  * method.
  * @return {boolean} if adding the egg was successful.
  */
@@ -86,7 +86,7 @@ FryPan.prototype.addEgg = function(egg) {
   if (this.eggCount() == FryPan.MAX_EGG_COUNT) {
     return false;
   }
-  var eggUuid = egg.getUuid();
+  var eggUuid = egg.uuid();
   for (var i = 0; i < this._eggs.length; ++i) {
     if (this._eggs[i].uuid === eggUuid)
       // Egg already exists.
@@ -106,14 +106,15 @@ FryPan.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
   }
   // Create an "index set" of eggs to fry. Do this so the _eggs array isn't mutated in
   // the loop.
-  var fryIndexSet = new Array();
+  var uuids = new Array();
   for (var i = 0; i < this._eggs.length; ++i) {
-    this._eggs[i].fryingTime += gameTimeDelta;
-    if (this._eggs[i].fryingTime >= this._fryInterval) {
-      fryIndexSet.push(i);
+    var egg = this._eggs[i];
+    egg.fryingTime += gameTimeDelta;
+    if (egg.fryingTime >= this._fryInterval) {
+      uuids.push(egg.uuid);
     }
   }
-  this._fryEggsInIndexSet(fryIndexSet);
+  this._fryEggsWithUuids(uuids);
 }
 
 /**
@@ -122,12 +123,112 @@ FryPan.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
  * @param {Array.<number>} fryIndexSet The set of indices of eggs to fry.
  * @private
  */
-FryPan.prototype._fryEggsInIndexSet = function(fryIndexSet) {
-  if (fryIndexSet.length == 0) {
+FryPan.prototype._fryEggsWithUuids = function(uuids) {
+  if (uuids.length == 0) {
     return;  // No eggs to fry.
   }
-  for (var i = 0; i < fryIndexSet.length; ++i) {
-    this._eggs.splice(fryIndexSet[i], 1);
+  for (var i = 0; i < uuids.length; ++i) {
+    for (var eggIdx = 0; eggIdx < this._eggs.length; ++eggIdx) {
+      if (this._eggs[eggIdx].uuid === uuids[i]) {
+        this._eggs.splice(eggIdx, 1);
+        break;
+      }
+    }
     NotificationDefaultCenter().postNotification(FryPan.DID_FRY_EGG_NOTIFICATION, this);
   }
+}
+
+/**
+ * Allocate the Box2D body definition for this fry pan.
+ * @override
+ */
+FryPan.prototype.getBodyDef = function() {
+  bodyDef = new Box2D.Dynamics.b2BodyDef();
+  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 0.425, 1.0);
+  return bodyDef;
+}
+
+/**
+ * Add geometry for a fry pan.
+ * @override
+ */
+FryPan.prototype.addFixturesToBody = function(simulation, body) {
+  var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  fixtureDef.density = 7.3;  // Density of cast iron.
+  fixtureDef.friction = 0.1;
+  fixtureDef.restitution = 0.1;
+  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  var fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, 0));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.015, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, -0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16, 0));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16 + 0.015, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(0.16 + 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+  fryPanVerts = new Array();
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065 - 0.01));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025 - 0.13, 0.065));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025 - 0.13, 0.075));
+  fryPanVerts.push(new Box2D.Common.Math.b2Vec2(-0.16 - 0.025, 0.065));
+  fixtureDef.shape.SetAsArray(fryPanVerts);
+  body.CreateFixture(fixtureDef);
+}
+
+/**
+ * Return a new PolyView.
+ * @override
+ */
+FryPan.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
+}
+
+/**
+ * The fry pan reports stats.
+ * @override
+ */
+FryPan.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+FryPan.prototype.displayName = function() {
+  return "Egg fry %:";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+FryPan.prototype.statsDisplayString = function() {
+  var statString = "";
+  var connector = "";
+  for (var i = 0; i < FryPan.MAX_EGG_COUNT; ++i) {
+    if (i < this._eggs.length) {
+      var fryPercent = (this._eggs[i].fryingTime / this._fryInterval * 100.0);
+      statString += connector + fryPercent.toPrecision(4);
+    } else {
+      statString += connector + "--.--";
+    }
+    statString += "%";
+    connector = ", ";
+  }
+  return statString;
 }

@@ -82,3 +82,26 @@ FeedBag.prototype.refill = function() {
   this._feed = FeedBag.MAX_FEED;
 }
 
+/**
+ * The feed bag reports stats.
+ * @override
+ */
+FeedBag.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name of this game piece.
+ * @override
+ */
+FeedBag.prototype.displayName = function() {
+  return "Feed Left";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+FeedBag.prototype.statsDisplayString = function() {
+  return this._feed.toFixed() + "g";
+}

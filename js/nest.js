@@ -109,3 +109,81 @@ Nest.prototype._hatchEgg = function() {
   this._incubationTime = 0.0;
   NotificationDefaultCenter().postNotification(Nest.DID_HATCH_EGG_NOTIFICATION, this);
 }
+
+/**
+ * Allocate the Box2D body definition for this nest.
+ * @override
+ */
+Nest.prototype.getBodyDef = function() {
+  bodyDef = new Box2D.Dynamics.b2BodyDef();
+  bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.925, 1.0 + 0.25);
+  return bodyDef;
+}
+
+/**
+ * Add geometry for a fry pan.
+ * @override
+ */
+Nest.prototype.addFixturesToBody = function(simulation, body) {
+  var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  fixtureDef.density = 1.0;
+  fixtureDef.friction = 0.5;
+  fixtureDef.restitution = 0.1;
+  fixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+  var dAlpha = Math.PI / 6;
+  var alpha = Math.PI + dAlpha;
+  var c0 = Math.cos(alpha);
+  var s0 = Math.sin(alpha);
+  for (var i = 0; i < 4; ++i) {
+    var c1 = Math.cos(alpha + dAlpha);
+    var s1 = Math.sin(alpha + dAlpha);
+    var nestVerts = new Array();
+    nestVerts.push(new Box2D.Common.Math.b2Vec2(0.25 * c0, 0.25 * s0));
+    nestVerts.push(new Box2D.Common.Math.b2Vec2(0.26 * c0, 0.26 * s0));
+    nestVerts.push(new Box2D.Common.Math.b2Vec2(0.26 * c1, 0.26 * s1));
+    nestVerts.push(new Box2D.Common.Math.b2Vec2(0.25 * c1, 0.25 * s1));
+    fixtureDef.shape.SetAsArray(nestVerts);
+    body.CreateFixture(fixtureDef);
+    c0 = c1;
+    s0 = s1;
+    alpha += dAlpha;
+  }
+}
+
+/**
+ * Return a new PolyView.
+ * @override
+ */
+Nest.prototype.loadView = function(simulation) {
+  this.view = new PolyView();
+}
+
+/**
+ * The egg carton reports stats.
+ * @override
+ */
+Nest.prototype.hasStats = function() {
+  return true;
+}
+
+/**
+ * Return the display name.
+ * @override
+ */
+Nest.prototype.displayName = function() {
+  return "Hatch time left:";  // TODO(daves): localize this?
+}
+
+/**
+ * Return the stats for this game piece.
+ * @override
+ */
+Nest.prototype.statsDisplayString = function() {
+  if (this.hasEgg()) {
+    var timeRemaining = this._incubationInterval - this._incubationTime;
+    return Math.floor(timeRemaining * 100) / 100 + "s";
+  } else {
+    return "-s";
+  }
+}
