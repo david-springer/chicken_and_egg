@@ -320,22 +320,6 @@ ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
 }
 
 /**
- * Deactivate and deallocate all the game pieces that have been marked for removal.
- * @private
- */
-ChickenAndEgg.prototype._deallocateInactiveGamePieces = function() {
-  // Remove all the game pieces that are scheduled to be deactivated.
-  for (var i = 0; i < this._deactiveGamePieces.length; ++i) {
-    var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
-        this._gamePieces, this._deactiveGamePieces[i]);
-    if (releasedGamePieceIdx != -1) {
-      this._gamePieces[releasedGamePieceIdx].removeFromSimulation(this);
-      this._gamePieces.splice(releasedGamePieceIdx, 1);
-    }
-  }
-}
-
-/**
  * Handle the collision of two game pieces. Delegate method of ContactListener.
  * @param {Box2D.Dynamics.b2contact} contact The object that describes the contact.
  * @param {string} uuidA One of the two bodies that collided.
@@ -396,6 +380,30 @@ ChickenAndEgg.prototype._activateGamePieces = function(gamePieces) {
       tbodyElt.append('<tr><td>' + gamePiece.displayName() + '</td>' +
           '<td id=' + gamePiece.uuid() +'>' +
           gamePiece.statsDisplayString() + '</td></tr>');
+    }
+  }
+}
+
+/**
+ * Deactivate and deallocate all the game pieces that have been marked for removal.
+ * @private
+ */
+ChickenAndEgg.prototype._deallocateInactiveGamePieces = function() {
+  // Remove all the game pieces that are scheduled to be deactivated.
+  for (var i = 0; i < this._deactiveGamePieces.length; ++i) {
+    var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
+        this._gamePieces, this._deactiveGamePieces[i]);
+    if (releasedGamePieceIdx != -1) {
+      var gamePiece = this._gamePieces.splice(releasedGamePieceIdx, 1)[0];
+      // If the game piece displays stats, remove it form the stats panel.
+      gamePiece.removeFromSimulation(this);
+      if (gamePiece.hasStats) {
+        var statsElt = $('#' + gamePiece.uuid());
+        if (statsElt) {
+          var tr = statsElt.parent();
+          tr.remove();
+        }
+      }
     }
   }
 }
