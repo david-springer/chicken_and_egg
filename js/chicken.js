@@ -92,7 +92,7 @@ Chicken.Constants = {
   MIN_DRINK_VOLUME: 30.0,
   MAX_DRINK_VOLUME: 60.0,
   DRINK_RATE: 25.0,  // ml per second
-  MAX_EGG_COUNT: 16  // All chickens start with this many eggs.
+  MAX_EGG_COUNT: 20  // All chickens start with this many eggs.
 };
 
 /**

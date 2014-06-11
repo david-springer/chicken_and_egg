@@ -217,16 +217,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._nest = new Nest();
   this._gamePieces.push(this._nest);
 
-  var tbodyElt = $('#game_stats_table').find('tbody');
-  for (var i = 0; i < this._gamePieces.length; ++i) {
-    var gamePiece = this._gamePieces[i];
-    gamePiece.addToSimulation(this);
-    if (gamePiece.hasStats()) {
-      tbodyElt.append('<tr><td>' + gamePiece.displayName() + '</td>' +
-          '<td id=' + gamePiece.uuid() +'>' +
-          gamePiece.statsDisplayString() + '</td></tr>');
-    }
-  }
+  this._activateGamePieces(this._gamePieces);
 
   // Set up all the game piece notifications.
   var defaultCenter = NotificationDefaultCenter();
@@ -338,7 +329,7 @@ ChickenAndEgg.prototype._deallocateInactiveGamePieces = function() {
     var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
         this._gamePieces, this._deactiveGamePieces[i]);
     if (releasedGamePieceIdx != -1) {
-      this._world.DestroyBody(this._gamePieces[releasedGamePieceIdx].body());
+      this._gamePieces[releasedGamePieceIdx].removeFromSimulation(this);
       this._gamePieces.splice(releasedGamePieceIdx, 1);
     }
   }
@@ -387,6 +378,25 @@ ChickenAndEgg.prototype.gamePiecesWillCollide = function(contact, uuidA, uuidB) 
     this._nest.addEgg();
     this.releaseGamePieceWithUuid(eggUuid);
     return;
+  }
+}
+
+/**
+ * Activate the given list of game pieces by adding them to the simulation and to the
+ * game status board.
+ * @param {Array.GamePieces} gamePieces The list of game pieces to activate.
+ * @private
+ */
+ChickenAndEgg.prototype._activateGamePieces = function(gamePieces) {
+  var tbodyElt = $('#game_stats_table').find('tbody');
+  for (var i = 0; i < gamePieces.length; ++i) {
+    var gamePiece = gamePieces[i];
+    gamePiece.addToSimulation(this);
+    if (gamePiece.hasStats()) {
+      tbodyElt.append('<tr><td>' + gamePiece.displayName() + '</td>' +
+          '<td id=' + gamePiece.uuid() +'>' +
+          gamePiece.statsDisplayString() + '</td></tr>');
+    }
   }
 }
 
@@ -455,11 +465,11 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
 
 /**
  * When the laying hen dies, replace it from the list of reserve pullets. When all the
- * pullets are gone, the game is over when the urrent laying hen dies.
+ * pullets are gone, the game is over when the current laying hen dies.
  * @param {Chicken} chicken The Chicken that sent the notification.
  * @private
  */
-ChickenAndEgg.prototype._chickenDied = function(chicken) {
+ChickenAndEgg.prototype._chickenDied = function(sender) {
   if (this._pullets.length == 0) {
     this._isRunning = false;
     return;
@@ -470,6 +480,7 @@ ChickenAndEgg.prototype._chickenDied = function(chicken) {
   this.releaseGamePieceWithUuid(this._chicken.uuid());
   this._chicken = chicken;
   this._gamePieces.push(this._chicken);
+  this._activateGamePieces([this._chicken]);
 }
 
 /**

@@ -159,8 +159,6 @@ GamePiece.prototype.statsDisplayString = function() {
  * @param {Object} simulation The simulation. This object is expected to implement these
  *     methods:
  *       world() The Box2D world
- *       worldSize() The size of the game board in Box2D world coordinates
- *       scale() The scale factor from CANVAS to Box2D world
  */
 GamePiece.prototype.addToSimulation = function(simulation) {
   var bodyDef = this.getBodyDef();
@@ -171,5 +169,18 @@ GamePiece.prototype.addToSimulation = function(simulation) {
     this._body.SetUserData(this.uuid());
   } else {
     this._body = null;
+  }
+}
+
+/**
+ * Remove the game piece from the simulation. If the game piece is not a physically
+ * active body, this method does nothing.
+ * @param {Object} simulation The simulation. This object is expected to implement these
+ *     methods:
+ *       world() The Box2D world
+ */
+GamePiece.prototype.removeFromSimulation = function(simulation) {
+  if (this.body()) {
+    simulation.world().DestroyBody(this.body());
   }
 }
