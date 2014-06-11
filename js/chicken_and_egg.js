@@ -219,6 +219,11 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   this._activateGamePieces(this._gamePieces);
 
+  // TODO(daves): remove this when the pullets can be viewed properly.
+  var tbodyElt = $('#game_stats_table').find('tbody');
+  tbodyElt.append('<tr><td>Pullets:</td>' +
+      '<td id=pullet_stats>' + 0 + '</td></tr>');
+
   // Set up all the game piece notifications.
   var defaultCenter = NotificationDefaultCenter();
 
@@ -469,6 +474,7 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
   // Don't add pullets as game pieces until the become active layers. (See _chickenDied()
   // below.)
   this._pullets.push(new Chicken());
+  $('#pullet_stats').text(this._pullets.length.toString());
 }
 
 /**
@@ -483,6 +489,7 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
     return;
   }
   var chicken = this._pullets.pop();
+  $('#pullet_stats').text(this._pullets.length.toString());
   chicken.feedBag = this._chicken.feedBag;
   chicken.waterBottle = this._chicken.waterBottle;
   this.releaseGamePieceWithUuid(this._chicken.uuid());
