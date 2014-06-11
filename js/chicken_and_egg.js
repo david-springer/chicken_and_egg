@@ -268,27 +268,10 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       EggCarton.DID_FILL_CARTON_NOTIFICATION, refillFeed.bind(this));
 
-  // Add a chicken every time one hatches. Release a chicken when one dies. When all the
-  // chickens are gone, the game is over.
-  var chickenHatched = function(nest) {
-    this._pullets.push(new Chicken());
-  }
-  var chickenDied = function(chicken) {
-    if (this._pullets.length == 0) {
-      this._isRunning = false;
-      return;
-    }
-    var chicken = this._pullets.pop();
-    chicken.feedBag = this._chicken.feedBag;
-    chicken.waterBottle = this._chicken.waterBottle;
-    this.releaseGamePieceWithUuid(this._chicken.uuid());
-    this._chicken = chicken;
-    this._gamePieces.push(this._chicken);
-  }
   defaultCenter.addNotificationObserver(
-      Nest.DID_HATCH_EGG_NOTIFICATION, chickenHatched.bind(this));
+      Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
-      Chicken.DID_DIE_NOTIFICATION, chickenDied.bind(this));
+      Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
 }
 
 /**
@@ -334,6 +317,22 @@ ChickenAndEgg.prototype.simulationTick = function() {
                    ChickenAndEgg.Box2DConsts.POSITION_ITERATION_COUNT);
   this._world.ClearForces();
   this._updateGameStats(this._gamePieces);
+  this._deallocateInactiveGamePieces();
+}
+
+/**
+ * Mark a game piece for deactivation (removal from the simulation).
+ * @param {string} uuid The game piece's UUID.
+ */
+ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
+  this._deactiveGamePieces.push(uuid);
+}
+
+/**
+ * Deactivate and deallocate all the game pieces that have been marked for removal.
+ * @private
+ */
+ChickenAndEgg.prototype._deallocateInactiveGamePieces = function() {
   // Remove all the game pieces that are scheduled to be deactivated.
   for (var i = 0; i < this._deactiveGamePieces.length; ++i) {
     var releasedGamePieceIdx = this._indexOfGamePieceWithUuid(
@@ -343,14 +342,6 @@ ChickenAndEgg.prototype.simulationTick = function() {
       this._gamePieces.splice(releasedGamePieceIdx, 1);
     }
   }
-}
-
-/**
- * Mark a game piece for deactivation (removal from the simulation).
- * @param {string} uuid The game piece's UUID.
- */
-ChickenAndEgg.prototype.releaseGamePieceWithUuid = function(uuid) {
-  this._deactiveGamePieces.push(uuid);
 }
 
 /**
@@ -449,6 +440,36 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
   return new Box2D.Common.Math.b2Vec2(
     x / this._scale,
     (y - canvas.height) / -this._scale);
+}
+
+/**
+ * Add a chicken to the list of reserve pullets every time an egg hatches.
+ * @param {Nest} nest The Nest that sent the notification.
+ * @private
+ */
+ChickenAndEgg.prototype._eggHatched = function(nest) {
+  // Don't add pullets as game pieces until the become active layers. (See _chickenDied()
+  // below.)
+  this._pullets.push(new Chicken());
+}
+
+/**
+ * When the laying hen dies, replace it from the list of reserve pullets. When all the
+ * pullets are gone, the game is over when the urrent laying hen dies.
+ * @param {Chicken} chicken The Chicken that sent the notification.
+ * @private
+ */
+ChickenAndEgg.prototype._chickenDied = function(chicken) {
+  if (this._pullets.length == 0) {
+    this._isRunning = false;
+    return;
+  }
+  var chicken = this._pullets.pop();
+  chicken.feedBag = this._chicken.feedBag;
+  chicken.waterBottle = this._chicken.waterBottle;
+  this.releaseGamePieceWithUuid(this._chicken.uuid());
+  this._chicken = chicken;
+  this._gamePieces.push(this._chicken);
 }
 
 /**

@@ -4,21 +4,6 @@
  */
 
 /**
- * Fakes for this test.
- */
-FakeFeedBag = function() {}
-FakeFeedBag.prototype.constructor = FakeFeedBag;
-FakeFeedBag.prototype.peck = function(peckVolume) {
-  return peckVolume;
-}
-
-FakeWaterBottle = function() {}
-FakeWaterBottle.prototype.constructor = FakeWaterBottle;
-FakeWaterBottle.prototype.drink = function(waterVolume) {
-  return waterVolume;
-}
-
-/**
  * Compute a test peck value based on the chicken's feeding parameters.
  * @param {number} factor The linear factor to use when choosing a feed amount.
  * @return The test peck value. Guaranteed to lie within the chicken's feeding parameters.
