@@ -34,7 +34,7 @@ Sluice._SLUICE_HANDLE_CONTEXT = "sluiceHandleContext";
  * The origin in world coordinates of the sluice.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.9, 1.50 - 0.015);
+Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.98, 1.50 - 0.015);
 
 /**
  * Draw the sluice.
@@ -97,22 +97,18 @@ Sluice.prototype.addToSimulation = function(simulation) {
   this._level1.SetUserData(new PolyView());
   // The left arm of the bar.
   var sluiceVerts = new Array();
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90, 0));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90 + 0.03, 0));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90, -0.015));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90, -0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.10, -0.03));
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.10, 0));
-  fixtureDef.shape.SetAsArray(sluiceVerts);
-  this._level1.CreateFixture(fixtureDef);
-  // The left stopping block.
-  sluiceVerts = new Array();
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90 + 0.06, 0));
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90, 0.03));
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.90, 0));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.10, -0.015));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.10 - 0.03, 0));
   fixtureDef.shape.SetAsArray(sluiceVerts);
   this._level1.CreateFixture(fixtureDef);
   // The right arm of the bar.
   sluiceVerts = new Array();
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.05, 0));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.05 + 0.03, 0));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.05, -0.015));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.05, -0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30, -0.03));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30, 0));
@@ -120,7 +116,7 @@ Sluice.prototype.addToSimulation = function(simulation) {
   this._level1.CreateFixture(fixtureDef);
   // The right stopping block.
   sluiceVerts = new Array();
-  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30, 0.03));
+  sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30, 0.06));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30 - 0.06, 0));
   sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.30, 0));
   fixtureDef.shape.SetAsArray(sluiceVerts);
