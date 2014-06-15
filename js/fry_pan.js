@@ -38,6 +38,12 @@ FryPan.prototype = new GamePiece();
 FryPan.prototype.constructor = Nest;
 
 /**
+ * The origin in world coordinates of the fry pan.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+FryPan.FRY_PAN_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60 + 0.90 + 0.425, 1.0);
+
+/**
  * Default frying time, measured in seconds.
  * @type {number}
  */
@@ -145,7 +151,7 @@ FryPan.prototype._fryEggsWithUuids = function(uuids) {
 FryPan.prototype.getBodyDef = function() {
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 0.425, 1.0);
+  bodyDef.position.Set(FryPan.FRY_PAN_ORIGIN.x, FryPan.FRY_PAN_ORIGIN.y);
   return bodyDef;
 }
 

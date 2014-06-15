@@ -45,6 +45,12 @@ Nest.prototype = new GamePiece();
 Nest.prototype.constructor = Nest;
 
 /**
+ * The origin in world coordinates of the nest.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+Nest.NEST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60 + 0.90 + 1.925, 1.0 + 0.25);
+
+/**
  * Default incubation time, measured in seconds.
  * @type {number}
  */
@@ -117,7 +123,7 @@ Nest.prototype._hatchEgg = function() {
 Nest.prototype.getBodyDef = function() {
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.925, 1.0 + 0.25);
+  bodyDef.position.Set(Nest.NEST_ORIGIN.x, Nest.NEST_ORIGIN.y);
   return bodyDef;
 }
 
