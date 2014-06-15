@@ -48,7 +48,7 @@ Nest.prototype.constructor = Nest;
  * The origin in world coordinates of the nest.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Nest.NEST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.90, 0.35);
+Nest.NEST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 0.35);
 
 /**
  * Default incubation time, measured in seconds.
