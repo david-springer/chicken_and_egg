@@ -21,12 +21,19 @@ Roost.prototype = new GamePiece();
 Roost.prototype.constructor = Roost;
 
 /**
+ * The origin in world coordinates of the roost assembly.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+Roost.ROOST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60, 2.0);
+
+/**
  * Return the body def for the roost.
  * @override
  */
 Roost.prototype.getBodyDef = function() {
   var roostBodyDef = new Box2D.Dynamics.b2BodyDef();
   roostBodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+  roostBodyDef.position.Set(Roost.ROOST_ORIGIN.x, Roost.ROOST_ORIGIN.y);
   return roostBodyDef;
 }
 
@@ -35,19 +42,29 @@ Roost.prototype.getBodyDef = function() {
  * @override
  */
 Roost.prototype.addFixturesToBody = function(simulation, body) {
-  // Set up the roost and the chute as one polygon.
-  var roostChuteVerts = new Array();
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60, 1.80));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50, 1.80));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.40, 1.80 - 0.25));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50 + 0.40, 1.80 - 0.25 + 0.03));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.50, 1.80 + 0.03));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.60, 1.80 + 0.03));
+  // Set up the roost and the chute as two fixtures, one for the platform and one for
+  // the ramp.
   var roostChuteFixture = new Box2D.Dynamics.b2FixtureDef();
   roostChuteFixture.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
   roostChuteFixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   roostChuteFixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
   roostChuteFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+
+  // The platform.
+  var roostChuteVerts = new Array();
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0, 0.03));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0, 0));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.03));
+  roostChuteFixture.shape.SetAsArray(roostChuteVerts);
+  body.CreateFixture(roostChuteFixture);
+
+  // The ramp.
+  roostChuteVerts = new Array()
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.015));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.015));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.25 - 0.015));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.25 + 0.015));
   roostChuteFixture.shape.SetAsArray(roostChuteVerts);
   body.CreateFixture(roostChuteFixture);
 }
