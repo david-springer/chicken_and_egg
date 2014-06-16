@@ -34,7 +34,7 @@ Sluice._SLUICE_HANDLE_CONTEXT = "sluiceHandleContext";
  * The origin in world coordinates of the sluice.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.60, 1.50 - 0.015);
+Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.70, 1.50 - 0.015);
 
 /**
  * Draw the sluice.
@@ -120,28 +120,12 @@ Sluice.prototype.addToSimulation = function(simulation) {
     sluiceLevel.SetUserData(new PolyView());
     // The left arm of the bar.
     var sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.60 + 0.03, levelOriginY));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.60, levelOriginY - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.60, levelOriginY - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.20, levelOriginY - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.20, levelOriginY - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.20 - 0.03, levelOriginY));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    // The right arm of the bar.
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.35 + 0.03, levelOriginY));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.35, levelOriginY - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.35, levelOriginY - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.60, levelOriginY - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.60, levelOriginY));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    // The right stopping block.
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.60, levelOriginY + 0.06));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.60 - 0.06, levelOriginY));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.60, levelOriginY));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.50 + 0.03, levelOriginY));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.50, levelOriginY - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX - 0.50, levelOriginY - 0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.50, levelOriginY - 0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.50, levelOriginY - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOriginX + 0.50 - 0.03, levelOriginY));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     // The centre wedge.
@@ -177,8 +161,8 @@ Sluice.prototype.addToSimulation = function(simulation) {
   }
 
   var hingePin1 = hingePinAt(0, 0, sluiceBodyDef, sluiceFixtureDef);
-  var hingePin2 = hingePinAt(-0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
-  var hingePin3 = hingePinAt(0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
+  var hingePin2 = hingePinAt(-0.70, -0.30, sluiceBodyDef, sluiceFixtureDef);
+  var hingePin3 = hingePinAt(0.70, -0.30, sluiceBodyDef, sluiceFixtureDef);
   // Create the dynamic part of level 1 of the sluice.
   sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
   this._level1 = sluiceLevelAt(0, 0, sluiceBodyDef, sluiceFixtureDef);
@@ -186,12 +170,12 @@ Sluice.prototype.addToSimulation = function(simulation) {
   this._level1Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level1, hingePin1);
 
-  this._level2 = sluiceLevelAt(-0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
+  this._level2 = sluiceLevelAt(-0.70, -0.30, sluiceBodyDef, sluiceFixtureDef);
   centerOfMass = this._level2.GetWorldCenter();
   this._level2Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level2, hingePin2);
 
-  this._level3 = sluiceLevelAt(0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
+  this._level3 = sluiceLevelAt(0.70, -0.30, sluiceBodyDef, sluiceFixtureDef);
   centerOfMass = this._level3.GetWorldCenter();
   this._level3Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level3, hingePin3);

@@ -32,7 +32,7 @@ EggCarton.prototype.constructor = EggCarton;
  * The origin in world coordinates of the egg carton.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-EggCarton.EGG_CARTON_ORIGIN = new Box2D.Common.Math.b2Vec2(1.60, 0.60);
+EggCarton.EGG_CARTON_ORIGIN = new Box2D.Common.Math.b2Vec2(1.70, 0.80);
 
 /**
  * The maximum number of eggs that can go in a crate.
