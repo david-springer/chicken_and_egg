@@ -29,6 +29,12 @@ EggCarton.prototype = new GamePiece();
 EggCarton.prototype.constructor = EggCarton;
 
 /**
+ * The origin in world coordinates of the egg carton.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+EggCarton.EGG_CARTON_ORIGIN = new Box2D.Common.Math.b2Vec2(1.70, 0.70);
+
+/**
  * The maximum number of eggs that can go in a crate.
  */
 EggCarton.MAX_EGG_COUNT = 12;
@@ -85,7 +91,7 @@ EggCarton.prototype.reset = function() {
 EggCarton.prototype.getBodyDef = function() {
   bodyDef = new Box2D.Dynamics.b2BodyDef();
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-  bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + 1.175, 1.0);
+  bodyDef.position.Set(EggCarton.EGG_CARTON_ORIGIN.x, EggCarton.EGG_CARTON_ORIGIN.y);
   return bodyDef;
 }
 
