@@ -41,7 +41,7 @@ FryPan.prototype.constructor = Nest;
  * The origin in world coordinates of the fry pan.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-FryPan.FRY_PAN_ORIGIN = new Box2D.Common.Math.b2Vec2(0.45, 0.80);
+FryPan.FRY_PAN_ORIGIN = new Box2D.Common.Math.b2Vec2(0.45, 0.70);
 
 /**
  * Default frying time, measured in seconds.

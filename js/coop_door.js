@@ -44,7 +44,7 @@ CoopDoor.prototype.constructor = CoopDoor;
  * The origin in world coordinates of the coop door assembly.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-CoopDoor.COOP_DOOR_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.20);
+CoopDoor.COOP_DOOR_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70 + 0.80, 2.20);
 
 /**
  * Draw the coop door.

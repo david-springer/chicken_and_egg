@@ -24,7 +24,7 @@ Roost.prototype.constructor = Roost;
  * The origin in world coordinates of the roost assembly.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Roost.ROOST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.60, 2.0);
+Roost.ROOST_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.0);
 
 /**
  * Return the body def for the roost.
@@ -59,12 +59,33 @@ Roost.prototype.addFixturesToBody = function(simulation, body) {
   roostChuteFixture.shape.SetAsArray(roostChuteVerts);
   body.CreateFixture(roostChuteFixture);
 
-  // The ramp.
+  // The funnel, as two sides.
   roostChuteVerts = new Array()
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.015));
   roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.015));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.25 - 0.015));
-  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.25 + 0.015));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40 - 0.02, -0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40 + 0.03, -0.25));
+  roostChuteFixture.shape.SetAsArray(roostChuteVerts);
+  body.CreateFixture(roostChuteFixture);
+  roostChuteVerts = new Array()
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40, -0.40));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40 + 0.03, -0.40));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.40 + 0.03, -0.25));
+  roostChuteFixture.shape.SetAsArray(roostChuteVerts);
+  body.CreateFixture(roostChuteFixture);
+  roostChuteVerts = new Array()
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 1.00, 0.015));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 - 0.02, -0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 + 0.03, -0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 1.00, -0.015));
+  roostChuteFixture.shape.SetAsArray(roostChuteVerts);
+  body.CreateFixture(roostChuteFixture);
+  roostChuteVerts = new Array()
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 - 0.02, -0.25));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 - 0.02, -0.40));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 + 0.01, -0.40));
+  roostChuteVerts.push(new Box2D.Common.Math.b2Vec2(0.50 + 0.60 + 0.01, -0.25));
   roostChuteFixture.shape.SetAsArray(roostChuteVerts);
   body.CreateFixture(roostChuteFixture);
 }
