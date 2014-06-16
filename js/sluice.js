@@ -177,8 +177,8 @@ Sluice.prototype.addToSimulation = function(simulation) {
   }
 
   var hingePin1 = hingePinAt(0, 0, sluiceBodyDef, sluiceFixtureDef);
-  var hingePin2 = hingePinAt(0, -0.50, sluiceBodyDef, sluiceFixtureDef);
-  var hingePin3 = hingePinAt(0, -1.00, sluiceBodyDef, sluiceFixtureDef);
+  var hingePin2 = hingePinAt(-0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
+  var hingePin3 = hingePinAt(0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
   // Create the dynamic part of level 1 of the sluice.
   sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
   this._level1 = sluiceLevelAt(0, 0, sluiceBodyDef, sluiceFixtureDef);
@@ -186,12 +186,12 @@ Sluice.prototype.addToSimulation = function(simulation) {
   this._level1Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level1, hingePin1);
 
-  this._level2 = sluiceLevelAt(0, -0.50, sluiceBodyDef, sluiceFixtureDef);
+  this._level2 = sluiceLevelAt(-0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
   centerOfMass = this._level2.GetWorldCenter();
   this._level2Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level2, hingePin2);
 
-  this._level3 = sluiceLevelAt(0, -1.00, sluiceBodyDef, sluiceFixtureDef);
+  this._level3 = sluiceLevelAt(0.70, -0.50, sluiceBodyDef, sluiceFixtureDef);
   centerOfMass = this._level3.GetWorldCenter();
   this._level3Hinge = hingeAt(centerOfMass.x, centerOfMass.y,
       this._level3, hingePin3);
