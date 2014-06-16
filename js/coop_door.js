@@ -41,13 +41,19 @@ CoopDoor.prototype = new GamePiece();
 CoopDoor.prototype.constructor = CoopDoor;
 
 /**
+ * The origin in world coordinates of the coop door assembly.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+CoopDoor.COOP_DOOR_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70 + 0.80, 2.20);
+
+/**
  * Draw the coop door.
  * @override
  */
 CoopDoor.prototype.draw = function(ctx, simulation) {
   var drawCoopDoorPart = function(ctx, b) {
     if (b.IsActive()) {
-        b.GetUserData().draw(ctx, b);
+      b.GetUserData().draw(ctx, b);
     }
   }
   drawCoopDoorPart(ctx, this._coopWall);
@@ -66,13 +72,14 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   fixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
 
   var bodyDef = new Box2D.Dynamics.b2BodyDef();
+  bodyDef.position.Set(CoopDoor.COOP_DOOR_ORIGIN.x, CoopDoor.COOP_DOOR_ORIGIN.y);
   bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
 
   var vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.40));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(-0.03, 0.40));
+  vertices.push(new Box2D.Common.Math.b2Vec2(-0.03, 0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0, 0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0, 0.40));
   fixture.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
@@ -83,10 +90,10 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
 
   // Create the dynamic part of the door.
   vertices = new Array()
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 2.0));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80 - 0.03, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 1.7));
-  vertices.push(new Box2D.Common.Math.b2Vec2(0.60 + 0.80, 2.0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(-0.03, 0));
+  vertices.push(new Box2D.Common.Math.b2Vec2(-0.03, -0.3));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0, -0.3));
+  vertices.push(new Box2D.Common.Math.b2Vec2(0, 0));
   fixture.density = 2.0;
   fixture.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   fixture.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
@@ -99,7 +106,7 @@ CoopDoor.prototype.addToSimulation = function(simulation) {
   // Create the joint that represents the hinge.
   var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
   jointDef.Initialize(this._coopWall, this._coopDoor, new Box2D.Common.Math.b2Vec2(
-      0.60 + 0.80 - 0.015, 2.0));
+      CoopDoor.COOP_DOOR_ORIGIN.x - 0.015, CoopDoor.COOP_DOOR_ORIGIN.y));
   jointDef.collideConnected = false;
   jointDef.lowerAngle = -Math.PI / 12;
   jointDef.upperAngle = Math.PI / 4;

@@ -107,7 +107,7 @@ ChickenAndEgg.Box2DConsts = {
   VELOCITY_ITERATION_COUNT: 10,
   POSITION_ITERATION_COUNT: 10,
   DOUG_FIR_DENSITY: 5.3,  // Density of Douglas Fir in g/cm^3
-  DOUG_FIR_FRICTION: 0.3,
+  DOUG_FIR_FRICTION: 0.2,
   DOUG_FIR_RESTITUTION: 0.804
 };
 
@@ -237,7 +237,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
   var didLayEgg = function(chicken) {
-    var egg = new Egg(0.60 + 0.45, 1.87);
+    var egg = new Egg(Roost.ROOST_ORIGIN.x + 0.45, Roost.ROOST_ORIGIN.y + 0.07);
     this._gamePieces.push(egg);
     egg.addToSimulation(this);
     var eggBody = egg.body();

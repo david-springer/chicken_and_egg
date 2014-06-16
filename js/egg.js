@@ -45,7 +45,7 @@ Egg.prototype.constructor = Egg;
 Egg.Box2DConsts = {
   EGG_DENSITY: 1.031,
   EGG_FRICTION: 0.2,
-  EGG_RESTITUTION: 0.7
+  EGG_RESTITUTION: 0.2
 }
 
 /**
