@@ -268,35 +268,47 @@ Sluice.prototype.addToSimulation = function(simulation) {
   this._hingeTrack2 = hingeTrackAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
   this._hingeTrack3 = hingeTrackAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
 
-  var hingePin1 = hingePinAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
-  var hingePin2 = hingePinAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
-  var hingePin3 = hingePinAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
+  this._hingePin1 = hingePinAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
+  this._hingePin2 = hingePinAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
+  this._hingePin3 = hingePinAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
 
   this._level1 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
-  this._level1Hinge = createHinge(hingePin1, this._level1);
-  createSlide(hingePin1, this._hingeTrack1);
+  this._level1Hinge = createHinge(this._hingePin1, this._level1);
+  this._level1Slide = createSlide(this._hingePin1, this._hingeTrack1);
 
   this._level2 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
-  this._level2Hinge = createHinge(hingePin2, this._level2);
-  createSlide(hingePin2, this._hingeTrack2);
+  this._level2Hinge = createHinge(this._hingePin2, this._level2);
+  this._level2Slide = createSlide(this._hingePin2, this._hingeTrack2);
 
   this._level3 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
-  this._level3Hinge = createHinge(hingePin3, this._level3);
-  createSlide(hingePin3, this._hingeTrack3);
+  this._level3Hinge = createHinge(this._hingePin3, this._level3);
+  this._level3Slide = createSlide(this._hingePin3, this._hingeTrack3);
 }
 /**
  * Apply Hooke's law dampening to the sluice level hinges.
  * @override
  */
 Sluice.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
-  var applyHookesLaw = function(hinge, levelBody) {
+  var applyHookesLawToHinge = function(hinge, levelBody) {
     var hingeAngle = hinge.GetJointAngle();
     var hingeVel = hinge.GetJointSpeed();
     if (Math.abs(hingeAngle) > 0.0001) {
       levelBody.ApplyTorque(-hingeAngle * 0.05 - hingeVel * 0.02);
     }
-  }
-  applyHookesLaw(this._level1Hinge, this._level1);
-  applyHookesLaw(this._level2Hinge, this._level2);
-  applyHookesLaw(this._level3Hinge, this._level3);
+  };
+  applyHookesLawToHinge(this._level1Hinge, this._level1);
+  applyHookesLawToHinge(this._level2Hinge, this._level2);
+  applyHookesLawToHinge(this._level3Hinge, this._level3);
+
+  var applyHookesLawToSlide = function(slide, hingePin) {
+    var slideX = slide.GetJointTranslation();
+    var slideVel = slide.GetJointSpeed();
+    if (Math.abs(slideX) > 0.0001) {
+      var springForce = new Box2D.Common.Math.b2Vec2(-slideX * 0.12 - slideVel * 0.05, 0);
+      hingePin.ApplyForce(springForce, hingePin.GetWorldCenter());
+    }
+  };
+  applyHookesLawToSlide(this._level1Slide, this._hingePin1);
+  applyHookesLawToSlide(this._level2Slide, this._hingePin2);
+  applyHookesLawToSlide(this._level3Slide, this._hingePin3);
 }
