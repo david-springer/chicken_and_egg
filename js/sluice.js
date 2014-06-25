@@ -48,6 +48,13 @@ Sluice._LEVEL_ORIGINS = [
 ];
 
 /**
+ * Half-width of the hinge track. measured in metres.
+ * @type {number}
+ * @private
+ */
+Sluice._HINGE_TRACK_HALF_WIDTH = 0.16;
+
+/**
  * Draw the sluice.
  * @override
  */
@@ -57,11 +64,9 @@ Sluice.prototype.draw = function(ctx, simulation) {
       b.GetUserData().draw(ctx, b);
     }
   }
-  /*
   drawSluicePart(ctx, this._hingeTrack1);
   drawSluicePart(ctx, this._hingeTrack2);
   drawSluicePart(ctx, this._hingeTrack3);
-  */
   drawSluicePart(ctx, this._level1);
   drawSluicePart(ctx, this._level2);
   drawSluicePart(ctx, this._level3);
@@ -100,14 +105,17 @@ Sluice.prototype.addToSimulation = function(simulation) {
     bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
     bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
     var vertices = new Array()
-    vertices.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.015));
-    vertices.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.015));
-    vertices.push(new Box2D.Common.Math.b2Vec2(0.09, -0.015));
-    vertices.push(new Box2D.Common.Math.b2Vec2(0.09, 0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-Sluice._HINGE_TRACK_HALF_WIDTH, 0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-Sluice._HINGE_TRACK_HALF_WIDTH, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(Sluice._HINGE_TRACK_HALF_WIDTH, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(Sluice._HINGE_TRACK_HALF_WIDTH, 0.015));
     fixtureDef.shape.SetAsArray(vertices);
+    var saveMaskBits = fixtureDef.filter.maskBits;
+    fixtureDef.filter.maskBits = 0;  // Turn off collision.
     var hingeTrack = simulation.world().CreateBody(bodyDef);
     hingeTrack.SetUserData(new PolyView());
     hingeTrack.CreateFixture(fixtureDef);
+    fixtureDef.filter.maskBits = saveMaskBits;
     return hingeTrack;
   };
 
@@ -122,7 +130,7 @@ Sluice.prototype.addToSimulation = function(simulation) {
   var hingePinAt = function(pinOrigin, fixtureDef) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+    bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
     var vertices = new Array()
     vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, 0.015));
     vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, -0.015));
@@ -210,8 +218,8 @@ Sluice.prototype.addToSimulation = function(simulation) {
   /**
    * Create the revolute joint that represents the hinge. The hinge joins the two given
    * bodies at their respective origins.
-   * @param {Object} levelBody The Box2D Body that represents the level.
    * @param {Object} hingePin The Box2D Body that represents the hinge pin.
+   * @param {Object} levelBody The Box2D Body that represents the level.
    * @return {Object} The Box2D Joint representing the hinge.
    */
   var createHinge = function(hingePin, levelBody) {
@@ -230,23 +238,21 @@ Sluice.prototype.addToSimulation = function(simulation) {
   /**
    * Create the prismatic joint that represents the hinge track. The hinge pin slides
    * along this track.
-   * @param {Box2D.Common.Math.b2Vec2} trackOrigin The track origin, relative to the
-   *    centre of the sluice body.
-   * @param {Object} hingeTrack The Box2D Body that represents the hinge track.
    * @param {Object} hingePin The Box2D Body that represents the hinge pin.
+   * @param {Object} hingeTrack The Box2D Body that represents the hinge track.
    * @return {Object} The Box2D Joint representing the hinge.
    */
-  var trackAt = function(trackOrigin, hingeTrack, hingePin) {
+  var createSlide = function(hingePin, hingeTrack) {
     var jointDef = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
     jointDef.bodyA = hingeTrack;
     jointDef.bodyB = hingePin;
-    jointDef.localAnchorA.Set(trackOrigin.x, trackOrigin.y);
-    jointDef.localAnchorB.Set(trackOrigin.x, trackOrigin.y);
+    jointDef.localAnchorA.Set(0, 0);
+    jointDef.localAnchorB.Set(0, 0);
     jointDef.localAxisA.Set(1.0, 0.0);
     jointDef.collideConnected = false;
     jointDef.referenceAngle = 0.0;
-    jointDef.lowerTranslation = -0.09;
-    jointDef.upperTranslation = 0.09;
+    jointDef.lowerTranslation = -Sluice._HINGE_TRACK_HALF_WIDTH;
+    jointDef.upperTranslation = Sluice._HINGE_TRACK_HALF_WIDTH;
     jointDef.enableLimit = true;
     return simulation.world().CreateJoint(jointDef);
   };
@@ -257,26 +263,26 @@ Sluice.prototype.addToSimulation = function(simulation) {
   sluiceFixtureDef.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
   sluiceFixtureDef.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
   sluiceFixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-/*
+
   this._hingeTrack1 = hingeTrackAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
   this._hingeTrack2 = hingeTrackAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
   this._hingeTrack3 = hingeTrackAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
-*/
+
   var hingePin1 = hingePinAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
   var hingePin2 = hingePinAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
   var hingePin3 = hingePinAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
 
   this._level1 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
   this._level1Hinge = createHinge(hingePin1, this._level1);
-  //trackAt(Sluice._LEVEL_ORIGINS[0], this._hingeTrack1, hingePin1);
+  createSlide(hingePin1, this._hingeTrack1);
 
   this._level2 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
   this._level2Hinge = createHinge(hingePin2, this._level2);
-  //trackAt(Sluice._LEVEL_ORIGINS[1], this._hingeTrack2, hingePin2);
+  createSlide(hingePin2, this._hingeTrack2);
 
   this._level3 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
   this._level3Hinge = createHinge(hingePin3, this._level3);
-  //trackAt(Sluice._LEVEL_ORIGINS[2], this._hingeTrack3, hingePin3);
+  createSlide(hingePin3, this._hingeTrack3);
 }
 /**
  * Apply Hooke's law dampening to the sluice level hinges.
