@@ -87,34 +87,23 @@ Sluice.prototype.isSluiceHandle = function(fixture) {
  * @override
  */
 Sluice.prototype.addToSimulation = function(simulation) {
-  // Create the static coop wall.
-  var sluiceFixtureDef = new Box2D.Dynamics.b2FixtureDef();
-  sluiceFixtureDef.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
-  sluiceFixtureDef.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
-  sluiceFixtureDef.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
-  sluiceFixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-
-  var sluiceBodyDef = new Box2D.Dynamics.b2BodyDef();
-  sluiceBodyDef.position.Set(Sluice.SLUICE_ORIGIN.x, Sluice.SLUICE_ORIGIN.y);
-  sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-
   /**
    * Create the hinge track geometry. The hinge track is a slide for the hinge pin that
    * lets you move the sluice level side-to-side.
-   * @param {number} pinOriginX The x-coordinate of the hinge origin, relative to the
+   * @param {Box2D.Common.Math.b2Vec2} pinOrigin The hinge origin, relative to the
    *    centre of the sluice body.
-   * @param {number} pinOriginY The y-coordinate of the hinge origin, relative to the
-   *    centre of the sluice body.
-   * @param {Object} bodyDef The Box2D BodyDef of the hinge body.
    * @param {Object} fixtureDef The Box2D FixtureDef to use for the hinge geometry.
    * @return {Object} The Box2D Body representing the hinge geometry.
    */
-  var hingeTrackAt = function(pinOriginX, pinOriginY, bodyDef, fixtureDef) {
+  var hingeTrackAt = function(pinOrigin, fixtureDef) {
+    var bodyDef = new Box2D.Dynamics.b2BodyDef();
+    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
+    bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
     var vertices = new Array()
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOriginX - 0.09, pinOriginY));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOriginX - 0.09, pinOriginY - 0.03));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOriginX + 0.09, pinOriginY - 0.03));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOriginX + 0.09, pinOriginY));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(0.09, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(0.09, 0.015));
     fixtureDef.shape.SetAsArray(vertices);
     var hingeTrack = simulation.world().CreateBody(bodyDef);
     hingeTrack.SetUserData(new PolyView());
@@ -127,16 +116,18 @@ Sluice.prototype.addToSimulation = function(simulation) {
    * hinge with a return spring.
    * @param {Box2D.Common.Math.b2Vec2} pinOrigin The hinge origin, relative to the
    *    centre of the sluice body.
-   * @param {Object} bodyDef The Box2D BodyDef of the hinge body.
    * @param {Object} fixtureDef The Box2D FixtureDef to use for the hinge geometry.
    * @return {Object} The Box2D Body representing the hinge geometry.
    */
-  var hingePinAt = function(pinOrigin, bodyDef, fixtureDef) {
+  var hingePinAt = function(pinOrigin, fixtureDef) {
+    var bodyDef = new Box2D.Dynamics.b2BodyDef();
+    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
+    bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
     var vertices = new Array()
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOrigin.x - 0.015, pinOrigin.y));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOrigin.x - 0.015, pinOrigin.y - 0.03));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOrigin.x + 0.015, pinOrigin.y - 0.03));
-    vertices.push(new Box2D.Common.Math.b2Vec2(pinOrigin.x + 0.015, pinOrigin.y));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, 0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(0.015, -0.015));
+    vertices.push(new Box2D.Common.Math.b2Vec2(0.015, 0.015));
     fixtureDef.shape.SetAsArray(vertices);
     var hingePin = simulation.world().CreateBody(bodyDef);
     hingePin.CreateFixture(fixtureDef);
@@ -147,111 +138,145 @@ Sluice.prototype.addToSimulation = function(simulation) {
    * Create the geometry for a sluice level.
    * @param {Box2D.Common.Math.b2Vec2} levelOrigin The level origin, relative to the
    *    centre of the sluice body.
-   * @param {Object} bodyDef The Box2D BodyDef to use for the level's body.
    * @param {Object} fixtureDef The Box2D FixtureDef to use for the level geometry.
    * @return {Object} The Box2D Body representing the level geometry.
    */
-  var sluiceLevelAt = function(levelOrigin, bodyDef, fixtureDef) {
+  var sluiceLevelAt = function(levelOrigin, fixtureDef) {
+    var bodyDef = new Box2D.Dynamics.b2BodyDef();
+    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + levelOrigin.x, Sluice.SLUICE_ORIGIN.y + levelOrigin.y);
+    bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
     var sluiceLevel = simulation.world().CreateBody(bodyDef);
     sluiceLevel.SetUserData(new PolyView());
     // The left arm of the bar.
     var sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.50, levelOrigin.y));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.50, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.32, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.32, levelOrigin.y - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, 0.0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.015));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.32, levelOrigin.y - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.32, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.26, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.26, levelOrigin.y - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.015));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.26, levelOrigin.y - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.26, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.09, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.09, levelOrigin.y));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.09, levelOrigin.y));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.09, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.09, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.09, levelOrigin.y));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.09, levelOrigin.y));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.09, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.26, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.26, levelOrigin.y - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.015));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.26, levelOrigin.y - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.26, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.32, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.32, levelOrigin.y - 0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.015));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.32, levelOrigin.y - 0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.32, levelOrigin.y - 0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.50, levelOrigin.y - 0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.50, levelOrigin.y));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.015));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.045));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.03));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.0));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     // The centre wedge.
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x + 0.09, levelOrigin.y));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x, levelOrigin.y + 0.06));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(levelOrigin.x - 0.09, levelOrigin.y));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.0, 0.06));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     return sluiceLevel;
   };
 
   /**
-   * Create the joint that represents the hinge.
-   * @param {Box2D.Common.Math.b2Vec2} hingeOrigin The hinge origin, relative to the
-   *    centre of the sluice body.
+   * Create the revolute joint that represents the hinge. The hinge joins the two given
+   * bodies at their respective origins.
    * @param {Object} levelBody The Box2D Body that represents the level.
-   * @param {Object} fixtureDef The Box2D Body that represents the hinge pin.
+   * @param {Object} hingePin The Box2D Body that represents the hinge pin.
    * @return {Object} The Box2D Joint representing the hinge.
    */
-  var hingeAt = function(hingeOrigin, levelBody, hingePin) {
+  var createHinge = function(hingePin, levelBody) {
     var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
     jointDef.bodyA = hingePin;
     jointDef.bodyB = levelBody;
-    jointDef.localAnchorA.Set(hingeOrigin.x, hingeOrigin.y);
-    jointDef.localAnchorB.Set(hingeOrigin.x, hingeOrigin.y);
+    jointDef.localAnchorA.Set(0, 0);
+    jointDef.localAnchorB.Set(0, 0);
     jointDef.collideConnected = false;
     jointDef.lowerAngle = -Math.PI / 4;
     jointDef.upperAngle = Math.PI / 4;
     jointDef.enableLimit = true;
     return simulation.world().CreateJoint(jointDef);
   };
+
+  /**
+   * Create the prismatic joint that represents the hinge track. The hinge pin slides
+   * along this track.
+   * @param {Box2D.Common.Math.b2Vec2} trackOrigin The track origin, relative to the
+   *    centre of the sluice body.
+   * @param {Object} hingeTrack The Box2D Body that represents the hinge track.
+   * @param {Object} hingePin The Box2D Body that represents the hinge pin.
+   * @return {Object} The Box2D Joint representing the hinge.
+   */
+  var trackAt = function(trackOrigin, hingeTrack, hingePin) {
+    var jointDef = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
+    jointDef.bodyA = hingeTrack;
+    jointDef.bodyB = hingePin;
+    jointDef.localAnchorA.Set(trackOrigin.x, trackOrigin.y);
+    jointDef.localAnchorB.Set(trackOrigin.x, trackOrigin.y);
+    jointDef.localAxisA.Set(1.0, 0.0);
+    jointDef.collideConnected = false;
+    jointDef.referenceAngle = 0.0;
+    jointDef.lowerTranslation = -0.09;
+    jointDef.upperTranslation = 0.09;
+    jointDef.enableLimit = true;
+    return simulation.world().CreateJoint(jointDef);
+  };
+
+  // Create the static coop wall.
+  var sluiceFixtureDef = new Box2D.Dynamics.b2FixtureDef();
+  sluiceFixtureDef.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
+  sluiceFixtureDef.friction = ChickenAndEgg.Box2DConsts.DOUG_FIR_FRICTION;
+  sluiceFixtureDef.restitution = ChickenAndEgg.Box2DConsts.DOUG_FIR_RESTITUTION;
+  sluiceFixtureDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
 /*
-  this._hingeTrack1 = hingeTrackAt(Sluice._LEVEL_ORIGINS[0], sluiceBodyDef, sluiceFixtureDef);
-  this._hingeTrack2 = hingeTrackAt(Sluice._LEVEL_ORIGINS[1], sluiceBodyDef, sluiceFixtureDef);
-  this._hingeTrack3 = hingeTrackAt(Sluice._LEVEL_ORIGINS[2], sluiceBodyDef, sluiceFixtureDef);
+  this._hingeTrack1 = hingeTrackAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
+  this._hingeTrack2 = hingeTrackAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
+  this._hingeTrack3 = hingeTrackAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
 */
-  var hingePin1 = hingePinAt(Sluice._LEVEL_ORIGINS[0], sluiceBodyDef, sluiceFixtureDef);
-  var hingePin2 = hingePinAt(Sluice._LEVEL_ORIGINS[1], sluiceBodyDef, sluiceFixtureDef);
-  var hingePin3 = hingePinAt(Sluice._LEVEL_ORIGINS[2], sluiceBodyDef, sluiceFixtureDef);
-  // Create the dynamic part of level 1 of the sluice.
-  sluiceBodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-  this._level1 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[0], sluiceBodyDef, sluiceFixtureDef);
-  this._level1Hinge = hingeAt(Sluice._LEVEL_ORIGINS[0], this._level1, hingePin1);
+  var hingePin1 = hingePinAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
+  var hingePin2 = hingePinAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
+  var hingePin3 = hingePinAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
 
-  this._level2 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[1], sluiceBodyDef, sluiceFixtureDef);
-  this._level2Hinge = hingeAt(Sluice._LEVEL_ORIGINS[1], this._level2, hingePin2);
+  this._level1 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
+  this._level1Hinge = createHinge(hingePin1, this._level1);
+  //trackAt(Sluice._LEVEL_ORIGINS[0], this._hingeTrack1, hingePin1);
 
-  this._level3 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[2], sluiceBodyDef, sluiceFixtureDef);
-  this._level3Hinge = hingeAt(Sluice._LEVEL_ORIGINS[2], this._level3, hingePin3);
+  this._level2 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
+  this._level2Hinge = createHinge(hingePin2, this._level2);
+  //trackAt(Sluice._LEVEL_ORIGINS[1], this._hingeTrack2, hingePin2);
+
+  this._level3 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
+  this._level3Hinge = createHinge(hingePin3, this._level3);
+  //trackAt(Sluice._LEVEL_ORIGINS[2], this._hingeTrack3, hingePin3);
 }
 /**
  * Apply Hooke's law dampening to the sluice level hinges.
