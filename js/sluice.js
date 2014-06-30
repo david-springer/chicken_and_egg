@@ -102,7 +102,8 @@ Sluice.prototype.addToSimulation = function(simulation) {
    */
   var hingeTrackAt = function(pinOrigin, fixtureDef) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
-    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
+    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x,
+        Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
     bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
     var vertices = new Array()
     vertices.push(new Box2D.Common.Math.b2Vec2(-Sluice._HINGE_TRACK_HALF_WIDTH, 0.015));
@@ -130,15 +131,18 @@ Sluice.prototype.addToSimulation = function(simulation) {
   var hingePinAt = function(pinOrigin, fixtureDef) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x, Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
+    bodyDef.type = Box2D.Dynamics.b2Body.b2_kinematicBody;
     var vertices = new Array()
     vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, 0.015));
     vertices.push(new Box2D.Common.Math.b2Vec2(-0.015, -0.015));
     vertices.push(new Box2D.Common.Math.b2Vec2(0.015, -0.015));
     vertices.push(new Box2D.Common.Math.b2Vec2(0.015, 0.015));
     fixtureDef.shape.SetAsArray(vertices);
+    var saveMaskBits = fixtureDef.filter.maskBits;
+    fixtureDef.filter.maskBits = 0;  // Turn off collision.
     var hingePin = simulation.world().CreateBody(bodyDef);
     hingePin.CreateFixture(fixtureDef);
+    fixtureDef.filter.maskBits = saveMaskBits;
     return hingePin;
   };
 
@@ -151,65 +155,66 @@ Sluice.prototype.addToSimulation = function(simulation) {
    */
   var sluiceLevelAt = function(levelOrigin, fixtureDef) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
-    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + levelOrigin.x, Sluice.SLUICE_ORIGIN.y + levelOrigin.y);
+    bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + levelOrigin.x,
+        Sluice.SLUICE_ORIGIN.y + levelOrigin.y);
     bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
     var sluiceLevel = simulation.world().CreateBody(bodyDef);
     sluiceLevel.SetUserData(new PolyView());
-    // The left arm of the bar.
-    var sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, 0.0));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.015));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.015));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.015));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.015));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
-    sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.015));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.045));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.03));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, 0.0));
-    fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
     // The centre wedge.
     sluiceVerts = new Array();
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, 0.0));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.0, 0.06));
-    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, 0.0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.06));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.0, 0));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.06));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    // The left arm of the bar.
+    var sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, -0.06));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.075));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.075));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.32, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.075));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.075));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.26, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.06));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.06));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.06));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.06));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.09, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.075));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.075));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.26, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.075));
+    fixtureDef.shape.SetAsArray(sluiceVerts);
+    sluiceLevel.CreateFixture(fixtureDef);
+    sluiceVerts = new Array();
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.075));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.32, -0.105));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.09));
+    sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.50, -0.06));
     fixtureDef.shape.SetAsArray(sluiceVerts);
     sluiceLevel.CreateFixture(fixtureDef);
     return sluiceLevel;
