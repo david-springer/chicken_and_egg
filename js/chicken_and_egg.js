@@ -540,7 +540,8 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
   angle = Math.min(
       Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
       ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
-  this._sluice.body().SetAngle(angle);
+  //this._sluice.body().SetAngle(angle);
+  console.log("angle=" + angle);
   for (var i = 0; i < this._gamePieces.length; ++i) {
     var gamePiece = this._gamePieces[i];
     if (gamePiece.hasOwnProperty('isEgg')) {

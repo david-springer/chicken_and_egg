@@ -102,9 +102,8 @@ Sluice.prototype.draw = function(ctx, simulation) {
  */
 Sluice.prototype.isSluiceHandle = function(fixture) {
   // TODO(daves): turn this back on when appropriate.
-  return false;
-//  var fixtureUserData = fixture.GetUserData();
-//  return fixtureUserData && fixtureUserData === Sluice._SLUICE_HANDLE_CONTEXT;
+  var fixtureUserData = fixture.GetUserData();
+  return Sluice._SLUICE_HINGE_PIN_CONTEXT.indexOf(fixtureUserData) >= 0;
 }
 
 
@@ -149,11 +148,9 @@ Sluice.prototype.addToSimulation = function(simulation) {
    * @param {Box2D.Common.Math.b2Vec2} pinOrigin The hinge origin, relative to the
    *    centre of the sluice body.
    * @param {Object} fixtureDef The Box2D FixtureDef to use for the hinge geometry.
-   * @param {String} context The context data to assign to this hinge pin. Used for
-   *     mouse picking.
    * @return {Object} The Box2D Body representing the hinge geometry.
    */
-  var hingePinAt = function(pinOrigin, fixtureDef, context) {
+  var hingePinAt = function(pinOrigin, fixtureDef) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + pinOrigin.x,
         Sluice.SLUICE_ORIGIN.y + pinOrigin.y);
@@ -168,7 +165,6 @@ Sluice.prototype.addToSimulation = function(simulation) {
     fixtureDef.filter.maskBits = 0;  // Turn off collision.
     var hingePin = simulation.world().CreateBody(bodyDef);
     hingePin.CreateFixture(fixtureDef);
-    hingePin.SetUserData(context);
     fixtureDef.filter.maskBits = saveMaskBits;
     return hingePin;
   };
@@ -178,9 +174,11 @@ Sluice.prototype.addToSimulation = function(simulation) {
    * @param {Box2D.Common.Math.b2Vec2} levelOrigin The level origin, relative to the
    *    centre of the sluice body.
    * @param {Object} fixtureDef The Box2D FixtureDef to use for the level geometry.
+   * @param {String} context The context data to assign to this hinge pin. Used for
+   *     mouse picking.
    * @return {Object} The Box2D Body representing the level geometry.
    */
-  var sluiceLevelAt = function(levelOrigin, fixtureDef) {
+  var sluiceLevelAt = function(levelOrigin, fixtureDef, context) {
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.position.Set(Sluice.SLUICE_ORIGIN.x + levelOrigin.x,
         Sluice.SLUICE_ORIGIN.y + levelOrigin.y);
@@ -193,7 +191,8 @@ Sluice.prototype.addToSimulation = function(simulation) {
     sluiceVerts.push(new Box2D.Common.Math.b2Vec2(0.0, 0));
     sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.09, -0.06));
     fixtureDef.shape.SetAsArray(sluiceVerts);
-    sluiceLevel.CreateFixture(fixtureDef);
+    var wedgeFixture = sluiceLevel.CreateFixture(fixtureDef);
+    wedgeFixture.SetUserData(context);
     // The left arm of the bar.
     var sluiceVerts = new Array();
     sluiceVerts.push(new Box2D.Common.Math.b2Vec2(-0.50, -0.06));
@@ -282,9 +281,9 @@ Sluice.prototype.addToSimulation = function(simulation) {
    * @return {Object} A dict populated with the sluice level parts.
    */
   var createPartsAtIndex = function(i, sluiceFixtureDef) {
-    var hingePin = hingePinAt(Sluice._LEVEL_ORIGINS[i], sluiceFixtureDef,
+    var hingePin = hingePinAt(Sluice._LEVEL_ORIGINS[i], sluiceFixtureDef)
+    var sluice = sluiceLevelAt(Sluice._LEVEL_ORIGINS[i], sluiceFixtureDef,
           Sluice._SLUICE_HINGE_PIN_CONTEXT[i]);
-    var sluice = sluiceLevelAt(Sluice._LEVEL_ORIGINS[i], sluiceFixtureDef);
     return {
       hingeTrack: hingeTrackAt(Sluice._LEVEL_ORIGINS[i], sluiceFixtureDef),
       hingePin: hingePin,
