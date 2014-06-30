@@ -240,28 +240,6 @@ Sluice.prototype.addToSimulation = function(simulation) {
     return simulation.world().CreateJoint(jointDef);
   };
 
-  /**
-   * Create the prismatic joint that represents the hinge track. The hinge pin slides
-   * along this track.
-   * @param {Object} hingePin The Box2D Body that represents the hinge pin.
-   * @param {Object} hingeTrack The Box2D Body that represents the hinge track.
-   * @return {Object} The Box2D Joint representing the hinge.
-   */
-  var createSlide = function(hingePin, hingeTrack) {
-    var jointDef = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
-    jointDef.bodyA = hingeTrack;
-    jointDef.bodyB = hingePin;
-    jointDef.localAnchorA.Set(0, 0);
-    jointDef.localAnchorB.Set(0, 0);
-    jointDef.localAxisA.Set(1.0, 0.0);
-    jointDef.collideConnected = false;
-    jointDef.referenceAngle = 0.0;
-    jointDef.lowerTranslation = -Sluice._HINGE_TRACK_HALF_WIDTH;
-    jointDef.upperTranslation = Sluice._HINGE_TRACK_HALF_WIDTH;
-    jointDef.enableLimit = true;
-    return simulation.world().CreateJoint(jointDef);
-  };
-
   // Create the static coop wall.
   var sluiceFixtureDef = new Box2D.Dynamics.b2FixtureDef();
   sluiceFixtureDef.density = ChickenAndEgg.Box2DConsts.DOUG_FIR_DENSITY;
@@ -279,16 +257,14 @@ Sluice.prototype.addToSimulation = function(simulation) {
 
   this._level1 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[0], sluiceFixtureDef);
   this._level1Hinge = createHinge(this._hingePin1, this._level1);
-  this._level1Slide = createSlide(this._hingePin1, this._hingeTrack1);
 
   this._level2 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[1], sluiceFixtureDef);
   this._level2Hinge = createHinge(this._hingePin2, this._level2);
-  this._level2Slide = createSlide(this._hingePin2, this._hingeTrack2);
 
   this._level3 = sluiceLevelAt(Sluice._LEVEL_ORIGINS[2], sluiceFixtureDef);
   this._level3Hinge = createHinge(this._hingePin3, this._level3);
-  this._level3Slide = createSlide(this._hingePin3, this._hingeTrack3);
 }
+
 /**
  * Apply Hooke's law dampening to the sluice level hinges.
  * @override
@@ -304,16 +280,4 @@ Sluice.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
   applyHookesLawToHinge(this._level1Hinge, this._level1);
   applyHookesLawToHinge(this._level2Hinge, this._level2);
   applyHookesLawToHinge(this._level3Hinge, this._level3);
-
-  var applyHookesLawToSlide = function(slide, hingePin) {
-    var slideX = slide.GetJointTranslation();
-    var slideVel = slide.GetJointSpeed();
-    if (Math.abs(slideX) > 0.0001) {
-      var springForce = new Box2D.Common.Math.b2Vec2(-slideX * 0.12 - slideVel * 0.05, 0);
-      hingePin.ApplyForce(springForce, hingePin.GetWorldCenter());
-    }
-  };
-  applyHookesLawToSlide(this._level1Slide, this._hingePin1);
-  applyHookesLawToSlide(this._level2Slide, this._hingePin2);
-  applyHookesLawToSlide(this._level3Slide, this._hingePin3);
 }
