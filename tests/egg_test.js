@@ -6,15 +6,15 @@
 /**
  * @fileoverview Unit tests for the Egg object.
  */
-module("Egg Object", {
-  teardown: function() {
-    equal(NotificationDefaultCenter().hasObserversForNotification(
-        EggCarton.DID_FILL_CARTON_NOTIFICATION), false);
-  }
-});
+module("Egg Object");
 
 test("Default Constructor", function() {
-  var testCarton = new EggCarton();
-  equal(testCarton.eggCount(), 0);
+  var testEgg = new Egg(0, 0);
+  equal(testEgg.ovality, Egg.DEFAULT_OVALITY);
+});
+
+test("Ovality Constructor", function() {
+  var testEgg = new Egg(0, 0, 0.2);
+  equal(testEgg.ovality, 0.2);
 });
 

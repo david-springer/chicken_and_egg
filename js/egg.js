@@ -11,10 +11,12 @@
  * Constructor for the Egg.
  * @param {number} xPos The initial x-coordinate of the Egg.
  * @param {number} yPos The initial y-coordinate of the Egg.
+ * @param {Number} opt_ovality The "ovalness" of the egg. This parameter is pretty
+ *     narrow in range. 0.17 to 0.2 are good values.
  * @constructor
  * @extends {GamePiece}
  */
-Egg = function(xPos, yPos) {
+Egg = function(xPos, yPos, opt_ovality) {
   GamePiece.call(this);
   /**
    * The initial x-coordinate of the Egg, measured in world-space units.
@@ -29,14 +31,25 @@ Egg = function(xPos, yPos) {
    */
   this._yPos = yPos || 0.0;
   /**
-   * Identify this game pice as an egg.
+   * Identify this game piece as an egg.
    * @type {boolean}
    * @public
    */
   this.isEgg = true;
+  /**
+   * The ovality of this egg.
+   * @type {number}
+   * @public
+   */
+  this.ovality = opt_ovality || Egg.DEFAULT_OVALITY;
 }
 Egg.prototype = new GamePiece();
 Egg.prototype.constructor = Egg;
+
+/**
+ * The default ovality of an egg.
+ */
+Egg.DEFAULT_OVALITY = 0.17;
 
 /**
  * Various constants used to set up and run the Box2D simulation.
@@ -52,13 +65,10 @@ Egg.Box2DConsts = {
  * Create the vertices of a polygon that describes an egg.
  * A common hen's egg is 5.7cm tall and 4.45cm in diameter at its widest point, on
  * average (ref: http://www.animalplanet.com/animal-facts/egg-info.htm).
- * @param {Number} opt_ovality The "ovalness" of the egg. This parameter is pretty
- *     narrow in range. 0.17 to 0.2 are good values.
  * @return {Array} the egg vertices.
  * @private
  */
-Egg.prototype._eggVertices = function(opt_ovality) {
-  var ovality = opt_ovality || 0.2;
+Egg.prototype._eggVertices = function(ovality) {
   var eggVertices = new Array();
 
   var step = Math.PI / 12;
@@ -95,7 +105,7 @@ Egg.prototype.addFixturesToBody = function(simulation, body) {
   eggFixture.friction = Egg.Box2DConsts.EGG_FRICTION;
   eggFixture.restitution = Egg.Box2DConsts.EGG_RESTITUTION;
   eggFixture.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-  eggFixture.shape.SetAsArray(this._eggVertices(0.17));
+  eggFixture.shape.SetAsArray(this._eggVertices(this.ovality));
   body.CreateFixture(eggFixture);
   body.SetBullet(true);
 }
