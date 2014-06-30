@@ -62,7 +62,8 @@ Sluice._SLUICE_HINGE_PIN_CONTEXT = [
 Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.705, 1.40 - 0.015);
 
 /**
- * The origins in local coordinates of the sluice levers.
+ * The origins in local coordinates of the sluice levers. The length of this array must
+ * be _SLUICE_LEVER_COUNT.
  * @type {Array.Box2D.Common.Math.b2Vec2}
  * @private
  */
@@ -96,16 +97,49 @@ Sluice.prototype.draw = function(ctx, simulation) {
 }
 
 /**
- * Test whether a fixture is the sluice handle.
+ * Return the index of the lever that contains the given Box2D fixture. If the fixture
+ * does not have an identifying context attached as its user data, then return -1.
  * @param {Box2D.Dynamics.b2Fixture} fixture The fixture to test.
- * @return {boolean} Whether the fixture is the sluice handle or not.
+ * @return The index of the fixture in the _parts array.
  */
-Sluice.prototype.isSluiceHandle = function(fixture) {
-  // TODO(daves): turn this back on when appropriate.
+Sluice.prototype.leverIndexOfFixture = function(fixture) {
   var fixtureUserData = fixture.GetUserData();
-  return Sluice._SLUICE_HINGE_PIN_CONTEXT.indexOf(fixtureUserData) >= 0;
+  return Sluice._SLUICE_HINGE_PIN_CONTEXT.indexOf(fixtureUserData);
 }
 
+/**
+ * Move the sluice lever and its hinge by the given amount. The translation is assumed to
+ * be in world coordinates. The delta is limited to the extents of the hinge track.
+ * @param {number} i The lever index.
+ * @param {Box2D.Common.Math.b2Vec2} delta The relative amount to move the sluice.
+ */
+Sluice.prototype.moveLeverAtIndexBy = function(i, delta) {
+  if (i < 0 || i >= Sluice._LEVER_ORIGINS.length) {
+    return;
+  }
+  // Move the individual parts.
+  var deltaX = Math.min(Math.max(delta.x, -Sluice._HINGE_TRACK_HALF_WIDTH),
+      Sluice._HINGE_TRACK_HALF_WIDTH);
+  var sluiceParts = this._parts[i];
+  var newOrigin = new Box2D.Common.Math.b2Vec2(
+      Sluice.SLUICE_ORIGIN.x + Sluice._LEVER_ORIGINS[i].x + deltaX,
+      Sluice.SLUICE_ORIGIN.y + Sluice._LEVER_ORIGINS[i].y);
+  sluiceParts.sluice.SetPosition(newOrigin);
+  sluiceParts.hingePin.SetPosition(newOrigin);
+}
+
+/**
+ * Return the lever origin in world coordinates.
+ * @param {number} i The lever index.
+ * @return {Box2D.Common.Math.b2Vec2} The lever origin.
+ */
+Sluice.prototype.leverWorldCoordinatesAtIndex = function(i) {
+  if (i < 0 || i >= Sluice._LEVER_ORIGINS.length) {
+    return new Box2D.Common.Math.b2Vec2(0, 0);
+  }
+  return new Box2D.Common.Math.b2Vec2(Sluice.SLUICE_ORIGIN.x + Sluice._LEVER_ORIGINS[i].x,
+      Sluice.SLUICE_ORIGIN.x + Sluice._LEVER_ORIGINS[i].y);
+}
 
 /**
  * Method to add the coop door pieces to the Box2D world. Customise this method to create
