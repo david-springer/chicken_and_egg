@@ -237,7 +237,8 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
   var didLayEgg = function(chicken) {
-    var egg = new Egg(Roost.ROOST_ORIGIN.x + 0.45, Roost.ROOST_ORIGIN.y + 0.07);
+    var ovality = (Math.random() * (0.25 - 0.12)) + 0.12;
+    var egg = new Egg(Roost.ROOST_ORIGIN.x + 0.45, Roost.ROOST_ORIGIN.y + 0.07, ovality);
     this._gamePieces.push(egg);
     egg.addToSimulation(this);
     var eggBody = egg.body();
@@ -511,11 +512,13 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
    * Callback for the QueryPoint() method. If the sluice handle was hit, bind the mouse-
    * drag and mouse-up event handlers and start dragging the sluice.
    * @param {Box2D.Dynamics.b2Fixture} fixture The fixture to test.
-   * @return {boolean} Wether to continue with the query. Returns false if the sluice
+   * @return {boolean} Whether to continue with the query. Returns false if the sluice
    *     handle was hit.
    */
   var hitSluiceHandle = function(fixture) {
-    if (this._sluice.isSluiceHandle(fixture)) {
+    var leverIndex = this._sluice.leverIndexOfFixture(fixture);
+    if (leverIndex >= 0) {
+      this._leverIndex = leverIndex;
       $(ChickenAndEgg._DOMConsts.BODY)
           .mousemove(this._mouseDrag.bind(this))
           .mouseup(this._mouseUp.bind(this));
@@ -535,12 +538,12 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
 ChickenAndEgg.prototype._mouseDrag = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
-  var origin = Sluice.SLUICE_ORIGIN;
-  var angle = Math.atan2(worldMouse.y - origin.y, worldMouse.x - origin.x);
-  angle = Math.min(
-      Math.max(angle, ChickenAndEgg._Limits.SLUICE_MIN_ANGLE),
-      ChickenAndEgg._Limits.SLUICE_MAX_ANGLE);
-  this._sluice.body().SetAngle(angle);
+  var origin = this._sluice.leverWorldCoordinatesAtIndex(this._leverIndex);
+  var deltaX = worldMouse.x - origin.x;
+  //this._sluice.body().SetAngle(angle);
+  console.log("deltaX=" + deltaX);
+  this._sluice.moveLeverAtIndexBy(this._leverIndex,
+      new Box2D.Common.Math.b2Vec2(deltaX, 0));
   for (var i = 0; i < this._gamePieces.length; ++i) {
     var gamePiece = this._gamePieces[i];
     if (gamePiece.hasOwnProperty('isEgg')) {
