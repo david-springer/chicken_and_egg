@@ -59,7 +59,7 @@ Sluice._SLUICE_HINGE_PIN_CONTEXT = [
  * The origin in world coordinates of the sluice.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.705, 1.40 - 0.015);
+Sluice.SLUICE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.705, 1.46 - 0.015);
 
 /**
  * The origins in local coordinates of the sluice levers. The length of this array must
