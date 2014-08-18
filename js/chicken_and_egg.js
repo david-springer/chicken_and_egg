@@ -161,7 +161,7 @@ ChickenAndEgg.prototype.worldSize = function() {
  * The run() method initializes and runs the simulation. It never returns.
  */
 ChickenAndEgg.prototype.run = function() {
-  // Bind the mouse-down event to the BODY element. This ensures that the conditionally-
+  // Bind the mouse-down event to the CANVAS element. This ensures that the conditionally-
   // bound mouse-up event will fire properly.
   $(this._canvas).mousedown(this._mouseDown.bind(this));
   this.initWorld(this._canvas);

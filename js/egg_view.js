@@ -26,7 +26,6 @@ EggView.prototype.constructor = EggView;
  */
 EggView.prototype.draw = function(ctx, body) {
   // Draw the polygon of the first fixture.
-  // TODO(daves): Replace this with a sprite for the egg.
   var transform = body.GetTransform();
   var egg = body.GetFixtureList().GetShape();
   var vertexCount = parseInt(egg.GetVertexCount());
