@@ -32,7 +32,7 @@ EggView.prototype.draw = function(ctx, body) {
   var vertexCount = parseInt(egg.GetVertexCount());
   var vertices = egg.GetVertices();
   ctx.save();
-  ctx.fillStyle = 'cyan';
+  ctx.fillStyle = "#FADABF";
 
   ctx.beginPath();
   var vertex0 = Box2D.Common.Math.b2Math.MulX(transform, vertices[0]);

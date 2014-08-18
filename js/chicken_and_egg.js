@@ -544,8 +544,6 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
       event.pageX, event.pageY, this._canvas);
   var origin = this._sluice.leverWorldCoordinatesAtIndex(this._leverIndex);
   var deltaX = worldMouse.x - origin.x;
-  //this._sluice.body().SetAngle(angle);
-  console.log("deltaX=" + deltaX);
   this._sluice.moveLeverAtIndexBy(this._leverIndex,
       new Box2D.Common.Math.b2Vec2(deltaX, 0));
   for (var i = 0; i < this._gamePieces.length; ++i) {
