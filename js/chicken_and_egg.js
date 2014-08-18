@@ -237,7 +237,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
   var didLayEgg = function(chicken) {
-    //var rand = Math.random();
     var skew_rand = Math.pow(Math.random(), 0.5);
     var dims = {
       ovality: (skew_rand * (0.25 - 0.0)) + 0.0,
