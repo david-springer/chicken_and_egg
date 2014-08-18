@@ -34,7 +34,7 @@ EggCarton.prototype.constructor = EggCarton;
  */
 EggCarton.EGG_CARTON_ORIGIN = new Box2D.Common.Math.b2Vec2(1.70, 0.70);
 EggCarton.EGG_CARTON_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.50, 0.55);
-// The frypan image is 275 x 211 points. Size the final image so it is 45cm wide and
+// The egg carton image is 275 x 211 points. Size the final image so it is 45cm wide and
 // preserves aspect ratio.
 EggCarton.EGG_CARTON_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.45, 0.45 * (211.0 / 275.0));
 
