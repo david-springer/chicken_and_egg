@@ -304,6 +304,11 @@ Chicken.prototype._layEgg = function() {
   }
 }
 
+/**
+ * Override addToSimulation to load the view. The chicken is a special case because it
+ * has no collision/physics geometry, it only draws an image.
+ * @Override
+ */
 Chicken.prototype.addToSimulation = function(simulation) {
   this.loadView();
 }
