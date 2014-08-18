@@ -201,7 +201,7 @@ FryPan.prototype.addFixturesToBody = function(simulation, body) {
 }
 
 /**
- * Return a new PolyView.
+ * Return a new ImageView.
  * @override
  */
 FryPan.prototype.loadView = function(simulation) {
