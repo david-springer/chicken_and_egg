@@ -42,6 +42,11 @@ FryPan.prototype.constructor = Nest;
  * @type {Box2D.Common.Math.b2Vec2}
  */
 FryPan.FRY_PAN_ORIGIN = new Box2D.Common.Math.b2Vec2(0.45, 0.70);
+FryPan.FRY_PAN_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.16, 0.55);
+// The frypan image is 395 x 153 points. Size the final image so it is 60cm wide and
+// preserves aspect ratio.
+// TODO(daves): Figure out how to get the image dims from the Image object.
+FryPan.FRY_PAN_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.8, 0.8 * (153.0 / 395.0));
 
 /**
  * Default frying time, measured in seconds.
@@ -196,11 +201,15 @@ FryPan.prototype.addFixturesToBody = function(simulation, body) {
 }
 
 /**
- * Return a new PolyView.
+ * Return a new ImageView.
  * @override
  */
 FryPan.prototype.loadView = function(simulation) {
-  this.view = new PolyView();
+  var frypanView = new ImageView();
+  frypanView.setOrigin(FryPan.FRY_PAN_IMAGE_ORIGIN);
+  frypanView.setSize(FryPan.FRY_PAN_IMAGE_SIZE);
+  frypanView.loadImage("./img/frypan.png");
+  this.view = frypanView;
 }
 
 /**
