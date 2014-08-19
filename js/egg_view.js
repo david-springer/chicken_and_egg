@@ -26,13 +26,12 @@ EggView.prototype.constructor = EggView;
  */
 EggView.prototype.draw = function(ctx, body) {
   // Draw the polygon of the first fixture.
-  // TODO(daves): Replace this with a sprite for the egg.
   var transform = body.GetTransform();
   var egg = body.GetFixtureList().GetShape();
   var vertexCount = parseInt(egg.GetVertexCount());
   var vertices = egg.GetVertices();
   ctx.save();
-  ctx.fillStyle = 'cyan';
+  ctx.fillStyle = "#FADABF";
 
   ctx.beginPath();
   var vertex0 = Box2D.Common.Math.b2Math.MulX(transform, vertices[0]);
