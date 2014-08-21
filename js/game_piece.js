@@ -59,6 +59,19 @@ GamePiece.prototype.body = function() {
 }
 
 /**
+ * Returns whether the game piece can be drawn. By default, returns true if the body
+ * exists and is active. Game pieces that do not have a physical body, but need to draw
+ * a game element (for example, the water bottle) can override this. Note: if this
+ * method returns true, the default implementation of draw() assumes that this.view
+ * is non-null and responds to the draw() method.
+ * @return {boolean} If the game piece should be drawn.
+ */
+GamePiece.prototype.canDraw = function() {
+  var b = this.body();
+  return (b && b.IsActive());
+}
+
+/**
  * Abstract method to process a "tick" in the game simulation. Subclasses should override
  * this to update any internal time-based state. Default implementation does nothing.
  * @param {number} gameTimeNow The wall-clock time when this function was called,
@@ -116,9 +129,8 @@ GamePiece.prototype.loadView = function(simulation) {
  *       scale() The scale factor from CANVAS to Box2D world
  */
 GamePiece.prototype.draw = function(ctx, simulation) {
-  var b = this.body();
-  if (b && b.IsActive()) {
-    this.view.draw(ctx, b);
+  if (this.canDraw()) {
+    this.view.draw(ctx, this.body());
   }
 }
 
@@ -169,6 +181,7 @@ GamePiece.prototype.addToSimulation = function(simulation) {
     this._body.SetUserData(this.uuid());
   } else {
     this._body = null;
+    this.loadView();
   }
 }
 

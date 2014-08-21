@@ -41,6 +41,16 @@ WaterBottle.MAX_WATER_LEVEL = 4000.0;
 WaterBottle.MAX_REFILL_LEVEL = 1000.0;
 
 /**
+ * The origin and size in world coordinates of the water bottle.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+WaterBottle.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.40, 2.03);
+// The water bottle image is 81 x 128 points. Size the final image so it is 20cm wide and
+// preserves aspect ratio.
+// TODO(daves): Figure out how to get the image dims from the Image object.
+WaterBottle.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.20, 0.20 * (128.0 / 81.0));
+
+/**
  * Indicates whether the feed bag is empty.
  * @return {boolean} Whether the feed bag is empty.
  */
@@ -76,6 +86,7 @@ WaterBottle.prototype.drink = function(drinkAmount) {
       drinkAmount += this._waterLevel;
       this._waterLevel = 0;
     }
+    this.view.waterLevelFraction = this._waterLevel / WaterBottle.MAX_WATER_LEVEL;
     return drinkAmount;
   }
   return 0;
@@ -91,6 +102,26 @@ WaterBottle.prototype.refill = function() {
     return true;
   }
   return false;
+}
+
+/**
+ * The water bottle is drawable when the image gets loaded.
+ * @override
+ */
+WaterBottle.prototype.canDraw = function() {
+  return this.view != null && this.view.canDraw();
+}
+
+/**
+ * Create an ImageView for the water bottle.
+ * @override
+ */
+WaterBottle.prototype.loadView = function(simulation) {
+  var bottleView = new WaterBottleView();
+  bottleView.setOrigin(WaterBottle.IMAGE_ORIGIN);
+  bottleView.setSize(WaterBottle.IMAGE_SIZE);
+  bottleView.loadAllImages();
+  this.view = bottleView;
 }
 
 /**
