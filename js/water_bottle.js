@@ -86,6 +86,7 @@ WaterBottle.prototype.drink = function(drinkAmount) {
       drinkAmount += this._waterLevel;
       this._waterLevel = 0;
     }
+    this.view.waterLevelFraction = this._waterLevel / WaterBottle.MAX_WATER_LEVEL;
     return drinkAmount;
   }
   return 0;

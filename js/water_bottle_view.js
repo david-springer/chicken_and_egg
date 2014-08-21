@@ -18,12 +18,12 @@ WaterBottleView = function() {
   ImageView.call(this);
   
   /**
-   * The water level, expressed as a percentage. The height of the water level overlay
-   * is determined by this value.
+   * The water level, expressed as a value between 0 and 1. The height of the water level
+   * overlay is determined by this value.
    * @type {number}
    * @public
    */
-  this.waterLevel = 0.0;
+  this.waterLevelFraction = 1.0;
 
   /**
    * The water level overlay image.
@@ -77,7 +77,13 @@ WaterBottleView.prototype.draw = function(ctx, body) {
   ctx.drawImage(this._image,
                 this._imageOrigin.x, this._imageOrigin.y,
                 this._imageSize.x, this._imageSize.y);
+  // Note: the clipping box for drawImage is specified in the image's original coordinate
+  // system, not in world coordinates.
   ctx.drawImage(this._waterLevelOverlay,
+                0.0, 0.0,
+                this._waterLevelOverlay.width,
+                this._waterLevelOverlay.height * this.waterLevelFraction,
                 this._imageOrigin.x, this._imageOrigin.y,
-                this._imageSize.x, this._imageSize.y);
+                this._imageSize.x,
+                this._imageSize.y * this.waterLevelFraction);
 }
