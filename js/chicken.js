@@ -120,11 +120,11 @@ Chicken.DID_DIE_NOTIFICATION = 'didDieNotification';
  * The origin in world coordinates of the chicken.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Chicken.CHICKEN_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.03);
+Chicken.CHICKEN_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.03);
 // The chicken image is 873 x 551 points. Size the final image so it is 50cm wide and
 // preserves aspect ratio.
 // TODO(daves): Figure out how to get the image dims from the Image object.
-Chicken.CHICKEN_SIZE = new Box2D.Common.Math.b2Vec2(0.5, 0.5 * (551.0 / 873.0));
+Chicken.CHICKEN_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.5, 0.5 * (551.0 / 873.0));
 
 /**
  * Accessors and mutators.
@@ -305,12 +305,11 @@ Chicken.prototype._layEgg = function() {
 }
 
 /**
- * Override addToSimulation to load the view. The chicken is a special case because it
- * has no collision/physics geometry, it only draws an image.
- * @Override
+ * The chicken is drawable when the image gets loaded.
+ * @override
  */
-Chicken.prototype.addToSimulation = function(simulation) {
-  this.loadView();
+Chicken.prototype.canDraw = function() {
+  return this.view != null && this.view.canDraw();
 }
 
 /**
@@ -319,18 +318,10 @@ Chicken.prototype.addToSimulation = function(simulation) {
  */
 Chicken.prototype.loadView = function(simulation) {
   var chickenView = new ImageView();
-  chickenView.setOrigin(Chicken.CHICKEN_ORIGIN);
-  chickenView.setSize(Chicken.CHICKEN_SIZE);
+  chickenView.setOrigin(Chicken.CHICKEN_IMAGE_ORIGIN);
+  chickenView.setSize(Chicken.CHICKEN_IMAGE_SIZE);
   chickenView.loadImage("./img/chicken.png");
   this.view = chickenView;
-}
-
-/**
- * Draw the ImageView.
- * @override
- */
-Chicken.prototype.draw = function(ctx, simulation) {
-  this.view.draw(ctx, null);
 }
 
 /**

@@ -74,11 +74,18 @@ ImageView.prototype.setSize = function(size) {
 }
 
 /**
+ * Return whether the image can be drawn.
+ */
+ImageView.prototype.canDraw = function() {
+  return this._image != null && this._isImageLoaded;
+}
+
+/**
  * The draw function.
  * @override
  */
 ImageView.prototype.draw = function(ctx, body) {
-  if (this._image == null || !this._isImageLoaded) {
+  if (!this.canDraw()) {
     return;
   }
   ctx.drawImage(this._image,
