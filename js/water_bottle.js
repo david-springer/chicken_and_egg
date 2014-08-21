@@ -99,6 +99,7 @@ WaterBottle.prototype.drink = function(drinkAmount) {
 WaterBottle.prototype.refill = function() {
   if (this._waterLevel < WaterBottle.MAX_REFILL_LEVEL) {
     this._waterLevel = WaterBottle.MAX_WATER_LEVEL;
+    this.view.waterLevelFraction = 1.0;
     return true;
   }
   return false;
