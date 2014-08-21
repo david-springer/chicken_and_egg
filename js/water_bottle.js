@@ -116,7 +116,7 @@ WaterBottle.prototype.canDraw = function() {
  * @override
  */
 WaterBottle.prototype.loadView = function(simulation) {
-  var bottleView = new ImageView();
+  var bottleView = new WaterBottleView();
   bottleView.setOrigin(WaterBottle.IMAGE_ORIGIN);
   bottleView.setSize(WaterBottle.IMAGE_SIZE);
   bottleView.loadImage("./img/water_bottle.png");
