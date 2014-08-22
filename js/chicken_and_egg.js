@@ -94,6 +94,12 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._pullets = new Array();
+  /**
+   * The game piece that is responding to mouse events.
+   * @type {GamePiece}
+   * @private
+   */
+  this._firstResponder = null;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -510,8 +516,8 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
 }
 
 /**
- * When the laying hen dies, replace it from the list of reserve pullets. When all the
- * pullets are gone, the game is over when the current laying hen dies.
+ * Query all the game pieces, and handle possible mouse hits. Processing stops when a
+ * game piece handles the mouse-down.
  * @param {Array.GamePieces} gamePieces The list of game pieces to test.
  * @param {Box2D.Vec2} worldMouse The world coordinates of the mouse-down event.
  * @return {boolean} Whether the mouse-down was handled by a game piece or not.
@@ -521,7 +527,11 @@ ChickenAndEgg.prototype._handleMouseDown = function(gamePieces, worldMouse) {
   for (var i = 0; i < gamePieces.length; ++i) {
     var gamePiece = gamePieces[i];
     if (gamePiece.isPointInside(worldMouse)) {
-      alert('Hose bib cliekced!');
+      // Handle this like a button click.
+      this._firstResponder = gamePiece;
+      $(ChickenAndEgg._DOMConsts.BODY)
+          .mousemove(this._buttonMouseDrag.bind(this))
+          .mouseup(this._buttonMouseUp.bind(this));
       return true;
     }
   }
@@ -554,8 +564,8 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
     if (leverIndex >= 0) {
       this._leverIndex = leverIndex;
       $(ChickenAndEgg._DOMConsts.BODY)
-          .mousemove(this._mouseDrag.bind(this))
-          .mouseup(this._mouseUp.bind(this));
+          .mousemove(this._sluiceMouseDrag.bind(this))
+          .mouseup(this._sluiceMouseUp.bind(this));
       return false;  // Stop searching.
     }
     return true;
@@ -564,12 +574,12 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
 }
 
 /**
- * Handle the mouse-drag event. Compute the angle formed by the mouse point and the
- * origin of the sluice, and rotate the sluice by that angle.
+ * Handle the mouse-drag event on a sluice object. Slide the sluice piece along its track
+ * by the mouse delta.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
  * @private
  */
-ChickenAndEgg.prototype._mouseDrag = function(event) {
+ChickenAndEgg.prototype._sluiceMouseDrag = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
   var origin = this._sluice.leverWorldCoordinatesAtIndex(this._leverIndex);
@@ -585,10 +595,34 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
 }
 
 /**
- * Handle the mouse-up event. End the sluice drag sequence.
+ * Handle the mouse-up event on a sluice object. End the sluice drag sequence.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
  * @private
  */
-ChickenAndEgg.prototype._mouseUp = function(event) {
+ChickenAndEgg.prototype._sluiceMouseUp = function(event) {
+  this._firstResponder = null;
+  $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
+}
+
+/**
+ * Handle the mouse-drag event on a button object. Does nothing.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._buttonMouseDrag = function(event) {
+}
+
+/**
+ * Handle the mouse-up event on a button object. End the button click sequence, fire
+ * the button's onClick handler if the mouse-up happened in the button's bounds.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._buttonMouseUp = function(event) {
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  if (this._firstResponder.isPointInside(worldMouse)) {
+      alert('Hose bib cliekced!');
+  }
   $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }

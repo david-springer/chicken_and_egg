@@ -36,7 +36,7 @@ HoseBib.ON_CLICK_NOTIFICATION = 'hoseBibOnCLickNotification';
  * The origin in world coordinates of the hose bib.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-HoseBib.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.45, 2.40);
+HoseBib.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.35, 2.40);
 // The chicken image is 80 x 83 points. Size the final image so it is 15cm wide and
 // preserves aspect ratio.
 // TODO(daves): Figure out how to get the image dims from the Image object.
@@ -48,13 +48,7 @@ HoseBib.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.15, 0.15 * (83.0 / 80.0));
  */
 HoseBib.prototype.setEnabled = function(enabled) {
   this._enabled = enabled;
- if (this.view) {
-    if (enabled) {
-      this.view.onClick = function(e) {
-        NotificationDefaultCenter().postNotification(HoseBib.ON_CLICK_NOTIFICATION, this);
-      }
-    } else {
-    }
+  if (this.view) {
     this.view.enabled = enabled;
   }
 }

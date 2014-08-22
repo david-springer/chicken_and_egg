@@ -85,6 +85,9 @@ GamePiece.prototype.isPointInside = function(worldPoint) {
 }
 
 /**
+ * Handle the case when a point is inside
+
+/**
  * Abstract method to process a "tick" in the game simulation. Subclasses should override
  * this to update any internal time-based state. Default implementation does nothing.
  * @param {number} gameTimeNow The wall-clock time when this function was called,
