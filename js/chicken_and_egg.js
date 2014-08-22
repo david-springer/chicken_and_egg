@@ -218,7 +218,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._nest);
   var hoseBib = new HoseBib();
   this._gamePieces.push(hoseBib);
-  hoseBib.setEnabled(false);
+  hoseBib.setEnabled(true);
 
   this._activateGamePieces(this._gamePieces);
 
@@ -276,6 +276,9 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
       Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
+
+  defaultCenter.addNotificationObserver(
+      HoseBib.ON_CLICK_NOTIFICATION, function() {alert('hose bib clicked'); });
 }
 
 /**
@@ -507,6 +510,25 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
 }
 
 /**
+ * When the laying hen dies, replace it from the list of reserve pullets. When all the
+ * pullets are gone, the game is over when the current laying hen dies.
+ * @param {Array.GamePieces} gamePieces The list of game pieces to test.
+ * @param {Box2D.Vec2} worldMouse The world coordinates of the mouse-down event.
+ * @return {boolean} Whether the mouse-down was handled by a game piece or not.
+ * @private
+ */
+ChickenAndEgg.prototype._handleMouseDown = function(gamePieces, worldMouse) {
+  for (var i = 0; i < gamePieces.length; ++i) {
+    var gamePiece = gamePieces[i];
+    if (gamePiece.isPointInside(worldMouse)) {
+      alert('Hose bib cliekced!');
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Handle the mouse-down event. Convert the event into Box2D coordinates and issue a
  * hit-detection. If the sluice handle is hit, start the handle-drag sequence.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
@@ -515,6 +537,11 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
 ChickenAndEgg.prototype._mouseDown = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
+  // First, query any game pieces that know how to handle hit-detection.
+  if (this._handleMouseDown(this._gamePieces, worldMouse)) {
+    return;  // The mouse down was handled.
+  }
+
   /**
    * Callback for the QueryPoint() method. If the sluice handle was hit, bind the mouse-
    * drag and mouse-up event handlers and start dragging the sluice.

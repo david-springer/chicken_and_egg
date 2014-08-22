@@ -72,6 +72,19 @@ GamePiece.prototype.canDraw = function() {
 }
 
 /**
+ * Return whether a point is inside the game piece. This is overridden by game pieces
+ * that do not have a Box2D-based physical body. The default implementation returns false,
+ * because hit detection is handled by Box2D normally. Subclasses can override this to
+ * perform their own hit detection, and should return true to indicate that the point is
+ * inside their boundaries.
+ * @param {Box2D.b2Vec2} worldPoint The point in world coordinates.
+ * @return {boolean} Whether the point is inside the game piece or not.
+ */
+GamePiece.prototype.isPointInside = function(worldPoint) {
+  return false;
+}
+
+/**
  * Abstract method to process a "tick" in the game simulation. Subclasses should override
  * this to update any internal time-based state. Default implementation does nothing.
  * @param {number} gameTimeNow The wall-clock time when this function was called,

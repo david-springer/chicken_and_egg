@@ -48,9 +48,28 @@ HoseBib.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.15, 0.15 * (83.0 / 80.0));
  */
 HoseBib.prototype.setEnabled = function(enabled) {
   this._enabled = enabled;
-  if (this.view) {
+ if (this.view) {
+    if (enabled) {
+      this.view.onClick = function(e) {
+        NotificationDefaultCenter().postNotification(HoseBib.ON_CLICK_NOTIFICATION, this);
+      }
+    } else {
+    }
     this.view.enabled = enabled;
   }
+}
+
+/**
+ * Handle hit detection.
+ * @override
+ */
+HoseBib.prototype.isPointInside = function(worldMouse) {
+  var x0 = HoseBib.IMAGE_ORIGIN.x;
+  var x1 = HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x;
+  var y0 = HoseBib.IMAGE_ORIGIN.y;
+  var y1 = HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y;
+  return worldMouse.x >= x0 && worldMouse.x <= x1 &&
+      worldMouse.y >= y0 && worldMouse.y <= y1;
 }
 
 /**
@@ -77,6 +96,6 @@ HoseBib.prototype.loadView = function(simulation) {
   hoseBibView.setOrigin(HoseBib.IMAGE_ORIGIN);
   hoseBibView.setSize(HoseBib.IMAGE_SIZE);
   hoseBibView.loadImage("./img/hose_bib.png");
+  this.setEnabled(this._enabled);
   this.view = hoseBibView;
-  this.view.enabled = this._enabled;
 }
