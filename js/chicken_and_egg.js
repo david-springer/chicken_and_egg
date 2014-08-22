@@ -281,6 +281,12 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
 
+  var refillLevel = function(waterBottle) {
+    this._hoseBib.setEnabled(true);
+  }
+  defaultCenter.addNotificationObserver(
+      WaterBottle.REFILL_LEVEL_NOTIFICATION, refillLevel.bind(this));
+
   var refillWaterBottle = function() {
     this._chicken.waterBottle.refill();
   }

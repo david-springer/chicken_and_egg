@@ -30,7 +30,7 @@ HoseBib.prototype.constructor = HoseBib;
  * Notification sent when the hose bib is clicked. Sent only if the hose bib is enabled.
  * @type {string}
  */
-HoseBib.ON_CLICK_NOTIFICATION = 'hoseBibOnCLickNotification';
+HoseBib.ON_CLICK_NOTIFICATION = 'hoseBibOnClickNotification';
 
 /**
  * The origin in world coordinates of the hose bib.
@@ -54,6 +54,13 @@ HoseBib.prototype.setEnabled = function(enabled) {
 }
 
 /**
+ * Return the enabled bit.
+ */
+HoseBib.prototype.isEnabled = function() {
+  return this._enabled;
+}
+
+/**
  * Handle hit detection.
  * @override
  */
@@ -74,14 +81,8 @@ HoseBib.prototype.isPointInside = function(worldMouse) {
  * @override
  */
 HoseBib.prototype.doActionWithPoint = function(worldPoint) {
+  this.setEnabled(false);
   NotificationDefaultCenter().postNotification(HoseBib.ON_CLICK_NOTIFICATION, this);
-}
-
-/**
- * Return the enabled bit.
- */
-HoseBib.prototype.isEnabled = function() {
-  return this._enabled;
 }
 
 /**
@@ -101,6 +102,6 @@ HoseBib.prototype.loadView = function(simulation) {
   hoseBibView.setOrigin(HoseBib.IMAGE_ORIGIN);
   hoseBibView.setSize(HoseBib.IMAGE_SIZE);
   hoseBibView.loadImage("./img/hose_bib.png");
-  this.setEnabled(this._enabled);
   this.view = hoseBibView;
+  this.setEnabled(this._enabled);
 }

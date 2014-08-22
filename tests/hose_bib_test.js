@@ -19,6 +19,7 @@ test("Point Inside", function() {
 
 test("Point Inside Disabled", function() {
   var testHoseBib = new HoseBib();
+  testHoseBib.setEnabled(false);
   var insidePoint = new Box2D.Common.Math.b2Vec2(
       HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
       HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
@@ -27,6 +28,7 @@ test("Point Inside Disabled", function() {
 
 test("Points Outside", function() {
   var testHoseBib = new HoseBib();
+  testHoseBib.setEnabled(true);
   var outsidePoint;
   outsidePoint = new Box2D.Common.Math.b2Vec2(
       HoseBib.IMAGE_ORIGIN.x - 1,
