@@ -31,7 +31,7 @@ PolyView.prototype.draw = function(ctx, body) {
     var vertexCount = parseInt(poly.GetVertexCount());
     var vertices = poly.GetVertices();
     ctx.save();
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = '#873B11';
 
     ctx.beginPath();
     var vertex0 = Box2D.Common.Math.b2Math.MulX(transform, vertices[0]);

@@ -94,6 +94,12 @@ ChickenAndEgg = function(canvas) {
    * @private
    */
   this._pullets = new Array();
+  /**
+   * The game piece that is responding to mouse events.
+   * @type {GamePiece}
+   * @private
+   */
+  this._firstResponder = null;
 }
 ChickenAndEgg.prototype.constructor = ChickenAndEgg;
 
@@ -216,6 +222,9 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._eggCarton);
   this._nest = new Nest();
   this._gamePieces.push(this._nest);
+  this._hoseBib = new HoseBib();
+  this._gamePieces.push(this._hoseBib);
+  this._hoseBib.setEnabled(false);
 
   this._activateGamePieces(this._gamePieces);
 
@@ -263,8 +272,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var refillFeed = function(eggCarton) {
     this._chicken.feedBag.refill();
     eggCarton.reset();
-    // TODO(daves): this should be in response to a mouse action.
-    this._chicken.waterBottle.refill();
   }
   defaultCenter.addNotificationObserver(
       EggCarton.DID_FILL_CARTON_NOTIFICATION, refillFeed.bind(this));
@@ -273,6 +280,18 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
       Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
+
+  var refillLevel = function(waterBottle) {
+    this._hoseBib.setEnabled(true);
+  }
+  defaultCenter.addNotificationObserver(
+      WaterBottle.REFILL_LEVEL_NOTIFICATION, refillLevel.bind(this));
+
+  var refillWaterBottle = function() {
+    this._chicken.waterBottle.refill();
+  }
+  defaultCenter.addNotificationObserver(
+      HoseBib.ON_CLICK_NOTIFICATION, refillWaterBottle.bind(this));
 }
 
 /**
@@ -504,6 +523,29 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
 }
 
 /**
+ * Query all the game pieces, and handle possible mouse hits. Processing stops when a
+ * game piece handles the mouse-down.
+ * @param {Array.GamePieces} gamePieces The list of game pieces to test.
+ * @param {Box2D.Vec2} worldMouse The world coordinates of the mouse-down event.
+ * @return {boolean} Whether the mouse-down was handled by a game piece or not.
+ * @private
+ */
+ChickenAndEgg.prototype._handleMouseDown = function(gamePieces, worldMouse) {
+  for (var i = 0; i < gamePieces.length; ++i) {
+    var gamePiece = gamePieces[i];
+    if (gamePiece.isPointInside(worldMouse)) {
+      // Handle this like a button click.
+      this._firstResponder = gamePiece;
+      $(ChickenAndEgg._DOMConsts.BODY)
+          .mousemove(this._buttonMouseDrag.bind(this))
+          .mouseup(this._buttonMouseUp.bind(this));
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Handle the mouse-down event. Convert the event into Box2D coordinates and issue a
  * hit-detection. If the sluice handle is hit, start the handle-drag sequence.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
@@ -512,6 +554,11 @@ ChickenAndEgg.prototype._chickenDied = function(sender) {
 ChickenAndEgg.prototype._mouseDown = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
+  // First, query any game pieces that know how to handle hit-detection.
+  if (this._handleMouseDown(this._gamePieces, worldMouse)) {
+    return;  // The mouse down was handled.
+  }
+
   /**
    * Callback for the QueryPoint() method. If the sluice handle was hit, bind the mouse-
    * drag and mouse-up event handlers and start dragging the sluice.
@@ -524,8 +571,8 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
     if (leverIndex >= 0) {
       this._leverIndex = leverIndex;
       $(ChickenAndEgg._DOMConsts.BODY)
-          .mousemove(this._mouseDrag.bind(this))
-          .mouseup(this._mouseUp.bind(this));
+          .mousemove(this._sluiceMouseDrag.bind(this))
+          .mouseup(this._sluiceMouseUp.bind(this));
       return false;  // Stop searching.
     }
     return true;
@@ -534,12 +581,12 @@ ChickenAndEgg.prototype._mouseDown = function(event) {
 }
 
 /**
- * Handle the mouse-drag event. Compute the angle formed by the mouse point and the
- * origin of the sluice, and rotate the sluice by that angle.
+ * Handle the mouse-drag event on a sluice object. Slide the sluice piece along its track
+ * by the mouse delta.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
  * @private
  */
-ChickenAndEgg.prototype._mouseDrag = function(event) {
+ChickenAndEgg.prototype._sluiceMouseDrag = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
   var origin = this._sluice.leverWorldCoordinatesAtIndex(this._leverIndex);
@@ -555,10 +602,34 @@ ChickenAndEgg.prototype._mouseDrag = function(event) {
 }
 
 /**
- * Handle the mouse-up event. End the sluice drag sequence.
+ * Handle the mouse-up event on a sluice object. End the sluice drag sequence.
  * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
  * @private
  */
-ChickenAndEgg.prototype._mouseUp = function(event) {
+ChickenAndEgg.prototype._sluiceMouseUp = function(event) {
+  this._firstResponder = null;
+  $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
+}
+
+/**
+ * Handle the mouse-drag event on a button object. Does nothing.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._buttonMouseDrag = function(event) {
+}
+
+/**
+ * Handle the mouse-up event on a button object. End the button click sequence, fire
+ * the button's onClick handler if the mouse-up happened in the button's bounds.
+ * @param {Event} event The mouse-down event. page{X|Y} is normalized by jQuery.
+ * @private
+ */
+ChickenAndEgg.prototype._buttonMouseUp = function(event) {
+  var worldMouse = this._convertToWorldCoordinates(
+      event.pageX, event.pageY, this._canvas);
+  if (this._firstResponder.isPointInside(worldMouse)) {
+    this._firstResponder.doActionWithPoint(worldMouse);
+  }
   $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }
