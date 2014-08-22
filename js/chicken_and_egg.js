@@ -216,6 +216,9 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._eggCarton);
   this._nest = new Nest();
   this._gamePieces.push(this._nest);
+  var hoseBib = new HoseBib();
+  this._gamePieces.push(hoseBib);
+  hoseBib.setEnabled(false);
 
   this._activateGamePieces(this._gamePieces);
 
