@@ -4,14 +4,14 @@
  */
 
 /**
- * @fileoverview  The WaterBottleView object. Draws an the water bottle as an image
+ * @fileoverview  The WaterBottleView object. Draws the water bottle as an image
  * with an overlay of the water level.
  * Requires: Box2d, BodyView.
  */
 
 /**
- * Constructor for the ImageView class.
- * @inherit BodyView
+ * Constructor for the WaterBottleView class.
+ * @inherit ImageView
  * @constructor
  */
 WaterBottleView = function() {
@@ -58,11 +58,12 @@ WaterBottleView.prototype.loadAllImages = function() {
   this._isOverlayLoaded = false;
   this._waterLevelOverlay = null;
   this._waterLevelOverlay = new Image();
-  var onImageLoad = function() {
+  var onWaterOverlayLoad = function() {
     this._isOverlayLoaded = true;
   }
-  this._waterLevelOverlay.onload = onImageLoad.bind(this);
+  this._waterLevelOverlay.onload = onWaterOverlayLoad.bind(this);
   this._waterLevelOverlay.src = "./img/water_level.png";
+
   this.loadImage("./img/water_bottle.png");
 }
 

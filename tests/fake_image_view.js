@@ -4,9 +4,8 @@
  */
 
 /**
- * @fileoverview  The ImageView object. Draws an image at a point specified in world
- * coordinates. Images drawn using this class are inverted in Y from the <CANVAS>
- * elements. That is, Y increases going up instead of down.
+ * @fileoverview  The fake ImageView object. Use to stub out the ImageView object in
+ * tests.
  * Requires: Box2d, BodyView.
  */
 
@@ -17,21 +16,6 @@
  */
 ImageView = function() {
   BodyView.call(this);
-
-  /**
-   * A bit indicating that the image has loaded and can be drawn in a CANVAS context.
-   * @type {boolean}
-   * @private
-   */
-  this._isImageLoaded = false;
-
-  /**
-   * The image.
-   * @type {Image}
-   * @private
-   */
-  this._image = null;
-
   /**
    * The lower-left origin and size of the image in world coordinates.
    * @type {Box2D.b2Vec2}
@@ -48,15 +32,6 @@ ImageView.prototype.constructor = ImageView;
  * image is loaded it can be drawn.
  */
 ImageView.prototype.loadImage = function(imageUrl) {
-  // Unload the old image.
-  this._isImageLoaded = false;
-  this._image = null;
-  this._image = new Image();
-  var onImageLoad = function() {
-    this._isImageLoaded = true;
-  }
-  this._image.onload = onImageLoad.bind(this);
-  this._image.src = imageUrl;
 }
 
 /**
@@ -77,7 +52,7 @@ ImageView.prototype.setSize = function(size) {
  * Return whether the image can be drawn.
  */
 ImageView.prototype.canDraw = function() {
-  return this._image != null && this._isImageLoaded;
+  return false;
 }
 
 /**
@@ -85,10 +60,4 @@ ImageView.prototype.canDraw = function() {
  * @override
  */
 ImageView.prototype.draw = function(ctx, body) {
-  if (this._image == null || !this._isImageLoaded) {
-    return;
-  }
-  ctx.drawImage(this._image,
-                this._imageOrigin.x, this._imageOrigin.y,
-                this._imageSize.x, this._imageSize.y);
 }
