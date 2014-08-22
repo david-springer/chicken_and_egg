@@ -10,10 +10,19 @@ module("HoseBib Object");
 
 test("Point Inside", function() {
   var testHoseBib = new HoseBib();
+  testHoseBib.setEnabled(true);
   var insidePoint = new Box2D.Common.Math.b2Vec2(
       HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
       HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
   ok(testHoseBib.isPointInside(insidePoint));
+});
+
+test("Point Inside Disabled", function() {
+  var testHoseBib = new HoseBib();
+  var insidePoint = new Box2D.Common.Math.b2Vec2(
+      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
+      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
+  equal(false, testHoseBib.isPointInside(insidePoint));
 });
 
 test("Points Outside", function() {

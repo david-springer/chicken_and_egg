@@ -85,7 +85,12 @@ GamePiece.prototype.isPointInside = function(worldPoint) {
 }
 
 /**
- * Handle the case when a point is inside
+ * Perform an action with a world-coordinate point. Subclasses can override this to do
+ * click handling. Default implementation does nothing.
+ * @param {Box2D.b2Vec2} worldPoint The point in world coordinates.
+ */
+GamePiece.prototype.doActionWithPoint = function(worldPoint) {
+}
 
 /**
  * Abstract method to process a "tick" in the game simulation. Subclasses should override

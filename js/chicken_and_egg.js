@@ -222,9 +222,9 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._eggCarton);
   this._nest = new Nest();
   this._gamePieces.push(this._nest);
-  var hoseBib = new HoseBib();
-  this._gamePieces.push(hoseBib);
-  hoseBib.setEnabled(true);
+  this._hoseBib = new HoseBib();
+  this._gamePieces.push(this._hoseBib);
+  this._hoseBib.setEnabled(false);
 
   this._activateGamePieces(this._gamePieces);
 
@@ -272,8 +272,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   var refillFeed = function(eggCarton) {
     this._chicken.feedBag.refill();
     eggCarton.reset();
-    // TODO(daves): this should be in response to a mouse action.
-    this._chicken.waterBottle.refill();
   }
   defaultCenter.addNotificationObserver(
       EggCarton.DID_FILL_CARTON_NOTIFICATION, refillFeed.bind(this));
@@ -283,8 +281,11 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
 
+  var refillWaterBottle = function() {
+    this._chicken.waterBottle.refill();
+  }
   defaultCenter.addNotificationObserver(
-      HoseBib.ON_CLICK_NOTIFICATION, function() {alert('hose bib clicked'); });
+      HoseBib.ON_CLICK_NOTIFICATION, refillWaterBottle.bind(this));
 }
 
 /**
@@ -622,7 +623,7 @@ ChickenAndEgg.prototype._buttonMouseUp = function(event) {
   var worldMouse = this._convertToWorldCoordinates(
       event.pageX, event.pageY, this._canvas);
   if (this._firstResponder.isPointInside(worldMouse)) {
-      alert('Hose bib cliekced!');
+    this._firstResponder.doActionWithPoint(worldMouse);
   }
   $(ChickenAndEgg._DOMConsts.BODY).unbind('mousemove').unbind('mouseup');
 }

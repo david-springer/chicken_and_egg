@@ -6,7 +6,12 @@
 /**
  * @fileoverview Unit tests for the WaterBottle object.
  */
-module("WaterBottle Object");
+module("WaterBottle Object", {
+  teardown: function() {
+    equal(NotificationDefaultCenter().hasObserversForNotification(
+        WaterBottle.REFILL_LEVEL_NOTIFICATION), false);
+  }
+});
 
 var fakeWaterBottleView = { waterLevelFraction: 1.0 };
 
@@ -89,3 +94,28 @@ test("Stats Display String", function() {
   testBottle.setWaterLevel(0);
   equal(testBottle.statsDisplayString(), "0ml");
 });
+
+/*
+ * Application tests.
+ */
+
+test("Refill Notification", function() {
+  var testBottle = new WaterBottle();
+  testBottle.view = fakeWaterBottleView;
+  testBottle.setWaterLevel(WaterBottle.MAX_REFILL_LEVEL + 10.0);
+  var waterLevel = testBottle.waterLevel();
+  ok(testBottle.waterLevel() > WaterBottle.MAX_REFILL_LEVEL);
+  // Set up an event listener for the refillLevel event.
+  var canRefill = false;
+  var didReachRefillLevel = function(waterBottle) {
+    canRefill = true;
+  };
+  var defaultCenter = NotificationDefaultCenter();
+  defaultCenter.addNotificationObserver(
+      WaterBottle.REFILL_LEVEL_NOTIFICATION, didReachRefillLevel);
+  testBottle.drink(20.0);
+  ok(canRefill);
+  defaultCenter.removeNotificationObserver(
+      WaterBottle.REFILL_LEVEL_NOTIFICATION, didReachRefillLevel);
+});
+

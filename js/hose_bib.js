@@ -58,12 +58,23 @@ HoseBib.prototype.setEnabled = function(enabled) {
  * @override
  */
 HoseBib.prototype.isPointInside = function(worldMouse) {
+  if (!this._enabled) {
+    return false;
+  }
   var x0 = HoseBib.IMAGE_ORIGIN.x;
   var x1 = HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x;
   var y0 = HoseBib.IMAGE_ORIGIN.y;
   var y1 = HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y;
   return worldMouse.x >= x0 && worldMouse.x <= x1 &&
       worldMouse.y >= y0 && worldMouse.y <= y1;
+}
+
+/**
+ * Perform the click action.
+ * @override
+ */
+HoseBib.prototype.doActionWithPoint = function(worldPoint) {
+  NotificationDefaultCenter().postNotification(HoseBib.ON_CLICK_NOTIFICATION, this);
 }
 
 /**

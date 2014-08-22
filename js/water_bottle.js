@@ -30,6 +30,12 @@ WaterBottle.prototype = new GamePiece();
 WaterBottle.prototype.constructor = WaterBottle;
 
 /**
+ * Notification sent when the water bottle reaches refill level.
+ * @type {string}
+ */
+WaterBottle.REFILL_LEVEL_NOTIFICATION = 'waterBottleRefillLevelNotification';
+
+/**
  * The amount of water in a full water bottle, measured in millilitres.
  */
 WaterBottle.MAX_WATER_LEVEL = 4000.0;
@@ -87,6 +93,10 @@ WaterBottle.prototype.drink = function(drinkAmount) {
       this._waterLevel = 0;
     }
     this.view.waterLevelFraction = this._waterLevel / WaterBottle.MAX_WATER_LEVEL;
+    if (this._waterLevel <= WaterBottle.MAX_REFILL_LEVEL) {
+      NotificationDefaultCenter().postNotification(
+          WaterBottle.REFILL_LEVEL_NOTIFICATION, this);
+    }
     return drinkAmount;
   }
   return 0;
