@@ -30,6 +30,16 @@ FeedBag.prototype = new GamePiece();
 FeedBag.prototype.constructor = FeedBag;
 
 /**
+ * The origin and size in world coordinates of the water bottle.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+FeedBag.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.05, 2.03);
+// The water bottle image is 150 x 232 points. Size the final image so it is 28cm wide and
+// preserves aspect ratio.
+// TODO(daves): Figure out how to get the image dims from the Image object.
+FeedBag.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.28, 0.28 * (232.0 / 150.0));
+
+/**
  * The amount of feed in a full feed bag, measured in grams.
  */
 FeedBag.MAX_FEED = 2000.0;
@@ -70,6 +80,7 @@ FeedBag.prototype.peck = function(peckAmount) {
       peckAmount += this._feed;
       this._feed = 0;
     }
+    this.view.feedLevelFraction = this._feed / FeedBag.MAX_FEED;
     return peckAmount;
   }
   return 0;
@@ -80,6 +91,27 @@ FeedBag.prototype.peck = function(peckAmount) {
  */
 FeedBag.prototype.refill = function() {
   this._feed = FeedBag.MAX_FEED;
+  this.view.feedLevelFraction = 1.0;
+}
+
+/**
+ * The feed bag is drawable when the image gets loaded.
+ * @override
+ */
+FeedBag.prototype.canDraw = function() {
+  return this.view != null && this.view.canDraw();
+}
+
+/**
+ * Create an FeedBagView for the feed bag.
+ * @override
+ */
+FeedBag.prototype.loadView = function(simulation) {
+  var bagView = new FeedBagView();
+  bagView.setOrigin(FeedBag.IMAGE_ORIGIN);
+  bagView.setSize(FeedBag.IMAGE_SIZE);
+  bagView.loadImage("./img/feed_bag.png");
+  this.view = bagView;
 }
 
 /**
