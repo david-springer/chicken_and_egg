@@ -36,7 +36,7 @@ HoseBib.ON_CLICK_NOTIFICATION = 'hoseBibOnClickNotification';
  * The origin in world coordinates of the hose bib.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-HoseBib.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.35, 2.40);
+HoseBib.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.37, 2.35);
 // The chicken image is 80 x 83 points. Size the final image so it is 15cm wide and
 // preserves aspect ratio.
 // TODO(daves): Figure out how to get the image dims from the Image object.

@@ -8,13 +8,17 @@
  */
 module("FeedBag Object");
 
+var fakeFeedBagView = { feedLevelFraction: 1.0 };
+
 test("Default Constructor", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   equal(testBag.feed(), FeedBag.MAX_FEED);
 });
 
 test("Peck From Full", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   var amountPecked = testBag.peck(60.0);
   equal(amountPecked, 60.0);
   equal(testBag.feed(), FeedBag.MAX_FEED - 60.0);
@@ -22,6 +26,7 @@ test("Peck From Full", function() {
 
 test("Peck Not Enough", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   testBag.setFeed(25.0);
   var amountPecked = testBag.peck(60.0);
   equal(amountPecked, 25.0);
@@ -30,6 +35,7 @@ test("Peck Not Enough", function() {
 
 test("Peck Negative", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   var amountPecked = testBag.peck(-10.0);
   equal(amountPecked, 0);
   equal(testBag.feed(), FeedBag.MAX_FEED);
@@ -37,6 +43,7 @@ test("Peck Negative", function() {
 
 test("Is Empty", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   var amountPecked = testBag.peck(FeedBag.MAX_FEED + 60.0);
   equal(amountPecked, FeedBag.MAX_FEED);
   ok(testBag.isEmpty());
@@ -44,6 +51,7 @@ test("Is Empty", function() {
 
 test("Refill", function() {
   var testBag = new FeedBag();
+  testBag.view = fakeFeedBagView;
   testBag.setFeed(25.0);
   equal(testBag.isEmpty(), false);
   ok(testBag.feed() < FeedBag.MAX_FEED);
