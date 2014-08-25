@@ -121,10 +121,7 @@ Chicken.DID_DIE_NOTIFICATION = 'didDieNotification';
  * @type {Box2D.Common.Math.b2Vec2}
  */
 Chicken.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.03);
-// The chicken image is 873 x 551 points. Size the final image so it is 50cm wide and
-// preserves aspect ratio.
-// TODO(daves): Figure out how to get the image dims from the Image object.
-Chicken.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.5, 0.5 * (551.0 / 873.0));
+Chicken.IMAGE_WIDTH = 0.5;
 
 /**
  * Accessors and mutators.
@@ -319,7 +316,7 @@ Chicken.prototype.canDraw = function() {
 Chicken.prototype.loadView = function(simulation) {
   var chickenView = new ChickenView();
   chickenView.setOrigin(Chicken.IMAGE_ORIGIN);
-  chickenView.setSize(Chicken.IMAGE_SIZE);
+  chickenView.setWidth(Chicken.IMAGE_WIDTH);
   chickenView.loadImage("./img/chicken.png");
   this.view = chickenView;
 }

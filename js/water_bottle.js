@@ -51,10 +51,7 @@ WaterBottle.MAX_REFILL_LEVEL = 1000.0;
  * @type {Box2D.Common.Math.b2Vec2}
  */
 WaterBottle.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.40, 2.03);
-// The water bottle image is 81 x 128 points. Size the final image so it is 20cm wide and
-// preserves aspect ratio.
-// TODO(daves): Figure out how to get the image dims from the Image object.
-WaterBottle.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.20, 0.20 * (128.0 / 81.0));
+WaterBottle.IMAGE_WIDTH = 0.20;
 
 /**
  * Indicates whether the feed bag is empty.
@@ -130,7 +127,7 @@ WaterBottle.prototype.canDraw = function() {
 WaterBottle.prototype.loadView = function(simulation) {
   var bottleView = new WaterBottleView();
   bottleView.setOrigin(WaterBottle.IMAGE_ORIGIN);
-  bottleView.setSize(WaterBottle.IMAGE_SIZE);
+  bottleView.setWidth(WaterBottle.IMAGE_WIDTH);
   bottleView.loadAllImages();
   this.view = bottleView;
 }

@@ -11,40 +11,45 @@ module("HoseBib Object");
 test("Point Inside", function() {
   var testHoseBib = new HoseBib();
   testHoseBib.setEnabled(true);
+  testHoseBib.loadView();
+  var imageWorldSize = testHoseBib.view.getWorldSize();
   var insidePoint = new Box2D.Common.Math.b2Vec2(
-      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
-      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
+      HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x / 2,
+      HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y / 2);
   ok(testHoseBib.isPointInside(insidePoint));
 });
 
 test("Point Inside Disabled", function() {
   var testHoseBib = new HoseBib();
   testHoseBib.setEnabled(false);
+  testHoseBib.loadView();
+  var imageWorldSize = testHoseBib.view.getWorldSize();
   var insidePoint = new Box2D.Common.Math.b2Vec2(
-      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
-      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
+      HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x / 2,
+      HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y / 2);
   equal(false, testHoseBib.isPointInside(insidePoint));
 });
 
 test("Points Outside", function() {
   var testHoseBib = new HoseBib();
   testHoseBib.setEnabled(true);
+  testHoseBib.loadView();
+  var imageWorldSize = testHoseBib.view.getWorldSize();
   var outsidePoint;
   outsidePoint = new Box2D.Common.Math.b2Vec2(
       HoseBib.IMAGE_ORIGIN.x - 1,
-      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
+      HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y / 2);
   equal(false, testHoseBib.isPointInside(outsidePoint));
   outsidePoint = new Box2D.Common.Math.b2Vec2(
-      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x + 1,
-      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y / 2);
+      HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x + 1,
+      HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y / 2);
   equal(false, testHoseBib.isPointInside(outsidePoint));
   outsidePoint = new Box2D.Common.Math.b2Vec2(
-      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
+      HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x / 2,
       HoseBib.IMAGE_ORIGIN.y - 1);
   equal(false, testHoseBib.isPointInside(outsidePoint));
   outsidePoint = new Box2D.Common.Math.b2Vec2(
-      HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x / 2,
-      HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y + 1);
+      HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x / 2,
+      HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y + 1);
   equal(false, testHoseBib.isPointInside(outsidePoint));
 });
-

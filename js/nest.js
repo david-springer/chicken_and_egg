@@ -49,10 +49,8 @@ Nest.prototype.constructor = Nest;
  * @type {Box2D.Common.Math.b2Vec2}
  */
 Nest.NEST_ORIGIN = new Box2D.Common.Math.b2Vec2(3.00, 0.70 + 0.25);
-Nest.NEST_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(2.80, 0.55);
-// The egg carton image is 420 x 280 points. Size the final image so it is 50cm wide and
-// preserves aspect ratio.
-Nest.NEST_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.55, 0.55 * (280.0 / 420.0));
+Nest.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(2.80, 0.55);
+Nest.IMAGE_WIDTH = 0.55;
 
 /**
  * Default incubation time, measured in seconds.
@@ -167,8 +165,8 @@ Nest.prototype.addFixturesToBody = function(simulation, body) {
  */
 Nest.prototype.loadView = function(simulation) {
   var nestView = new ImageView();
-  nestView.setOrigin(Nest.NEST_IMAGE_ORIGIN);
-  nestView.setSize(Nest.NEST_IMAGE_SIZE);
+  nestView.setOrigin(Nest.IMAGE_ORIGIN);
+  nestView.setWidth(Nest.IMAGE_WIDTH);
   nestView.loadImage("./img/nest.png");
   this.view = nestView;
 }
