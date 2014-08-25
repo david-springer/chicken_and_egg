@@ -36,21 +36,7 @@ test("Add Egg When Full", function() {
 
 test("Has Stats", function() {
   var testCarton = new EggCarton();
-  ok(testCarton.hasStats());
-});
-
-test("Display Name", function() {
-  var testCarton = new EggCarton();
-  ok(testCarton.displayName() !== "<unnamed>");
-});
-
-test("Stats Display String", function() {
-  var testCarton = new EggCarton();
-  equal(testCarton.statsDisplayString(), "0");
-  testCarton.setEggCount(6);
-  equal(testCarton.statsDisplayString(), "6");
-  testCarton.setEggCount(EggCarton.MAX_EGG_COUNT);
-  equal(testCarton.statsDisplayString(), EggCarton.MAX_EGG_COUNT.toString());
+  equal(false, testCarton.hasStats());
 });
 
 test("Send Crate Full Notification", function() {
