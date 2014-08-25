@@ -70,6 +70,14 @@ ImageView.prototype.setOrigin = function(origin) {
 }
 
 /**
+ * Get the origin of the image in world coordinates. Returns a copy of the object which
+ * can be changed by the caller without any effect on this object.
+ */
+ImageView.prototype.getWorldOrigin = function() {
+  return this._imageOrigin.Copy();
+}
+
+/**
  * Set the width of the image in world coordinates. The height is determined so that
  * the aspect ratio of the original image is preserved.
  */
@@ -79,7 +87,8 @@ ImageView.prototype.setWidth = function(width) {
 
 /**
  * Get the size of the image in world coordinates. The height value is not valid until
- * after the image is fully loaded.
+ * after the image is fully loaded. Returns a copy of the object which can be changed
+ * by the caller without any effect on this object.
  */
 ImageView.prototype.getWorldSize = function() {
   return this._imageSize.Copy();

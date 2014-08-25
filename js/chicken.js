@@ -296,11 +296,19 @@ Chicken.prototype._layEgg = function() {
   this._water = 0.0;
   NotificationDefaultCenter().postNotification(Chicken.DID_LAY_EGG_NOTIFICATION, this);
   this._eggCount--;
-  if (this.view) {
-    this.view.eggCount = this._eggCount;
-  }
+  this._setViewEggCount(this._eggCount);
   if (this._eggCount == 0) {
     NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
+  }
+}
+
+/**
+ * Set the egg count for the view.
+ * @private
+ */
+Chicken.prototype._setViewEggCount = function(eggCount) {
+  if (this.view) {
+    this.view.eggCount = eggCount;
   }
 }
 
@@ -322,28 +330,5 @@ Chicken.prototype.loadView = function(simulation) {
   chickenView.setWidth(Chicken.IMAGE_WIDTH);
   chickenView.init();
   this.view = chickenView;
-}
-
-/**
- * The chicken reports stats.
- * @override
- */
-Chicken.prototype.hasStats = function() {
-  return true;
-}
-
-/**
- * Return the display name.
- * @override
- */
-Chicken.prototype.displayName = function() {
-  return "Eggs to Lay:";  // TODO(daves): localize this?
-}
-
-/**
- * Return the stats for this game piece.
- * @override
- */
-Chicken.prototype.statsDisplayString = function() {
-  return this._eggCount.toString();
+  this._setViewEggCount(this._eggCount);
 }
