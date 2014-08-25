@@ -22,10 +22,6 @@ BodyView.prototype.constructor = BodyView;
  * Draw the body. Abstract method. Default does nothing.
  * @param {Object} ctx The 2D drawing contest, normally the one attached to a <CANVAS>
  *     element.
- * @param {Object} body The Box2D body used to query position, angle, etc. |body| must
- *     respond to:
- *       b2Vec2 GetPosition()
- *       float GetAngle()
- *       b2Vec2 GetWorldCenter()
+ * @param {Object} body The Box2D body associated with this view. Can be null.
  */
 BodyView.prototype.draw = function(ctx, body) {}

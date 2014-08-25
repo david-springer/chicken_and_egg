@@ -22,7 +22,7 @@ ImageView = function() {
    * @private
    */
   this._imageOrigin = new Box2D.Common.Math.b2Vec2(0.0, 0.0);
-  this._imageSize = new Box2D.Common.Math.b2Vec2(0.1, 0.1);
+  this._imageSize = new Box2D.Common.Math.b2Vec2(0.5, 0.5);
 }
 ImageView.prototype = new BodyView();
 ImageView.prototype.constructor = ImageView;
@@ -44,8 +44,15 @@ ImageView.prototype.setOrigin = function(origin) {
 /**
  * Set the size of the image in world coordinates.
  */
-ImageView.prototype.setSize = function(size) {
-  this._imageSize = size;
+ImageView.prototype.setWidth = function(width) {
+  this._imageSize.x = width;
+}
+
+/**
+ * Get the size of the image in world coordinates.
+ */
+ImageView.prototype.getWorldSize = function() {
+  return this._imageSize;
 }
 
 /**

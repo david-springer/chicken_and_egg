@@ -120,11 +120,8 @@ Chicken.DID_DIE_NOTIFICATION = 'didDieNotification';
  * The origin in world coordinates of the chicken.
  * @type {Box2D.Common.Math.b2Vec2}
  */
-Chicken.CHICKEN_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.03);
-// The chicken image is 873 x 551 points. Size the final image so it is 50cm wide and
-// preserves aspect ratio.
-// TODO(daves): Figure out how to get the image dims from the Image object.
-Chicken.CHICKEN_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.5, 0.5 * (551.0 / 873.0));
+Chicken.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.70, 2.03);
+Chicken.IMAGE_WIDTH = 0.5;
 
 /**
  * Accessors and mutators.
@@ -299,8 +296,19 @@ Chicken.prototype._layEgg = function() {
   this._water = 0.0;
   NotificationDefaultCenter().postNotification(Chicken.DID_LAY_EGG_NOTIFICATION, this);
   this._eggCount--;
+  this._setViewEggCount(this._eggCount);
   if (this._eggCount == 0) {
     NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
+  }
+}
+
+/**
+ * Set the egg count for the view.
+ * @private
+ */
+Chicken.prototype._setViewEggCount = function(eggCount) {
+  if (this.view) {
+    this.view.eggCount = eggCount;
   }
 }
 
@@ -317,33 +325,10 @@ Chicken.prototype.canDraw = function() {
  * @override
  */
 Chicken.prototype.loadView = function(simulation) {
-  var chickenView = new ImageView();
-  chickenView.setOrigin(Chicken.CHICKEN_IMAGE_ORIGIN);
-  chickenView.setSize(Chicken.CHICKEN_IMAGE_SIZE);
-  chickenView.loadImage("./img/chicken.png");
+  var chickenView = new ChickenView();
+  chickenView.setOrigin(Chicken.IMAGE_ORIGIN);
+  chickenView.setWidth(Chicken.IMAGE_WIDTH);
+  chickenView.init();
   this.view = chickenView;
-}
-
-/**
- * The chicken reports stats.
- * @override
- */
-Chicken.prototype.hasStats = function() {
-  return true;
-}
-
-/**
- * Return the display name.
- * @override
- */
-Chicken.prototype.displayName = function() {
-  return "Eggs to Lay:";  // TODO(daves): localize this?
-}
-
-/**
- * Return the stats for this game piece.
- * @override
- */
-Chicken.prototype.statsDisplayString = function() {
-  return this._eggCount.toString();
+  this._setViewEggCount(this._eggCount);
 }
