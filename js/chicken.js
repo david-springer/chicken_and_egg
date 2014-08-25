@@ -317,7 +317,7 @@ Chicken.prototype.loadView = function(simulation) {
   var chickenView = new ChickenView();
   chickenView.setOrigin(Chicken.IMAGE_ORIGIN);
   chickenView.setWidth(Chicken.IMAGE_WIDTH);
-  chickenView.loadImage("./img/chicken.png");
+  chickenView.init();
   this.view = chickenView;
 }
 
