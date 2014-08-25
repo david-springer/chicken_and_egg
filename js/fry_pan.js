@@ -202,10 +202,10 @@ FryPan.prototype.addFixturesToBody = function(simulation, body) {
  * @override
  */
 FryPan.prototype.loadView = function(simulation) {
-  var frypanView = new ImageView();
+  var frypanView = new FryPanView();
   frypanView.setOrigin(FryPan.IMAGE_ORIGIN);
   frypanView.setWidth(FryPan.IMAGE_WIDTH);
-  frypanView.loadImage("./img/frypan.png");
+  frypanView.init();
   this.view = frypanView;
 }
 
