@@ -127,21 +127,7 @@ test("Should Lay Egg", function() {
 
 test("Has Stats", function() {
   var testChicken = new Chicken();
-  ok(testChicken.hasStats());
-});
-
-test("Display Name", function() {
-  var testChicken = new Chicken();
-  ok(testChicken.displayName() !== "<unnamed>");
-});
-
-test("Stats Display String", function() {
-  var testChicken = new Chicken();
-  equal(testChicken.statsDisplayString(), Chicken.Constants.MAX_EGG_COUNT.toString());
-  testChicken.setEggCount(12);
-  equal(testChicken.statsDisplayString(), "12");
-  testChicken.setEggCount(0);
-  equal(testChicken.statsDisplayString(), "0");
+  equal(false, testChicken.hasStats());
 });
 
 /*
