@@ -296,6 +296,9 @@ Chicken.prototype._layEgg = function() {
   this._water = 0.0;
   NotificationDefaultCenter().postNotification(Chicken.DID_LAY_EGG_NOTIFICATION, this);
   this._eggCount--;
+  if (this.view) {
+    this.view.eggCount = this._eggCount;
+  }
   if (this._eggCount == 0) {
     NotificationDefaultCenter().postNotification(Chicken.DID_DIE_NOTIFICATION, this);
   }

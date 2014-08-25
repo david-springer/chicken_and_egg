@@ -35,22 +35,26 @@ ChickenView.prototype.constructor = ChickenView;
 
 ChickenView.prototype.init = function() {
   this._chickenImage.loadImage("./img/chicken.png");
+  this._eggImage.loadImage("./img/egg.png");
   // TODO(daves): Load egg image.
 }
 
 ChickenView.prototype.setOrigin = function(origin) {
   this._chickenImage.setOrigin(origin);
+  this._eggImage.setOrigin(origin);
 }
 
 ChickenView.prototype.setWidth = function(width) {
   this._chickenImage.setWidth(width);
+  this._eggImage.setWidth(width / 8.0);
 }
 
 ChickenView.prototype.canDraw = function() {
-  return this._chickenImage.canDraw();  // && this._eggImage.canDraw();
+  return this._chickenImage.canDraw() && this._eggImage.canDraw();
 }
 
 ChickenView.prototype.draw = function(ctx, body) {
   this._chickenImage.draw(ctx, body);
   // TODO(daves): Draw the remaining eggs.
+  this._eggImage.draw(ctx, body);
 }
