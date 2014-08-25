@@ -37,10 +37,7 @@ HoseBib.ON_CLICK_NOTIFICATION = 'hoseBibOnClickNotification';
  * @type {Box2D.Common.Math.b2Vec2}
  */
 HoseBib.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(0.37, 2.35);
-// The chicken image is 80 x 83 points. Size the final image so it is 15cm wide and
-// preserves aspect ratio.
-// TODO(daves): Figure out how to get the image dims from the Image object.
-HoseBib.IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.15, 0.15 * (83.0 / 80.0));
+HoseBib.IMAGE_WIDTH = 0.15;
 
 /**
  * Set the enabled bit. This changes the presentation layer, too.
@@ -68,10 +65,11 @@ HoseBib.prototype.isPointInside = function(worldMouse) {
   if (!this._enabled) {
     return false;
   }
+  var imageWorldSize = this.view.getWorldSize();
   var x0 = HoseBib.IMAGE_ORIGIN.x;
-  var x1 = HoseBib.IMAGE_ORIGIN.x + HoseBib.IMAGE_SIZE.x;
+  var x1 = HoseBib.IMAGE_ORIGIN.x + imageWorldSize.x;
   var y0 = HoseBib.IMAGE_ORIGIN.y;
-  var y1 = HoseBib.IMAGE_ORIGIN.y + HoseBib.IMAGE_SIZE.y;
+  var y1 = HoseBib.IMAGE_ORIGIN.y + imageWorldSize.y;
   return worldMouse.x >= x0 && worldMouse.x <= x1 &&
       worldMouse.y >= y0 && worldMouse.y <= y1;
 }
@@ -100,7 +98,7 @@ HoseBib.prototype.canDraw = function() {
 HoseBib.prototype.loadView = function(simulation) {
   var hoseBibView = new HoseBibView();
   hoseBibView.setOrigin(HoseBib.IMAGE_ORIGIN);
-  hoseBibView.setSize(HoseBib.IMAGE_SIZE);
+  hoseBibView.setWidth(HoseBib.IMAGE_WIDTH);
   hoseBibView.loadImage("./img/hose_bib.png");
   this.view = hoseBibView;
   this.setEnabled(this._enabled);

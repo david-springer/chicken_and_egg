@@ -6,7 +6,8 @@
 /**
  * @fileoverview  The ImageView object. Draws an image at a point specified in world
  * coordinates. Images drawn using this class are inverted in Y from the <CANVAS>
- * elements. That is, Y increases going up instead of down.
+ * elements. That is, Y increases going up instead of down. When scaling is used, the
+ * aspect ratio of the image is preserved.
  * Requires: Box2d, BodyView.
  */
 
@@ -53,6 +54,8 @@ ImageView.prototype.loadImage = function(imageUrl) {
   this._image = null;
   this._image = new Image();
   var onImageLoad = function() {
+    var aspectRatio = this._image.height / this._image.width;
+    this._imageSize.y = this._imageSize.x * aspectRatio;
     this._isImageLoaded = true;
   }
   this._image.onload = onImageLoad.bind(this);
@@ -67,10 +70,28 @@ ImageView.prototype.setOrigin = function(origin) {
 }
 
 /**
- * Set the size of the image in world coordinates.
+ * Get the origin of the image in world coordinates. Returns a copy of the object which
+ * can be changed by the caller without any effect on this object.
  */
-ImageView.prototype.setSize = function(size) {
-  this._imageSize = size;
+ImageView.prototype.getWorldOrigin = function() {
+  return this._imageOrigin.Copy();
+}
+
+/**
+ * Set the width of the image in world coordinates. The height is determined so that
+ * the aspect ratio of the original image is preserved.
+ */
+ImageView.prototype.setWidth = function(width) {
+  this._imageSize.x = width;
+}
+
+/**
+ * Get the size of the image in world coordinates. The height value is not valid until
+ * after the image is fully loaded. Returns a copy of the object which can be changed
+ * by the caller without any effect on this object.
+ */
+ImageView.prototype.getWorldSize = function() {
+  return this._imageSize.Copy();
 }
 
 /**

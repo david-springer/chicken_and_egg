@@ -33,10 +33,8 @@ EggCarton.prototype.constructor = EggCarton;
  * @type {Box2D.Common.Math.b2Vec2}
  */
 EggCarton.EGG_CARTON_ORIGIN = new Box2D.Common.Math.b2Vec2(1.70, 0.70);
-EggCarton.EGG_CARTON_IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.40, 0.45);
-// The egg carton image is 275 x 211 points. Size the final image so it is 45cm wide and
-// preserves aspect ratio.
-EggCarton.EGG_CARTON_IMAGE_SIZE = new Box2D.Common.Math.b2Vec2(0.65, 0.65 * (211.0 / 275.0));
+EggCarton.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(1.40, 0.45);
+EggCarton.IMAGE_WIDTH = 0.65;
 
 /**
  * The maximum number of eggs that can go in a crate.
@@ -138,8 +136,8 @@ EggCarton.prototype.addFixturesToBody = function(simulation, body) {
  */
 EggCarton.prototype.loadView = function(simulation) {
   var cartonView = new ImageView();
-  cartonView.setOrigin(EggCarton.EGG_CARTON_IMAGE_ORIGIN);
-  cartonView.setSize(EggCarton.EGG_CARTON_IMAGE_SIZE);
+  cartonView.setOrigin(EggCarton.IMAGE_ORIGIN);
+  cartonView.setWidth(EggCarton.IMAGE_WIDTH);
   cartonView.loadImage("./img/eggcarton.png");
   this.view = cartonView;
 }
