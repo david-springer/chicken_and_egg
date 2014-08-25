@@ -30,7 +30,7 @@ ChickenView = function() {
    */
   this.eggCount = 0;
 }
-ChickenView.prototype = new ImageView();
+ChickenView.prototype = new BodyView();
 ChickenView.prototype.constructor = ChickenView;
 
 /**

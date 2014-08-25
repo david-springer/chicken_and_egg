@@ -64,6 +64,16 @@ EggCarton.prototype.setEggCount = function(eggCount) {
 }
 
 /**
+ * Set the egg count in the associated view.
+ * @private
+ */
+EggCarton.prototype._setViewEggCount = function() {
+  if (this.view) {
+    this.view.eggCount = this._eggCount;
+  }
+}
+
+/**
  * Add an egg to the crate. If the crate is full, does nothing and returns {@code false}.
  * @return {boolean} whether the egg was successfully added.
  */
@@ -72,6 +82,7 @@ EggCarton.prototype.addEgg = function() {
     return false;
   }
   this._eggCount++;
+  this._setViewEggCount(this._eggCount);
   if (this._eggCount == EggCarton.MAX_EGG_COUNT) {
     NotificationDefaultCenter().postNotification(
         EggCarton.DID_FILL_CARTON_NOTIFICATION, this);
@@ -84,6 +95,7 @@ EggCarton.prototype.addEgg = function() {
  */
 EggCarton.prototype.reset = function() {
   this._eggCount = 0;
+  this._setViewEggCount(this._eggCount);
 }
 
 /**
@@ -135,33 +147,10 @@ EggCarton.prototype.addFixturesToBody = function(simulation, body) {
  * @override
  */
 EggCarton.prototype.loadView = function(simulation) {
-  var cartonView = new ImageView();
+  var cartonView = new EggCartonView();
   cartonView.setOrigin(EggCarton.IMAGE_ORIGIN);
   cartonView.setWidth(EggCarton.IMAGE_WIDTH);
-  cartonView.loadImage("./img/eggcarton.png");
+  cartonView.init();
   this.view = cartonView;
-}
-
-/**
- * The egg carton reports stats.
- * @override
- */
-EggCarton.prototype.hasStats = function() {
-  return true;
-}
-
-/**
- * Return the display name.
- * @override
- */
-EggCarton.prototype.displayName = function() {
-  return "Egg Carton";  // TODO(daves): localize this?
-}
-
-/**
- * Return the stats for this game piece.
- * @override
- */
-EggCarton.prototype.statsDisplayString = function() {
-  return this._eggCount.toString();
+  this._setViewEggCount(this._eggCount);
 }
