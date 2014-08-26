@@ -101,6 +101,7 @@ FryPan.prototype.addEgg = function(egg) {
       return false;
   }
   this._eggs.push({uuid: eggUuid, fryingTime: 0.0});
+  this._setViewEggCount(this.eggCount());
   return true;
 }
 
@@ -142,7 +143,18 @@ FryPan.prototype._fryEggsWithUuids = function(uuids) {
         break;
       }
     }
+    this._setViewEggCount(this.eggCount());
     NotificationDefaultCenter().postNotification(FryPan.DID_FRY_EGG_NOTIFICATION, this);
+  }
+}
+
+/**
+ * Set the egg count in the associated view.
+ * @private
+ */
+FryPan.prototype._setViewEggCount = function(eggCount) {
+  if (this.view) {
+    this.view.eggCount = eggCount;
   }
 }
 
@@ -207,6 +219,7 @@ FryPan.prototype.loadView = function(simulation) {
   frypanView.setWidth(FryPan.IMAGE_WIDTH);
   frypanView.init();
   this.view = frypanView;
+  this._setViewEggCount(this.eggCount());
 }
 
 /**
