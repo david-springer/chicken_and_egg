@@ -33,6 +33,13 @@ FryPan = function() {
    * @private
    */
   this._eggs = new Array();
+  /**
+   * Index of the current egg image. Implemented as a ring, starting with 1 and ending
+   * with MAX_EGG_COUNT.
+   * @type {number}
+   * @private
+   */
+  this._eggImageIndex = 1;
 }
 FryPan.prototype = new GamePiece();
 FryPan.prototype.constructor = Nest;
@@ -100,8 +107,7 @@ FryPan.prototype.addEgg = function(egg) {
       // Egg already exists.
       return false;
   }
-  this._eggs.push({uuid: eggUuid, fryingTime: 0.0});
-  this._setViewEggCount(this.eggCount());
+  this._eggs.push(this._createFriedEgg(eggUuid));
   return true;
 }
 
@@ -143,16 +149,24 @@ FryPan.prototype._fryEggsWithUuids = function(uuids) {
         break;
       }
     }
-    this._setViewEggCount(this.eggCount());
     NotificationDefaultCenter().postNotification(FryPan.DID_FRY_EGG_NOTIFICATION, this);
   }
 }
 
 /**
- * Set the egg count in the associated view.
+ * Create an object used to track the egg as it fries.
  * @private
  */
-FryPan.prototype._setViewEggCount = function(eggCount) {
+FryPan.prototype._createFriedEgg = function(eggUuid) {
+  var friedEggImage = new ImageView();
+  friedEggImage.setOrigin(FryPan.IMAGE_ORIGIN);
+  friedEggImage.setWidth(FryPan.IMAGE_WIDTH);
+  friedEggImage.loadImage("./img/fried_egg" + this._eggImageIndex + ".png");
+  this._eggImageIndex += 1;
+  if (this._eggImageIndex > FryPan.MAX_EGG_COUNT) {
+    this._eggImageIndex = 1;
+  }
+  return {uuid: eggUuid, fryingTime: 0.0, eggImage: friedEggImage};
 }
 
 /**
@@ -216,7 +230,21 @@ FryPan.prototype.loadView = function(simulation) {
   frypanView.setWidth(FryPan.IMAGE_WIDTH);
   frypanView.loadImage("./img/frypan.png");
   this.view = frypanView;
-  this._setViewEggCount(this.eggCount());
+}
+
+/**
+ * Draw the frypan and any frying eggs.
+ * @override
+ */
+FryPan.prototype.draw = function(ctx, simulation) {
+  if (!this.canDraw()) {
+    return;
+  }
+  var b = this.body();
+  this.view.draw(ctx, b);
+  for (var eggIdx = 0; eggIdx < this._eggs.length; ++eggIdx) {
+    this._eggs[eggIdx].eggImage.draw(ctx, b);
+  }
 }
 
 /**
