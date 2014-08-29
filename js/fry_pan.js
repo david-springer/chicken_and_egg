@@ -153,9 +153,6 @@ FryPan.prototype._fryEggsWithUuids = function(uuids) {
  * @private
  */
 FryPan.prototype._setViewEggCount = function(eggCount) {
-  if (this.view) {
-    this.view.eggCount = eggCount;
-  }
 }
 
 /**
@@ -214,10 +211,10 @@ FryPan.prototype.addFixturesToBody = function(simulation, body) {
  * @override
  */
 FryPan.prototype.loadView = function(simulation) {
-  var frypanView = new FryPanView();
+  var frypanView = new ImageView();
   frypanView.setOrigin(FryPan.IMAGE_ORIGIN);
   frypanView.setWidth(FryPan.IMAGE_WIDTH);
-  frypanView.init();
+  frypanView.loadImage("./img/frypan.png");
   this.view = frypanView;
   this._setViewEggCount(this.eggCount());
 }
