@@ -125,6 +125,7 @@ FryPan.prototype.processGameTick = function(gameTimeNow, gameTimeDelta) {
   for (var i = 0; i < this._eggs.length; ++i) {
     var egg = this._eggs[i];
     egg.fryingTime += gameTimeDelta;
+    egg.eggImage.friedFraction = Math.min(egg.fryingTime / this._fryInterval, 1.0);
     if (egg.fryingTime >= this._fryInterval) {
       uuids.push(egg.uuid);
     }
@@ -158,7 +159,7 @@ FryPan.prototype._fryEggsWithUuids = function(uuids) {
  * @private
  */
 FryPan.prototype._createFriedEgg = function(eggUuid) {
-  var friedEggImage = new ImageView();
+  var friedEggImage = new FriedEggView();
   friedEggImage.setOrigin(FryPan.IMAGE_ORIGIN);
   friedEggImage.setWidth(FryPan.IMAGE_WIDTH);
   friedEggImage.loadImage("./img/fried_egg" + this._eggImageIndex + ".png");

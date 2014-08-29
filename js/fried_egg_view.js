@@ -15,7 +15,7 @@
  * @constructor
  */
 FriedEggView = function() {
-  BodyView.call(this);
+  ImageView.call(this);
   /**
    * The fried amount, expressed as a value between 0 and 1. The opacity of the egg is
    * determined by this value.
@@ -24,7 +24,7 @@ FriedEggView = function() {
    */
   this.friedFraction = 1.0;
 }
-FriedEggView.prototype = new BodyView();
+FriedEggView.prototype = new ImageView();
 FriedEggView.prototype.constructor = FriedEggView;
 
 /**
