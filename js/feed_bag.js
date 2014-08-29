@@ -110,27 +110,3 @@ FeedBag.prototype.loadView = function(simulation) {
   bagView.loadImage("./img/feed_bag.png");
   this.view = bagView;
 }
-
-/**
- * The feed bag reports stats.
- * @override
- */
-FeedBag.prototype.hasStats = function() {
-  return true;
-}
-
-/**
- * Return the display name of this game piece.
- * @override
- */
-FeedBag.prototype.displayName = function() {
-  return "Feed Left";  // TODO(daves): localize this?
-}
-
-/**
- * Return the stats for this game piece.
- * @override
- */
-FeedBag.prototype.statsDisplayString = function() {
-  return this._feed.toFixed() + "g";
-}

@@ -131,27 +131,3 @@ WaterBottle.prototype.loadView = function(simulation) {
   bottleView.loadAllImages();
   this.view = bottleView;
 }
-
-/**
- * The water bottle reports stats.
- * @override
- */
-WaterBottle.prototype.hasStats = function() {
-  return true;
-}
-
-/**
- * Return the display name of this game piece.
- * @override
- */
-WaterBottle.prototype.displayName = function() {
-  return "Water Level";  // TODO(daves): localize this?
-}
-
-/**
- * Return the stats for this game piece.
- * @override
- */
-WaterBottle.prototype.statsDisplayString = function() {
-  return this._waterLevel.toFixed() + "ml";
-}
