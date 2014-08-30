@@ -23,8 +23,8 @@ A hen can lay at most 20 eggs. You can drop an egg in the nest and hatch a new p
 
 TODO
 ====
-  Add pullets and pullet feed/water consumption.
-  Fix up egg frying graphics. Need a more obvious timing sequence.
-  Add farmer graphics.
-  Add dead hen graphics (a roasted chicken? a can of soup?).
-  Add sound.
+1. Add pullets and pullet feed/water consumption.
+2. Fix up egg frying graphics. Need a more obvious timing sequence.
+3. Add farmer graphics.
+4. Add dead hen graphics (a roasted chicken? a can of soup?).
+5. Add sound.
