@@ -73,11 +73,9 @@ test("Chicken Died With Pullets", function() {
   equal(testChickenAndEgg._chicken.uuid(), testPullet.uuid());
   equal(testPullet.feedBag.uuid(), fakeFeedBag.uuid());
   equal(testPullet.waterBottle.uuid(), fakeWaterBottle.uuid());
-  // No more pullets should result in game over.
   testChicken = testPullet;
   testChickenAndEgg._chickenDied(testChicken);
   equal(testChickenAndEgg._pullets.length, 0);
-  equal(testChickenAndEgg._isRunning, false);
 });
 
 test("Convert To Sim Coords", function() {

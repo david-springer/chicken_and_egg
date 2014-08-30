@@ -509,7 +509,6 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
  */
 ChickenAndEgg.prototype._chickenDied = function(sender) {
   if (this._pullets.length == 0) {
-    this._isRunning = false;
     return;
   }
   var chicken = this._pullets.pop();
