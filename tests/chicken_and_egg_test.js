@@ -44,8 +44,8 @@ test("Chicken Died With Pullets", function() {
   var testChicken = new Chicken();
   testChicken.feedBag = fakeFeedBag;
   testChicken.waterBottle = fakeWaterBottle;
-  testChickenAndEgg._chicken = testChicken;
-  testChickenAndEgg._gamePieces.push(testChickenAndEgg._chicken);
+  testChickenAndEgg._hen = testChicken;
+  testChickenAndEgg._gamePieces.push(testChickenAndEgg._hen);
   // Add a pullet.
   testChickenAndEgg._eggHatched({});  // Hatch from a fake nest.
   equal(testChickenAndEgg._pullets.length, 1);
@@ -56,13 +56,13 @@ test("Chicken Died With Pullets", function() {
       testChickenAndEgg._gamePieces, testChicken.uuid()) >= 0);
   equal(testChickenAndEgg._indexOfGamePieceWithUuid(
       testChickenAndEgg._gamePieces, testPullet.uuid()), -1);
-  equal(testChickenAndEgg._chicken.uuid(), testChicken.uuid());
-  ok(testChickenAndEgg._chicken.uuid() !== testPullet.uuid());
+  equal(testChickenAndEgg._hen.uuid(), testChicken.uuid());
+  ok(testChickenAndEgg._hen.uuid() !== testPullet.uuid());
   equal(testPullet.feedBag, null);
   equal(testPullet.waterBottle, null);
   // Kill the original hen. This should cause a CHICKEN_DID_DIE notification, which
   // should in turn replace the hen with the pullet.
-  testChickenAndEgg._chickenDied(testChicken);
+  testChickenAndEgg._henDied(testChicken);
   // Verify the game pieces.
   testChickenAndEgg._deallocateInactiveGamePieces();
   equal(testChickenAndEgg._indexOfGamePieceWithUuid(
@@ -70,11 +70,11 @@ test("Chicken Died With Pullets", function() {
   ok(testChickenAndEgg._indexOfGamePieceWithUuid(
       testChickenAndEgg._gamePieces, testPullet.uuid()) >= 0);
   equal(testChickenAndEgg._pullets.length, 0);
-  equal(testChickenAndEgg._chicken.uuid(), testPullet.uuid());
+  equal(testChickenAndEgg._hen.uuid(), testPullet.uuid());
   equal(testPullet.feedBag.uuid(), fakeFeedBag.uuid());
   equal(testPullet.waterBottle.uuid(), fakeWaterBottle.uuid());
   testChicken = testPullet;
-  testChickenAndEgg._chickenDied(testChicken);
+  testChickenAndEgg._henDied(testChicken);
   equal(testChickenAndEgg._pullets.length, 0);
 });
 

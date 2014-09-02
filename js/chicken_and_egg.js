@@ -210,12 +210,12 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._sluice);
   this._coopDoor = new CoopDoor();
   this._gamePieces.push(this._coopDoor);
-  this._chicken = new Chicken();
-  this._chicken.feedBag = new FeedBag();
-  this._chicken.waterBottle = new WaterBottle();
-  this._gamePieces.push(this._chicken.feedBag);
-  this._gamePieces.push(this._chicken.waterBottle);
-  this._gamePieces.push(this._chicken);
+  this._hen = new Hen();
+  this._hen.feedBag = new FeedBag();
+  this._hen.waterBottle = new WaterBottle();
+  this._gamePieces.push(this._hen.feedBag);
+  this._gamePieces.push(this._hen.waterBottle);
+  this._gamePieces.push(this._hen);
   this._fryPan = new FryPan();
   this._gamePieces.push(this._fryPan);
   this._eggCarton = new EggCarton();
@@ -270,7 +270,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   
   // Refill the feed bag when the egg carton is filled.
   var refillFeed = function(eggCarton) {
-    this._chicken.feedBag.refill();
+    this._hen.feedBag.refill();
     eggCarton.reset();
   }
   defaultCenter.addNotificationObserver(
@@ -279,7 +279,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
-      Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
+      Chicken.DID_DIE_NOTIFICATION, this._henDied.bind(this));
 
   var refillLevel = function(waterBottle) {
     this._hoseBib.setEnabled(true);
@@ -288,7 +288,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       WaterBottle.REFILL_LEVEL_NOTIFICATION, refillLevel.bind(this));
 
   var refillWaterBottle = function() {
-    this._chicken.waterBottle.refill();
+    this._hen.waterBottle.refill();
   }
   defaultCenter.addNotificationObserver(
       HoseBib.ON_CLICK_NOTIFICATION, refillWaterBottle.bind(this));
@@ -495,7 +495,7 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
  * @private
  */
 ChickenAndEgg.prototype._eggHatched = function(nest) {
-  // Don't add pullets as game pieces until the become active layers. (See _chickenDied()
+  // Don't add pullets as game pieces until the become active layers. (See _henDied()
   // below.)
   this._pullets.push(new Chicken());
   $('#pullet_stats').text(this._pullets.length.toString());
@@ -507,18 +507,18 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
  * @param {Chicken} chicken The Chicken that sent the notification.
  * @private
  */
-ChickenAndEgg.prototype._chickenDied = function(sender) {
+ChickenAndEgg.prototype._henDied = function(sender) {
   if (this._pullets.length == 0) {
     return;
   }
   var chicken = this._pullets.pop();
   $('#pullet_stats').text(this._pullets.length.toString());
-  chicken.feedBag = this._chicken.feedBag;
-  chicken.waterBottle = this._chicken.waterBottle;
-  this.releaseGamePieceWithUuid(this._chicken.uuid());
-  this._chicken = chicken;
-  this._gamePieces.push(this._chicken);
-  this._activateGamePieces([this._chicken]);
+  chicken.feedBag = this._hen.feedBag;
+  chicken.waterBottle = this._hen.waterBottle;
+  this.releaseGamePieceWithUuid(this._hen.uuid());
+  this._hen = chicken;
+  this._gamePieces.push(this._hen);
+  this._activateGamePieces([this._hen]);
 }
 
 /**
