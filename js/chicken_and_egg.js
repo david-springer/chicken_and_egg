@@ -259,7 +259,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     return false;
   };
   defaultCenter.addNotificationObserver(
-      Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
+      Hen.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
 
   // Feed the farmer whenever an egg is fried.
   var feedFarmer = function(fryPan) {
@@ -279,7 +279,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
-      Chicken.DID_DIE_NOTIFICATION, this._henDied.bind(this));
+      Hen.DID_DIE_NOTIFICATION, this._henDied.bind(this));
 
   var refillLevel = function(waterBottle) {
     this._hoseBib.setEnabled(true);
@@ -497,14 +497,14 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
 ChickenAndEgg.prototype._eggHatched = function(nest) {
   // Don't add pullets as game pieces until the become active layers. (See _henDied()
   // below.)
-  this._pullets.push(new Chicken());
+  this._pullets.push(new Hen());
   $('#pullet_stats').text(this._pullets.length.toString());
 }
 
 /**
  * When the laying hen dies, replace it from the list of reserve pullets. When all the
  * pullets are gone, the game is over when the current laying hen dies.
- * @param {Chicken} chicken The Chicken that sent the notification.
+ * @param {Chicken} sender The Hen that sent the notification.
  * @private
  */
 ChickenAndEgg.prototype._henDied = function(sender) {
