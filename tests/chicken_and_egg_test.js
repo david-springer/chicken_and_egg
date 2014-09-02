@@ -41,10 +41,10 @@ test("Chicken Died With Pullets", function() {
   testChickenAndEgg._world = fakeWorld;
   var fakeFeedBag = new FakeFeedBag();
   var fakeWaterBottle = new FakeWaterBottle();
-  var testChicken = new Chicken();
-  testChicken.feedBag = fakeFeedBag;
-  testChicken.waterBottle = fakeWaterBottle;
-  testChickenAndEgg._hen = testChicken;
+  var testHen = new Hen();
+  testHen.feedBag = fakeFeedBag;
+  testHen.waterBottle = fakeWaterBottle;
+  testChickenAndEgg._hen = testHen;
   testChickenAndEgg._gamePieces.push(testChickenAndEgg._hen);
   // Add a pullet.
   testChickenAndEgg._eggHatched({});  // Hatch from a fake nest.
@@ -53,28 +53,27 @@ test("Chicken Died With Pullets", function() {
   // Verify the game pieces.
   testChickenAndEgg._deallocateInactiveGamePieces();
   ok(testChickenAndEgg._indexOfGamePieceWithUuid(
-      testChickenAndEgg._gamePieces, testChicken.uuid()) >= 0);
-  equal(testChickenAndEgg._indexOfGamePieceWithUuid(
-      testChickenAndEgg._gamePieces, testPullet.uuid()), -1);
-  equal(testChickenAndEgg._hen.uuid(), testChicken.uuid());
+      testChickenAndEgg._gamePieces, testHen.uuid()) >= 0);
+  ok(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testPullet.uuid()) >= 0);
+  equal(testChickenAndEgg._hen.uuid(), testHen.uuid());
   ok(testChickenAndEgg._hen.uuid() !== testPullet.uuid());
-  equal(testPullet.feedBag, null);
-  equal(testPullet.waterBottle, null);
+  equal(testPullet.feedBag.uuid(), fakeFeedBag.uuid());
+  equal(testPullet.waterBottle.uuid(), fakeWaterBottle.uuid());
   // Kill the original hen. This should cause a CHICKEN_DID_DIE notification, which
   // should in turn replace the hen with the pullet.
-  testChickenAndEgg._henDied(testChicken);
+  testChickenAndEgg._henDied(testHen);
   // Verify the game pieces.
   testChickenAndEgg._deallocateInactiveGamePieces();
   equal(testChickenAndEgg._indexOfGamePieceWithUuid(
-      testChickenAndEgg._gamePieces, testChicken.uuid()), -1);
-  ok(testChickenAndEgg._indexOfGamePieceWithUuid(
-      testChickenAndEgg._gamePieces, testPullet.uuid()) >= 0);
+      testChickenAndEgg._gamePieces, testHen.uuid()), -1);
+  equal(testChickenAndEgg._indexOfGamePieceWithUuid(
+      testChickenAndEgg._gamePieces, testPullet.uuid()), -1);
   equal(testChickenAndEgg._pullets.length, 0);
-  equal(testChickenAndEgg._hen.uuid(), testPullet.uuid());
-  equal(testPullet.feedBag.uuid(), fakeFeedBag.uuid());
-  equal(testPullet.waterBottle.uuid(), fakeWaterBottle.uuid());
-  testChicken = testPullet;
-  testChickenAndEgg._henDied(testChicken);
+  testHen = testChickenAndEgg._hen;
+  equal(testHen.feedBag.uuid(), fakeFeedBag.uuid());
+  equal(testHen.waterBottle.uuid(), fakeWaterBottle.uuid());
+  testChickenAndEgg._henDied(testHen);
   equal(testChickenAndEgg._pullets.length, 0);
 });
 

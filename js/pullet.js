@@ -16,6 +16,17 @@
  */
 Pullet = function() {
   Chicken.call(this);
+  // Pullets eat 1/2 as much as a full-sized chicken, and consume at 1/2 the rate.
+  this.constants = {
+      MAX_FEED: 30.0,  // Maximum amount of feed.
+      MAX_WATER: 60.0,  // Maximum amount of water.
+      MIN_PECK_VOLUME: 10.0,
+      MAX_PECK_VOLUME: 15.0,
+      CHEW_RATE: 7.0,  // grams per second
+      MIN_DRINK_VOLUME: 15.0,
+      MAX_DRINK_VOLUME: 30.0,
+      DRINK_RATE: 12.0  // ml per second
+  };
 }
 Pullet.prototype = new Chicken();
 Pullet.prototype.constructor = Chicken;

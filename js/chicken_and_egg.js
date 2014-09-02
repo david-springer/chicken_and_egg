@@ -118,6 +118,12 @@ ChickenAndEgg.Box2DConsts = {
 };
 
 /**
+ * Maximum number of pullets that can be alive at any one time.
+ * @type {number}
+ */
+ChickenAndEgg.MAX_PULLET_COUNT = 6;
+
+/**
  * Constants used to refer to the DOM.
  * @enum {string}
  * @private
@@ -245,7 +251,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
-  var didLayEgg = function(chicken) {
+  var didLayEgg = function(hen) {
     var skew_rand = Math.pow(Math.random(), 0.5);
     var dims = {
       ovality: (skew_rand * (0.25 - 0.0)) + 0.0,
@@ -490,14 +496,20 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
 }
 
 /**
- * Add a chicken to the list of reserve pullets every time an egg hatches.
+ * Add a pullet to the list of reserve pullets every time an egg hatches.
  * @param {Nest} nest The Nest that sent the notification.
  * @private
  */
 ChickenAndEgg.prototype._eggHatched = function(nest) {
-  // Don't add pullets as game pieces until the become active layers. (See _henDied()
-  // below.)
-  this._pullets.push(new Hen());
+  if (this._pullets.length >= ChickenAndEgg.MAX_PULLET_COUNT) {
+    return;
+  }
+  var pullet = new Pullet();
+  pullet.feedBag = this._hen.feedBag;
+  pullet.waterBottle = this._hen.waterBottle;
+  this._pullets.push(pullet);
+  this._gamePieces.push(pullet);
+  this._activateGamePieces([pullet]);
   $('#pullet_stats').text(this._pullets.length.toString());
 }
 
@@ -511,12 +523,14 @@ ChickenAndEgg.prototype._henDied = function(sender) {
   if (this._pullets.length == 0) {
     return;
   }
-  var chicken = this._pullets.pop();
+  var pullet = this._pullets.pop();
+  this.releaseGamePieceWithUuid(pullet.uuid());
+  var hen = new Hen();
   $('#pullet_stats').text(this._pullets.length.toString());
-  chicken.feedBag = this._hen.feedBag;
-  chicken.waterBottle = this._hen.waterBottle;
+  hen.feedBag = this._hen.feedBag;
+  hen.waterBottle = this._hen.waterBottle;
   this.releaseGamePieceWithUuid(this._hen.uuid());
-  this._hen = chicken;
+  this._hen = hen;
   this._gamePieces.push(this._hen);
   this._activateGamePieces([this._hen]);
 }
