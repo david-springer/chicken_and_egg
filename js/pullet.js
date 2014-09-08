@@ -11,10 +11,12 @@
 
 /**
  * Constructor for the Pullet.
+ * @param {number} index The index of this pullet. Used to determine which pullet image
+ *     to load.
  * @constructor
  * @extends {Chicken}
  */
-Pullet = function() {
+Pullet = function(index) {
   Chicken.call(this);
   // Pullets eat 1/2 as much as a full-sized chicken, and consume at 1/2 the rate.
   this.constants = {
@@ -27,9 +29,18 @@ Pullet = function() {
       MAX_DRINK_VOLUME: 30.0,
       DRINK_RATE: 12.0  // ml per second
   };
+  this._index = index || 1;
 }
 Pullet.prototype = new Chicken();
 Pullet.prototype.constructor = Chicken;
+
+/**
+ * The origin in world coordinates of the chicken.
+ * @type {Box2D.Common.Math.b2Vec2}
+ */
+Pullet.IMAGE_ORIGIN = new Box2D.Common.Math.b2Vec2(2.75, 0.25);
+Pullet.IMAGE_WIDTH = 0.6;
+
 
 /**
  * Eat ("peck") some feed. Adds to the internal total until the maximum feed has been
@@ -66,4 +77,24 @@ Pullet.prototype.drinkWater = function(waterVolume, waterBottle) {
   if (this._water >= this.constants.MAX_WATER) {
     this._water = 0.0;
   }
+}
+
+/**
+ * The pullet is drawable when the image gets loaded.
+ * @override
+ */
+Pullet.prototype.canDraw = function() {
+  return this.view != null && this.view.canDraw();
+}
+
+/**
+ * Load all the pullet views.
+ * @override
+ */
+Pullet.prototype.loadView = function(simulation) {
+  var pulletView = new ImageView();
+  pulletView.setOrigin(Pullet.IMAGE_ORIGIN);
+  pulletView.setWidth(Pullet.IMAGE_WIDTH);
+  pulletView.loadImage("./img/pullets" + (this._index) + ".png");
+  this.view = pulletView;
 }

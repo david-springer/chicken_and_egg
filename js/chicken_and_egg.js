@@ -504,7 +504,7 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
   if (this._pullets.length >= ChickenAndEgg.MAX_PULLET_COUNT) {
     return;
   }
-  var pullet = new Pullet();
+  var pullet = new Pullet(this._pullets.length + 1);
   pullet.feedBag = this._hen.feedBag;
   pullet.waterBottle = this._hen.waterBottle;
   this._pullets.push(pullet);
