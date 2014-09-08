@@ -234,11 +234,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   this._activateGamePieces(this._gamePieces);
 
-  // TODO(daves): remove this when the pullets can be viewed properly.
-  var tbodyElt = $('#game_stats_table').find('tbody');
-  tbodyElt.append('<tr><td>Pullets:</td>' +
-      '<td id=pullet_stats>' + 0 + '</td></tr>');
-
   // Set up all the game piece notifications.
   var defaultCenter = NotificationDefaultCenter();
 
@@ -510,7 +505,6 @@ ChickenAndEgg.prototype._eggHatched = function(nest) {
   this._pullets.push(pullet);
   this._gamePieces.push(pullet);
   this._activateGamePieces([pullet]);
-  $('#pullet_stats').text(this._pullets.length.toString());
 }
 
 /**
@@ -526,7 +520,6 @@ ChickenAndEgg.prototype._henDied = function(sender) {
   var pullet = this._pullets.pop();
   this.releaseGamePieceWithUuid(pullet.uuid());
   var hen = new Hen();
-  $('#pullet_stats').text(this._pullets.length.toString());
   hen.feedBag = this._hen.feedBag;
   hen.waterBottle = this._hen.waterBottle;
   this.releaseGamePieceWithUuid(this._hen.uuid());
