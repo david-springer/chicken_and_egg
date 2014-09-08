@@ -118,6 +118,12 @@ ChickenAndEgg.Box2DConsts = {
 };
 
 /**
+ * Maximum number of pullets that can be alive at any one time.
+ * @type {number}
+ */
+ChickenAndEgg.MAX_PULLET_COUNT = 6;
+
+/**
  * Constants used to refer to the DOM.
  * @enum {string}
  * @private
@@ -210,12 +216,12 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._gamePieces.push(this._sluice);
   this._coopDoor = new CoopDoor();
   this._gamePieces.push(this._coopDoor);
-  this._chicken = new Chicken();
-  this._chicken.feedBag = new FeedBag();
-  this._chicken.waterBottle = new WaterBottle();
-  this._gamePieces.push(this._chicken.feedBag);
-  this._gamePieces.push(this._chicken.waterBottle);
-  this._gamePieces.push(this._chicken);
+  this._hen = new Hen();
+  this._hen.feedBag = new FeedBag();
+  this._hen.waterBottle = new WaterBottle();
+  this._gamePieces.push(this._hen.feedBag);
+  this._gamePieces.push(this._hen.waterBottle);
+  this._gamePieces.push(this._hen);
   this._fryPan = new FryPan();
   this._gamePieces.push(this._fryPan);
   this._eggCarton = new EggCarton();
@@ -227,11 +233,6 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   this._hoseBib.setEnabled(false);
 
   this._activateGamePieces(this._gamePieces);
-
-  // TODO(daves): remove this when the pullets can be viewed properly.
-  var tbodyElt = $('#game_stats_table').find('tbody');
-  tbodyElt.append('<tr><td>Pullets:</td>' +
-      '<td id=pullet_stats>' + 0 + '</td></tr>');
 
   // Set up all the game piece notifications.
   var defaultCenter = NotificationDefaultCenter();
@@ -245,7 +246,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
 
   // Listen for the eggs to be laid. Create a new egg when this happens, and give it a
   // nudge so it rolls down the chute onto the sluice.
-  var didLayEgg = function(chicken) {
+  var didLayEgg = function(hen) {
     var skew_rand = Math.pow(Math.random(), 0.5);
     var dims = {
       ovality: (skew_rand * (0.25 - 0.0)) + 0.0,
@@ -259,7 +260,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
     return false;
   };
   defaultCenter.addNotificationObserver(
-      Chicken.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
+      Hen.DID_LAY_EGG_NOTIFICATION, didLayEgg.bind(this));
 
   // Feed the farmer whenever an egg is fried.
   var feedFarmer = function(fryPan) {
@@ -270,7 +271,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   
   // Refill the feed bag when the egg carton is filled.
   var refillFeed = function(eggCarton) {
-    this._chicken.feedBag.refill();
+    this._hen.feedBag.refill();
     eggCarton.reset();
   }
   defaultCenter.addNotificationObserver(
@@ -279,7 +280,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
   defaultCenter.addNotificationObserver(
       Nest.DID_HATCH_EGG_NOTIFICATION, this._eggHatched.bind(this));
   defaultCenter.addNotificationObserver(
-      Chicken.DID_DIE_NOTIFICATION, this._chickenDied.bind(this));
+      Hen.DID_DIE_NOTIFICATION, this._henDied.bind(this));
 
   var refillLevel = function(waterBottle) {
     this._hoseBib.setEnabled(true);
@@ -288,7 +289,7 @@ ChickenAndEgg.prototype.initWorld = function(canvas) {
       WaterBottle.REFILL_LEVEL_NOTIFICATION, refillLevel.bind(this));
 
   var refillWaterBottle = function() {
-    this._chicken.waterBottle.refill();
+    this._hen.waterBottle.refill();
   }
   defaultCenter.addNotificationObserver(
       HoseBib.ON_CLICK_NOTIFICATION, refillWaterBottle.bind(this));
@@ -490,35 +491,41 @@ ChickenAndEgg.prototype._convertToWorldCoordinates = function(x, y, canvas) {
 }
 
 /**
- * Add a chicken to the list of reserve pullets every time an egg hatches.
+ * Add a pullet to the list of reserve pullets every time an egg hatches.
  * @param {Nest} nest The Nest that sent the notification.
  * @private
  */
 ChickenAndEgg.prototype._eggHatched = function(nest) {
-  // Don't add pullets as game pieces until the become active layers. (See _chickenDied()
-  // below.)
-  this._pullets.push(new Chicken());
-  $('#pullet_stats').text(this._pullets.length.toString());
+  if (this._pullets.length >= ChickenAndEgg.MAX_PULLET_COUNT) {
+    return;
+  }
+  var pullet = new Pullet(this._pullets.length + 1);
+  pullet.feedBag = this._hen.feedBag;
+  pullet.waterBottle = this._hen.waterBottle;
+  this._pullets.push(pullet);
+  this._gamePieces.push(pullet);
+  this._activateGamePieces([pullet]);
 }
 
 /**
  * When the laying hen dies, replace it from the list of reserve pullets. When all the
  * pullets are gone, the game is over when the current laying hen dies.
- * @param {Chicken} chicken The Chicken that sent the notification.
+ * @param {Chicken} sender The Hen that sent the notification.
  * @private
  */
-ChickenAndEgg.prototype._chickenDied = function(sender) {
+ChickenAndEgg.prototype._henDied = function(sender) {
   if (this._pullets.length == 0) {
     return;
   }
-  var chicken = this._pullets.pop();
-  $('#pullet_stats').text(this._pullets.length.toString());
-  chicken.feedBag = this._chicken.feedBag;
-  chicken.waterBottle = this._chicken.waterBottle;
-  this.releaseGamePieceWithUuid(this._chicken.uuid());
-  this._chicken = chicken;
-  this._gamePieces.push(this._chicken);
-  this._activateGamePieces([this._chicken]);
+  var pullet = this._pullets.pop();
+  this.releaseGamePieceWithUuid(pullet.uuid());
+  var hen = new Hen();
+  hen.feedBag = this._hen.feedBag;
+  hen.waterBottle = this._hen.waterBottle;
+  this.releaseGamePieceWithUuid(this._hen.uuid());
+  this._hen = hen;
+  this._gamePieces.push(this._hen);
+  this._activateGamePieces([this._hen]);
 }
 
 /**
